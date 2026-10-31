@@ -1,0 +1,206 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Bank zadań · Iryna Wołoszko</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: у стилі Instagram iryna.voloshko — кремовий папір, контрастна антиква, барвінковий акцент, м'які картки з тінню. Свідомо одна світла тема. */
+:root {
+  color-scheme: light;
+  --cream: #f7f4ee;
+  --card: #f9f7f2;
+  --ink: #26201c;
+  --muted: #6b645d;
+  --line: #e4ded3;
+  --blue: #5468f0;
+  --blue-soft: #e9ebfd;
+  --sage: #b9bfae;
+  --flag: #d7263d;
+  --shadow: 0 10px 24px -12px rgba(60, 45, 30, .28), 0 2px 6px rgba(60, 45, 30, .06);
+  --display: "Playfair Display", "Didot", Georgia, serif;
+  --body: "Manrope", "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing: border-box }
+body { background: var(--cream); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55 }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)) }
+
+nav.site .wrap { display: flex; gap: 6px; flex-wrap: wrap; padding-block: 16px 0 }
+nav.site a { padding: 6px 14px; border-radius: 999px; color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 600 }
+nav.site a[aria-current] { background: var(--card); box-shadow: var(--shadow) }
+nav.site a:not([aria-current]):hover { background: var(--card) }
+header.top .wrap { padding-block: 28px 28px; display: grid; gap: 14px }
+.pill { justify-self: start; font-size: 12.5px; font-weight: 600; padding: 5px 14px; border-radius: 999px; background: var(--sage); color: #3d4235 }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(38px, 7vw, 68px); line-height: 1; margin: 0; letter-spacing: -.01em; text-wrap: balance }
+.sub { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 15px }
+.flag { display: inline-block; width: 16px; height: 9px; background: linear-gradient(#fff 50%, var(--flag) 50%); box-shadow: 0 0 0 1px var(--line); border-radius: 1px }
+.lede { max-width: 60ch; margin: 4px 0 0; font-size: 16px }
+.tiles { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px }
+.tile { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 14px 20px; min-width: 120px; text-align: center }
+.tile b { display: block; font-family: var(--display); font-weight: 700; color: var(--blue); font-size: 34px; line-height: 1.1; font-variant-numeric: lining-nums }
+.tile span { font-size: 13px; font-weight: 600 }
+
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--cream) 92%, transparent); backdrop-filter: blur(8px) }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--cream) }
+.controls .wrap { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding-block: 12px }
+.controls input[type=search], .controls select { font: inherit; padding: 10px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink); box-shadow: 0 2px 6px rgba(60,45,30,.05) }
+.controls input[type=search] { flex: 1 1 240px; min-width: 0 }
+.controls label.chk { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--muted); cursor: pointer }
+.controls input[type=checkbox] { accent-color: var(--blue); width: 16px; height: 16px }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px }
+
+.layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 36px; padding-block: 28px 60px }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 80px); align-self: start; font-size: 14px }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px }
+nav.toc a { display: flex; justify-content: space-between; gap: 8px; padding: 7px 12px; border-radius: 999px; color: var(--ink); text-decoration: none }
+nav.toc a:hover { background: var(--card); box-shadow: 0 2px 8px rgba(60,45,30,.08) }
+nav.toc .cnt { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px }
+nav.toc .cnt.has { color: var(--blue); font-weight: 700 }
+@media (max-width: 760px) { .layout { grid-template-columns: minmax(0, 1fr) } nav.toc { display: none } }
+
+section.dzial { margin-bottom: 40px; scroll-margin-top: 80px }
+.dzial-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 6px }
+.dzial-h .nr { font-family: var(--display); font-weight: 700; font-size: 40px; color: var(--blue); line-height: 1 }
+.dzial-h h2 { font-family: var(--display); font-weight: 700; font-size: 26px; margin: 0; text-wrap: balance }
+.dzial-h .pg { margin-left: auto; font-size: 12px; color: var(--muted); white-space: nowrap }
+
+.temat { border-bottom: 1px solid var(--line); padding-block: 12px }
+.temat-h { display: flex; gap: 14px; align-items: baseline }
+.temat-h .nr { font-variant-numeric: tabular-nums; color: var(--muted); min-width: 2.6em; font-size: 14px }
+.temat-h h3 { font-size: 16px; font-weight: 600; margin: 0 }
+.temat-h .badge { margin-left: auto; font-size: 12px; white-space: nowrap; color: var(--muted) }
+.temat.has .temat-h .badge { color: var(--blue); font-weight: 700 }
+.temat:not(.has) h3 { color: var(--muted); font-weight: 500 }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr)); gap: 18px; margin: 16px 0 8px }
+.card { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 14px; background: var(--card); border-radius: 18px; padding: 16px; box-shadow: var(--shadow) }
+.card img { width: 78px; height: 110px; object-fit: cover; object-position: top; border-radius: 6px; background: #fff; box-shadow: 0 1px 4px rgba(60,45,30,.15) }
+.card .body { display: grid; gap: 5px; align-content: start; min-width: 0 }
+.type { justify-self: start; font-size: 11.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--blue-soft); color: var(--blue) }
+.card h4 { margin: 0; font-family: var(--display); font-size: 17px; font-weight: 700; line-height: 1.25 }
+.card p { margin: 0; font-size: 13px; color: var(--muted) }
+.card .meta { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums }
+.card .btn { justify-self: start; display: inline-flex; align-items: center; gap: 10px; margin-top: 6px; font-size: 13.5px; font-weight: 700; color: var(--ink); text-decoration: none }
+.card .btn::before { content: "→"; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 17px; box-shadow: 0 6px 14px -6px var(--blue) }
+.card .btn:hover::before { transform: translateX(2px) }
+.card .btn.busy { opacity: .6; pointer-events: none }
+.card .msg { font-size: 12px; color: var(--muted) }
+@media (prefers-reduced-motion: no-preference) { .card .btn::before { transition: transform .15s } }
+
+.empty { padding: 30px 0; color: var(--muted) }
+footer .wrap { padding-block: 10px 44px; display: grid; gap: 10px; justify-items: center; text-align: center; color: var(--muted); font-size: 13px }
+.sign { display: flex; align-items: center; gap: 14px; color: var(--ink); font-size: 16px }
+.sign::before, .sign::after { content: ""; width: 60px; height: 1px; background: var(--ink) }
+</style>
+
+<nav class="site" aria-label="Strona"><div class="wrap"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../arkusze/">Arkusze</a><a href="../materialy/" aria-current="page">Materiały</a></div></nav>
+
+<header class="top"><div class="wrap">
+  <span class="pill">Liceum · zakres podstawowy · MATeMAtyka 1</span>
+  <h1>Bank zadań</h1>
+  <div class="sub">Математика · Польська програма <span class="flag" aria-hidden="true"></span></div>
+  <p class="lede">Усі теми підручника MATeMAtyka 1 (Nowa Era) і готові матеріали до кожної. Картки польською, з полем у клітинку для розв'язку. Знайдіть тему й завантажте PDF.</p>
+  <div class="tiles" id="stats"></div>
+</div></header>
+
+<div class="controls"><div class="wrap">
+  <input type="search" id="q" placeholder="Пошук: procenty, logarytm, układ równań…" aria-label="Пошук теми або матеріалу">
+  <select id="typ" aria-label="Тип матеріалу"><option value="">Усі типи</option></select>
+  <select id="who" aria-label="Вчителька"><option value="">Усі вчительки</option></select>
+  <label class="chk"><input type="checkbox" id="only"> лише теми з матеріалами</label>
+</div></div>
+
+<div class="wrap layout">
+  <nav class="toc" aria-label="Розділи"><ol id="toc"></ol></nav>
+  <main id="main"></main>
+</div>
+
+<footer><div class="wrap" id="foot"></div></footer>
+
+<script>
+const K = {"zaktualizowano": "2026-10-30", "podreczniki": [{"klasa": 1, "tytul": "MATeMAtyka 1, zakres podstawowy (Nowa Era)", "plik": "podreczniki/MATeMAtyka_1_ZP_NowaEra.pdf", "uwaga": "skan; strona PDF = strona książki − 1"}], "klasy": [{"klasa": 1, "dzialy": [{"nr": "0", "tytul": "Powtórzenie i diagnoza", "tematy": [{"nr": "0", "tytul": "Lekcja próbna – powtórzenie z klasy 1", "folder": "materialy/klasa-1/00-powtorzenie-diagnoza"}]}, {"nr": "1", "tytul": "Liczby rzeczywiste", "tematy": [{"nr": "1.1", "tytul": "Liczby naturalne"}, {"nr": "1.2", "tytul": "Liczby całkowite. Liczby wymierne"}, {"nr": "1.3", "tytul": "Liczby niewymierne"}, {"nr": "1.4", "tytul": "Rozwinięcie dziesiętne liczby rzeczywistej"}, {"nr": "1.5", "tytul": "Pierwiastek kwadratowy"}, {"nr": "1.6", "tytul": "Pierwiastek sześcienny"}, {"nr": "1.7", "tytul": "Potęga o wykładniku całkowitym"}, {"nr": "1.8", "tytul": "Potęga o wykładniku wymiernym"}, {"nr": "1.9", "tytul": "Logarytm i jego własności"}, {"nr": "1.10", "tytul": "Procenty", "folder": "materialy/klasa-1/01-liczby-rzeczywiste/1.10-procenty"}, {"nr": "1.11", "tytul": "Zagadnienia uzupełniające"}]}, {"nr": "2", "tytul": "Język matematyki", "tematy": [{"nr": "2.1", "tytul": "Zbiory"}, {"nr": "2.2", "tytul": "Działania na zbiorach"}, {"nr": "2.3", "tytul": "Przedziały"}, {"nr": "2.4", "tytul": "Działania na przedziałach"}, {"nr": "2.5", "tytul": "Rozwiązywanie nierówności"}, {"nr": "2.6", "tytul": "Wyłączanie jednomianu przed nawias"}, {"nr": "2.7", "tytul": "Mnożenie sum algebraicznych"}, {"nr": "2.8", "tytul": "Wzory skróconego mnożenia"}, {"nr": "2.9", "tytul": "Zastosowanie przekształceń algebraicznych"}, {"nr": "2.10", "tytul": "Wartość bezwzględna"}, {"nr": "2.11", "tytul": "Zagadnienia uzupełniające"}]}, {"nr": "3", "tytul": "Układy równań", "tematy": [{"nr": "3.1", "tytul": "Co to jest układ równań"}, {"nr": "3.2", "tytul": "Rozwiązywanie układów równań metodą podstawiania"}, {"nr": "3.3", "tytul": "Rozwiązywanie układów równań metodą przeciwnych współczynników"}, {"nr": "3.4", "tytul": "Układy równań – zadania tekstowe (1)"}, {"nr": "3.5", "tytul": "Układy równań – zadania tekstowe (2)"}, {"nr": "3.6", "tytul": "Zagadnienia uzupełniające"}]}, {"nr": "4", "tytul": "Funkcje", "tematy": [{"nr": "4.1", "tytul": "Pojęcie funkcji"}, {"nr": "4.2", "tytul": "Szkicowanie wykresu funkcji (1)"}, {"nr": "4.3", "tytul": "Szkicowanie wykresu funkcji (2)"}, {"nr": "4.4", "tytul": "Monotoniczność funkcji"}, {"nr": "4.5", "tytul": "Odczytywanie własności funkcji z wykresu (1)"}, {"nr": "4.6", "tytul": "Odczytywanie własności funkcji z wykresu (2)"}, {"nr": "4.7", "tytul": "Przesuwanie wykresu wzdłuż osi OY"}, {"nr": "4.8", "tytul": "Przesuwanie wykresu wzdłuż osi OX"}, {"nr": "4.9", "tytul": "Przekształcanie wykresu przez symetrię względem osi OX"}, {"nr": "4.10", "tytul": "Przekształcanie wykresu przez symetrię względem osi OY"}, {"nr": "4.11", "tytul": "Proporcjonalność odwrotna"}, {"nr": "4.12", "tytul": "Zagadnienia uzupełniające"}]}, {"nr": "5", "tytul": "Funkcja liniowa", "tematy": [{"nr": "5.1", "tytul": "Wykres funkcji liniowej (1)"}, {"nr": "5.2", "tytul": "Wykres funkcji liniowej (2)"}, {"nr": "5.3", "tytul": "Własności funkcji liniowej"}, {"nr": "5.4", "tytul": "Równanie prostej na płaszczyźnie"}, {"nr": "5.5", "tytul": "Współczynnik kierunkowy prostej"}, {"nr": "5.6", "tytul": "Warunek prostopadłości prostych"}, {"nr": "5.7", "tytul": "Interpretacja geometryczna układu równań liniowych"}, {"nr": "5.8", "tytul": "Funkcja liniowa – zastosowania"}, {"nr": "5.9", "tytul": "Zagadnienia uzupełniające"}]}, {"nr": "6", "tytul": "Planimetria", "tematy": [{"nr": "6.1", "tytul": "Miary kątów w trójkącie"}, {"nr": "6.2", "tytul": "Trójkąty przystające"}, {"nr": "6.3", "tytul": "Twierdzenie Talesa"}, {"nr": "6.4", "tytul": "Wielokąty podobne"}, {"nr": "6.5", "tytul": "Trójkąty podobne"}, {"nr": "6.6", "tytul": "Pola wielokątów podobnych"}, {"nr": "6.7", "tytul": "Twierdzenie o dwusiecznej kąta w trójkącie"}, {"nr": "6.8", "tytul": "Zagadnienia uzupełniające"}]}, {"nr": "7", "tytul": "Wstęp do funkcji kwadratowej", "tematy": [{"nr": "7.1", "tytul": "Wykres funkcji f(x) = ax²"}, {"nr": "7.2", "tytul": "Przesunięcie wykresu funkcji f(x) = ax² wzdłuż osi OX i OY"}, {"nr": "7.3", "tytul": "Postać kanoniczna i postać ogólna funkcji kwadratowej (1)"}, {"nr": "7.4", "tytul": "Postać kanoniczna i postać ogólna funkcji kwadratowej (2)"}, {"nr": "7.5", "tytul": "Zagadnienia uzupełniające"}]}]}], "materialy": [{"temat": "0", "klasa": 1, "typ": "karta-pracy", "tytul": "Lekcja próbna – powtórzenie z klasy 1 (z przypomnieniem i przykładami)", "opis": "Liczby ujemne, ułamki, potęgi, pierwiastki, logarytmy, procenty, funkcja liniowa i kwadratowa", "nauczyciel": "Катерина", "data": "2026-10-23", "strony": 8, "plik": "materialy/klasa-1/00-powtorzenie-diagnoza/karta-pracy_lekcja-probna.pdf"}, {"temat": "0", "klasa": 1, "typ": "zadania", "tytul": "Lekcja próbna – powtórzenie z klasy 1 (tylko zadania)", "opis": "Ta sama lekcja diagnostyczna, wersja bez teorii, z miejscem na rozwiązania", "nauczyciel": "Катерина", "data": "2026-10-23", "strony": 7, "plik": "materialy/klasa-1/00-powtorzenie-diagnoza/zadania_lekcja-probna.pdf"}, {"temat": "1.10", "klasa": 1, "typ": "zadania", "tytul": "Procenty – lekcja 1: ułamki, procenty, diagramy", "opis": "Rozgrzewka z ułamków, zamiana ułamków na procenty i odwrotnie, diagramy procentowe, kartkówka i odpowiedzi", "nauczyciel": "Катерина", "data": "2026-10-29", "strony": 10, "plik": "materialy/klasa-1/01-liczby-rzeczywiste/1.10-procenty/zadania_lekcja-1_ulamki-procenty-diagramy.pdf"}, {"temat": "1.10", "klasa": 1, "typ": "slowniczek", "tytul": "Procenty – słowniczek PL–UA", "opis": "Terminy do lekcji i kartkówki: polski termin, tłumaczenie ukraińskie, przykład", "nauczyciel": "Катерина", "data": "2026-10-29", "strony": 4, "plik": "materialy/klasa-1/01-liczby-rzeczywiste/1.10-procenty/slowniczek_procenty_PL-UA.pdf"}]};
+const TYPY = { "zadania": "Zadania", "karta-pracy": "Karta pracy", "kartkowka": "Kartkówka", "sprawdzian": "Sprawdzian", "slowniczek": "Słowniczek PL–UA", "odpowiedzi": "Odpowiedzi" };
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const plural = n => n === 1 ? "матеріал" : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? "матеріали" : "матеріалів";
+const fmtDate = d => d.split("-").reverse().join(".");
+
+const mats = K.materialy;
+const byTopic = {};
+for (const m of mats) (byTopic[m.klasa + ":" + m.temat] ||= []).push(m);
+
+for (const t of [...new Set(mats.map(m => m.typ))]) $("#typ").insertAdjacentHTML("beforeend", `<option value="${esc(t)}">${esc(TYPY[t] || t)}</option>`);
+for (const w of [...new Set(mats.map(m => m.nauczyciel))].sort()) $("#who").insertAdjacentHTML("beforeend", `<option value="${esc(w)}">${esc(w)}</option>`);
+
+const allTopics = K.klasy.flatMap(k => k.dzialy.flatMap(d => d.tematy.filter(t => t.nr !== "0")));
+const covered = allTopics.filter(t => byTopic["1:" + t.nr]).length;
+$("#stats").innerHTML = `<div class="tile"><b>${mats.length}</b><span>${plural(mats.length)}</span></div><div class="tile"><b>${covered}/${allTopics.length}</b><span>тем із матеріалами</span></div><div class="tile"><b>${K.zaktualizowano.slice(8,10)}.${K.zaktualizowano.slice(5,7)}</b><span>останнє оновлення</span></div>`;
+$("#foot").innerHTML = '<span class="sign">iryna.voloshko</span>'; $("#foot").insertAdjacentText("beforeend", "Нові матеріали додаються до каталогу в проєкті й з'являються тут після оновлення сторінки. Назви тем — за змістом підручника MATeMAtyka 1, zakres podstawowy.");
+
+try { const s = JSON.parse(localStorage.getItem("bank-filtry") || "{}"); if (s.only) $("#only").checked = true; } catch (e) {}
+
+function render() {
+  const q = $("#q").value.trim().toLowerCase(), typ = $("#typ").value, who = $("#who").value;
+  const only = $("#only").checked || !!typ || !!who;
+  try { localStorage.setItem("bank-filtry", JSON.stringify({ only: $("#only").checked })); } catch (e) {}
+  let html = "", toc = "", shown = 0;
+  for (const k of K.klasy) for (const d of k.dzialy) {
+    let rows = "", dCount = 0;
+    for (const t of d.tematy) {
+      const ms = (byTopic[k.klasa + ":" + t.nr] || []).filter(m => (!typ || m.typ === typ) && (!who || m.nauczyciel === who));
+      const topicHit = !q || (t.nr + " " + t.tytul + " " + d.tytul).toLowerCase().includes(q);
+      const matsHit = q ? ms.filter(m => (m.tytul + " " + m.opis + " " + (TYPY[m.typ] || "")).toLowerCase().includes(q)) : ms;
+      const list = topicHit ? ms : matsHit;
+      if (!topicHit && !matsHit.length) continue;
+      if (only && !list.length) continue;
+      dCount += list.length; shown++;
+      rows += `<div class="temat${list.length ? " has" : ""}">
+        <div class="temat-h"><span class="nr">${t.nr === "0" ? "—" : esc(t.nr)}</span><h3>${esc(t.tytul)}</h3>
+        <span class="badge">${list.length ? list.length + " " + plural(list.length) : "поки немає"}</span></div>
+        ${list.length ? `<div class="cards">${list.map(card).join("")}</div>` : ""}</div>`;
+    }
+    if (!rows) continue;
+    const id = "dzial-" + k.klasa + "-" + d.nr;
+    html += `<section class="dzial" id="${id}"><div class="dzial-h"><span class="nr">${d.nr === "0" ? "◦" : esc(d.nr)}</span><h2>${esc(d.tytul)}</h2><span class="pg">klasa ${k.klasa}</span></div>${rows}</section>`;
+    toc += `<li><a href="#${id}"><span>${d.nr === "0" ? "" : esc(d.nr) + ". "}${esc(d.tytul)}</span><span class="cnt${dCount ? " has" : ""}">${dCount}</span></a></li>`;
+  }
+  $("#main").innerHTML = shown ? html : `<p class="empty">Нічого не знайдено. Спробуйте іншу назву теми або зніміть фільтри.</p>`;
+  $("#toc").innerHTML = toc;
+}
+
+function card(m) {
+  const file = m.plik.split("/").pop(), base = file.replace(/\.pdf$/, "");
+  return `<article class="card">
+    <img src="thumb/${esc(base)}.png" alt="Перша сторінка: ${esc(m.tytul)}" loading="lazy">
+    <div class="body">
+      <span class="type">${esc(TYPY[m.typ] || m.typ)}</span>
+      <h4>${esc(m.tytul)}</h4>
+      <p>${esc(m.opis)}</p>
+      <span class="meta">${esc(m.nauczyciel)} · ${fmtDate(m.data)} · ${m.strony} стор.</span>
+      <a class="btn" href="pdf/${esc(file)}" target="_blank" rel="noopener" data-file="${esc(file)}">Завантажити PDF</a>
+      <span class="msg" aria-live="polite"></span>
+    </div></article>`;
+}
+
+let dl = null;
+const dlReady = (window.claude?.use ? window.claude.use("downloads") : Promise.resolve(null)).then(x => (dl = x)).catch(() => null);
+
+document.addEventListener("click", async e => {
+  const b = e.target.closest("a[data-file]");
+  if (!b || !window.claude?.use) return;   // на звичайному сайті посилання просто відкриває PDF
+  e.preventDefault();
+  const msg = b.nextElementSibling;
+  b.classList.add("busy"); msg.textContent = "Готую файл…";
+  try {
+    await dlReady;
+    if (!dl) { msg.textContent = "Завантаження недоступне в цьому перегляді."; return; }
+    const blob = await (await fetch("pdf/" + b.dataset.file)).blob();
+    await dl.save({ filename: b.dataset.file, data: blob });
+    msg.textContent = "";
+  } catch (err) {
+    msg.textContent = err?.code === "declined" ? "" : "Не вдалося завантажити. Спробуйте ще раз.";
+  } finally { b.classList.remove("busy"); }
+});
+
+["#q", "#typ", "#who", "#only"].forEach(s => $(s).addEventListener("input", render));
+render();
+</script>
+</body></html>

@@ -35,7 +35,7 @@ input[type=email], input[type=password] { font: inherit; padding: 9px 14px; bord
 </head>
 <body>
 <div class="wrap">
-  <div class="row" style="justify-content:space-between"><a class="btn" href="../e8/">← Egzamin ósmoklasisty</a><span class="muted" id="who"></span></div>
+  <div class="row" style="justify-content:space-between"><a class="btn" href="../">← Na stronę</a><span class="muted" id="who"></span></div>
   <h1>Panel</h1>
 
   <section class="box" id="login" hidden>
@@ -83,8 +83,14 @@ else {
   document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => { filter = b.dataset.f; document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-pressed", x === b)); draw(); });
 
   // прогрес учня: скільки розв'язав, скільки правильно і відсоток
-  const stat = w => { const v = Object.values(w || {}); if (!v.length) return "—"; const ok = v.filter(x => x === "ok").length;
-    return `<span style="white-space:nowrap">${v.length} розв. · <b style="color:var(--ok)">✓ ${ok}</b> · <b style="color:var(--bad)">✗ ${v.length - ok}</b> · <b>${Math.round(100 * ok / v.length)}%</b></span>`; };
+  // аркуші лежать у тих самих результатах під ключами «arkusz:…»
+  const stat = w => {
+    const e = Object.entries(w || {}), v = e.filter(([k]) => !k.startsWith("arkusz:")).map(([, x]) => x), ark = e.filter(([k]) => k.startsWith("arkusz:")).map(([, x]) => x);
+    if (!v.length && !ark.length) return "—";
+    const ok = v.filter(x => x === "ok").length;
+    const a = ark.length ? `<br><span class="muted">аркушів: ${ark.length}, середній ${Math.round(100 * ark.reduce((s, r) => s + r.pkt / r.max, 0) / ark.length)}%</span>` : "";
+    return `<span style="white-space:nowrap">${v.length} розв. · <b style="color:var(--ok)">✓ ${ok}</b> · <b style="color:var(--bad)">✗ ${v.length - ok}</b> · <b>${v.length ? Math.round(100 * ok / v.length) : 0}%</b></span>${a}`;
+  };
 
   function draw() {
     const l = users.filter(u => filter === "all" || (filter === "ok") === !!u.approved)
