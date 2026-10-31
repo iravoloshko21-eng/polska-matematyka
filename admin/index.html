@@ -51,7 +51,7 @@ input[type=email], input[type=password] { font: inherit; padding: 9px 14px; bord
   <section class="box" id="users" hidden>
     <div class="row" style="justify-content:space-between"><h2>Учні</h2>
       <div class="row tabs"><button data-f="wait" aria-pressed="true">Очікують</button><button data-f="ok" aria-pressed="false">Схвалені</button><button data-f="all" aria-pressed="false">Усі</button></div></div>
-    <div class="scroll"><table><thead><tr><th>Ім'я</th><th>E-mail</th><th>Дата</th><th>Статус</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
+    <div class="scroll"><table><thead><tr><th>Ім'я</th><th>E-mail</th><th>Дата</th><th>Статус</th><th>Прогрес</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
     <p class="muted" id="empty" style="margin:0" hidden>Нікого немає в цьому списку.</p>
   </section>
 
@@ -75,12 +75,16 @@ else {
   const base = "https://www.gstatic.com/firebasejs/10.12.2/";
   const [app, a, fs] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]);
   const fbApp = app.initializeApp(FB), auth = a.getAuth(fbApp), db = fs.getFirestore(fbApp);
-  let users = [], filter = "wait";
+  let users = [], prog = {}, filter = "wait";
 
   $("#g").onclick = () => a.signInWithPopup(auth, new a.GoogleAuthProvider()).catch(e => $("#lerr").textContent = e.message);
   $("#ef").onsubmit = e => { e.preventDefault(); a.signInWithEmailAndPassword(auth, $("#em").value, $("#pw").value).catch(() => $("#lerr").textContent = "Неправильний e-mail або пароль."); };
   $("#out").onclick = $("#out2").onclick = () => a.signOut(auth);
   document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => { filter = b.dataset.f; document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-pressed", x === b)); draw(); });
+
+  // прогрес учня: скільки розв'язав, скільки правильно і відсоток
+  const stat = w => { const v = Object.values(w || {}); if (!v.length) return "—"; const ok = v.filter(x => x === "ok").length;
+    return `<span style="white-space:nowrap">${v.length} розв. · <b style="color:var(--ok)">✓ ${ok}</b> · <b style="color:var(--bad)">✗ ${v.length - ok}</b> · <b>${Math.round(100 * ok / v.length)}%</b></span>`; };
 
   function draw() {
     const l = users.filter(u => filter === "all" || (filter === "ok") === !!u.approved)
@@ -89,6 +93,7 @@ else {
     $("#tb").innerHTML = l.map(u => `<tr><td>${esc(u.name) || "—"}</td><td>${esc(u.email)}</td>
       <td>${u.created ? new Date(u.created.seconds * 1000).toLocaleDateString("uk-UA") : ""}</td>
       <td><span class="pill ${u.approved ? "ok" : "wait"}">${u.approved ? "схвалено" : "очікує"}</span></td>
+      <td>${stat(prog[u.id])}</td>
       <td>${u.approved ? `<button data-id="${u.id}" data-v="0">Закрити доступ</button>` : `<button class="primary" data-id="${u.id}" data-v="1">Схвалити</button>`}</td></tr>`).join("");
   }
   $("#tb").addEventListener("click", async e => {
@@ -122,6 +127,7 @@ else {
     try {
       const snap = await fs.getDocs(fs.collection(db, "users"));
       users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      prog = await fs.getDocs(fs.collection(db, "postepy")).then(q => Object.fromEntries(q.docs.map(d => [d.id, d.data().wyniki])), () => ({}));
       show("users", "upload", "out"); draw();
     } catch (e) { show("denied"); }
   });

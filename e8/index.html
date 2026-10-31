@@ -78,6 +78,25 @@ main { display: grid; gap: 22px; padding-block: 20px 40px }
 .more { justify-self: center; font: inherit; font-weight: 700; padding: 10px 22px; border-radius: 999px; border: 0; background: var(--ink); color: var(--cream); cursor: pointer }
 .empty { text-align: center; color: var(--muted); padding: 40px 0 }
 
+.prog { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 14px 18px; margin-bottom: 10px }
+.prog summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; list-style: none }
+.prog summary::-webkit-details-marker { display: none }
+.prog summary::after { content: "▾"; margin-left: auto; color: var(--muted) }
+.prog[open] summary::after { content: "▴" }
+.prog summary b { font-family: var(--display); font-size: 22px }
+.prog summary span { font-size: 13.5px; color: var(--muted) }
+.prog .sync { font-size: 12.5px; color: var(--muted); margin: 8px 0 0 }
+.pt { display: grid; gap: 4px; margin-top: 12px }
+.pr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line) }
+.pr button { font: inherit; font-size: 14px; font-weight: 600; text-align: left; background: none; border: 0; padding: 0; color: var(--ink); cursor: pointer; overflow-wrap: anywhere }
+.pr button:hover { color: var(--blue) }
+.pr .st { font-size: 13px; color: var(--muted); white-space: nowrap; text-align: right }
+.pr .st .ok { color: var(--ok); font-weight: 700 } .pr .st .bad { color: var(--bad); font-weight: 700 }
+.pr .pc { font-weight: 800; color: var(--ink); margin-left: 6px }
+.bar { grid-column: 1 / -1; display: flex; height: 8px; border-radius: 999px; background: var(--line); overflow: hidden }
+.bar i { display: block; height: 100% } .bar .ok { background: var(--ok) } .bar .bad { background: var(--bad) }
+@media (max-width: 520px) { .pr { grid-template-columns: 1fr } .pr .st { text-align: left } }
+
 footer .wrap { padding-block: 10px 44px; display: grid; gap: 10px; justify-items: center; text-align: center; color: var(--muted); font-size: 13px }
 .sign { display: flex; align-items: center; gap: 14px; color: var(--ink); font-size: 16px }
 .sign::before, .sign::after { content: ""; width: 60px; height: 1px; background: var(--ink) }
@@ -120,6 +139,7 @@ dialog::backdrop { background: rgba(38, 32, 28, .35) }
 </div></header>
 
 <div class="wrap">
+  <details class="prog" id="prog" hidden><summary id="prog-sum"></summary><div class="pt" id="prog-list"></div><p class="sync" id="prog-sync"></p></details>
   <div class="filters">
     <div class="row" id="f-temat"><span class="lbl">Dział</span></div>
     <div class="row" id="f-typ"><span class="lbl">Typ</span></div>
@@ -163,7 +183,8 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const STORE = "e8-wyniki";
 let res = {}; try { res = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) {}
-const save = () => { try { localStorage.setItem(STORE, JSON.stringify(res)); } catch (e) {} };
+let cloud = null;   // зберігання прогресу учня в базі (postepy/{uid}), коли він увійшов
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(res)); } catch (e) {} cloud?.(); };
 
 const state = { temat: "", typ: "", order: null, hideDone: false, shown: 15 };
 const all = D.zadania;                       // закриті завдання тут без змісту, поки не прийдуть з бази
@@ -186,15 +207,40 @@ document.addEventListener("click", e => {
 });
 $("#shuffle").onclick = () => { state.order = all.map(t => [Math.random(), t.id]).sort().map(x => x[1]); state.shown = 15; $("#shuffle").textContent = "Wylosuj ponownie"; render(); };
 $("#hide-done").onclick = () => { state.hideDone = !state.hideDone; $("#hide-done").textContent = state.hideDone ? "Pokaż rozwiązane" : "Ukryj rozwiązane"; render(); };
-$("#reset").onclick = () => { res = {}; save(); render(); };
+$("#reset").onclick = () => { if (!confirm("Usunąć wszystkie Twoje wyniki?")) return; res = {}; save(); render(); };
 
 const unlocked = t => !t.zamkniete || t.img;
 const openCount = () => all.filter(unlocked).length;
 
+const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
+const score = l => { const r = l.map(t => res[t.id]).filter(Boolean); return { done: r.length, ok: r.filter(v => v === "ok").length }; };
+
 function tiles() {
-  const vals = Object.values(res), ok = vals.filter(v => v === "ok").length;
-  $("#tiles").innerHTML = `<div class="tile"><b>${all.length}</b><span>zadań</span></div><div class="tile"><b>${openCount()}</b><span>dostępnych dla Ciebie</span></div><div class="tile"><b>${ok}/${vals.length}</b><span>moje poprawne</span></div>`;
+  const s = score(all);
+  $("#tiles").innerHTML = `<div class="tile"><b>${all.length}</b><span>zadań</span></div><div class="tile"><b>${openCount()}</b><span>dostępnych dla Ciebie</span></div>
+    <div class="tile"><b>${s.done}</b><span>rozwiązanych</span></div><div class="tile"><b>${s.done ? pct(s.ok, s.done) + "%" : "—"}</b><span>poprawnie</span></div>`;
+  progress();
 }
+
+// Мій прогрес: загалом і по кожному розділу (правильно / неправильно у відсотках)
+function progress() {
+  const s = score(all), box = $("#prog");
+  box.hidden = !s.done;
+  if (!s.done) return;
+  $("#prog-sum").innerHTML = `<b>Mój postęp</b><span>rozwiązane ${s.done} z ${openCount()} · ✓ ${s.ok} poprawnie · ✗ ${s.done - s.ok} błędnie · ${pct(s.ok, s.done)}% poprawnych</span>`;
+  $("#prog-list").innerHTML = D.tematy.map(({ temat }) => {
+    const l = all.filter(t => t.temat === temat), n = l.filter(unlocked).length || l.length, r = score(l);
+    return `<div class="pr"><button type="button" data-temat="${esc(temat)}">${esc(temat)}</button>
+      <span class="st">${r.done ? `<span class="ok">✓ ${r.ok}</span> · <span class="bad">✗ ${r.done - r.ok}</span> · ${r.done}/${n}<span class="pc">${pct(r.ok, r.done)}%</span>` : `0/${n}`}</span>
+      <div class="bar" role="img" aria-label="${esc(temat)}: ${r.ok} poprawnie, ${r.done - r.ok} błędnie z ${n}"><i class="ok" style="width:${pct(r.ok, n)}%"></i><i class="bad" style="width:${pct(r.done - r.ok, n)}%"></i></div></div>`;
+  }).join("");
+  $("#prog-sync").textContent = !FB ? "" : auth.user ? "Wyniki zapisują się na Twoim koncie i są widoczne na każdym urządzeniu." : "Wyniki są zapisane tylko w tej przeglądarce. Zaloguj się, aby zachować je na koncie.";
+}
+$("#prog-list").addEventListener("click", e => {
+  const b = e.target.closest("[data-temat]"); if (!b) return;
+  document.querySelector(`.chip[data-k="temat"][data-v="${CSS.escape(b.dataset.temat)}"]`)?.click();
+  $("#f-temat").scrollIntoView({ behavior: "smooth", block: "start" });
+});
 
 function list() {
   let l = all.filter(t => (!state.temat || t.temat === state.temat) && (!state.typ || t.format === state.typ) && !(state.hideDone && res[t.id]));
@@ -315,7 +361,7 @@ function authbar() {
   else b.innerHTML = `<span>${esc(auth.user.displayName || auth.user.email)}</span>${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
   $("#ab-in")?.addEventListener("click", () => openAuth("in"));
   $("#ab-up")?.addEventListener("click", () => openAuth("up"));
-  $("#ab-out")?.addEventListener("click", () => auth.fb.signOut(auth.fb.auth).then(() => location.reload()));
+  $("#ab-out")?.addEventListener("click", () => auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));
 }
 
 let mode = "in";
@@ -371,6 +417,16 @@ async function initFirebase() {
     if (!snap || !snap.exists()) {
       await fs.setDoc(ref, { email: user.email, name: user.displayName || $("#f-name").value.trim() || "", approved: false, created: fs.serverTimestamp() }).catch(() => {});
       snap = await fs.getDoc(ref).catch(() => null);
+    }
+    // прогрес: зливаємо локальні результати з тими, що на акаунті, і далі зберігаємо в базу
+    const pref = fs.doc(db, "postepy", user.uid);
+    const remote = await fs.getDoc(pref).then(d => d.exists() ? d.data().wyniki || {} : {}, () => null);
+    if (remote) {
+      res = { ...res, ...remote };
+      try { localStorage.setItem(STORE, JSON.stringify(res)); } catch (e) {}
+      let timer;
+      cloud = () => { clearTimeout(timer); timer = setTimeout(() => fs.setDoc(pref, { wyniki: res, updated: fs.serverTimestamp() }).catch(e => console.warn(e)), 1200); };
+      if (Object.keys(res).length !== Object.keys(remote).length) cloud();
     }
     const isAdmin = await fs.getDocs(fs.query(fs.collection(db, "users"), fs.limit(1))).then(() => true, () => false);
     auth.status = isAdmin ? "admin" : snap?.data()?.approved ? "approved" : "pending";
