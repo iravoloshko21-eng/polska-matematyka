@@ -151,11 +151,15 @@ dialog::backdrop { background: rgba(38, 32, 28, .35) }
 .self .q { color: var(--ink) }
 .task { scroll-margin-top: 70px }
 .pts { margin-left: auto; font-weight: 700 }
+.etap { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: 6px; white-space: nowrap }
+.etap.wait { background: #ece8df; color: var(--muted) } .etap.mid { background: #f6ecd9; color: #8a5a12 } .etap.okp { background: var(--ok-soft); color: var(--ok) }
+.muted-s { color: var(--muted); font-size: 13px; font-weight: 400 }
+.pr .st .btn-s { padding: 3px 12px; font-size: 12.5px }
 .pts.ok { color: var(--ok) } .pts.bad { color: var(--bad) } .pts.part { color: #8a5a12 }
 </style>
 </head>
 <body>
-<nav class="site" aria-label="Strona"><div class="wrap"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../arkusze/" aria-current="page">Arkusze</a><a href="../materialy/">Materiały</a><div class="authbar" id="authbar"></div></div></nav>
+<nav class="site" aria-label="Strona"><div class="wrap"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../arkusze/" aria-current="page">Arkusze</a><a href="../materialy/">Materiały</a><a href="../konto/">Mój gabinet</a><div class="authbar" id="authbar"></div></div></nav>
 
 <header class="top"><div class="wrap">
   <span class="pill">Egzamin ósmoklasisty · pełne arkusze CKE</span>
@@ -206,6 +210,43 @@ const auth = { user: null, status: "out", fb: null };   // status: out | pending
 const unlocked = t => !t.zamkniete || t.img;
 const openCount = () => all.filter(unlocked).length;
 
+// Повні аркуші CKE, зібрані з завдань бази за джерелом («maj 2026 - zad. 8»); потрібні сторінкам аркушів і кабінету.
+const MIESIACE = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"];
+const slugify = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+const ARKUSZE = (() => {
+  const g = {};
+  for (const t of all) {
+    const m = /^(\S+) (\d{4}) - zad\. (\d+)$/.exec(t.zrodlo || "");
+    if (!m || +m[2] < 2017 || !MIESIACE.includes(m[1])) continue;   // з 2017 — формат іспиту восьмикласника
+    const key = `${m[1]} ${m[2]}`;
+    const a = (g[key] ||= { nazwa: key, rok: +m[2], mies: MIESIACE.indexOf(m[1]), zadania: [] });
+    if (!a.zadania.some(z => z.nr === +m[3])) a.zadania.push({ t, nr: +m[3] });   // те саме завдання буває у двох темах
+  }
+  return Object.values(g)
+    .map(a => {
+      a.zadania.sort((x, y) => x.nr - y.nr);
+      const nums = a.zadania.map(z => z.nr);
+      a.braki = Math.max(...nums) - new Set(nums).size;
+      a.slug = slugify(a.nazwa);
+      a.max = a.zadania.reduce((s, z) => s + z.t.pkt, 0);
+      return a;
+    })
+    .filter(a => a.braki <= 1 && a.zadania.length >= 15)
+    .sort((a, b) => b.rok - a.rok || b.mies - a.mies);
+})();
+const bySlug = Object.fromEntries(ARKUSZE.map(a => [a.slug, a]));
+const label = a => a.nazwa[0].toUpperCase() + a.nazwa.slice(1);
+const dostepny = a => a.zadania.every(z => unlocked(z.t));
+
+// Arkusz miesiąca: щомісяця всі учні пишуть той самий аркуш (по колу, від найстарішого).
+// Перша спроба, завершена в цьому місяці, зберігається в res["miesiac:РРРР-ММ"] — для порівняння місяців.
+const ym = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+const MIESIAC = ym(new Date());
+const arkuszMiesiaca = (m = MIESIAC) => { const [y, mm] = m.split("-").map(Number), l = ARKUSZE.slice().reverse(); return l[(y * 12 + mm - 1) % l.length]; };
+const nazwaMiesiaca = m => { const [y, mm] = m.split("-").map(Number); return MIESIACE[mm - 1][0].toUpperCase() + MIESIACE[mm - 1].slice(1) + " " + y; };
+const proc = r => Math.round(100 * r.pkt / r.max);
+
 function lockedBody() {
   if (!FB) return `<div class="locked"><b>Zadanie dla zarejestrowanych</b><span>Dostęp wkrótce.</span></div>`;
   if (auth.status === "pending") return `<div class="locked"><b>Czekasz na akceptację</b><span>Iryna sprawdzi Twoje konto i otworzy dostęp.</span></div>`;
@@ -232,7 +273,7 @@ function authbar() {
   const b = $("#authbar");
   if (!FB) { b.innerHTML = ""; return; }
   if (!auth.user) b.innerHTML = `<button type="button" id="ab-in">Zaloguj się</button><button type="button" class="primary" id="ab-up">Zarejestruj się</button>`;
-  else b.innerHTML = `<span>${esc(auth.user.displayName || auth.user.email)}</span>${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
+  else b.innerHTML = `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
   $("#ab-in")?.addEventListener("click", () => openAuth("in"));
   $("#ab-up")?.addEventListener("click", () => openAuth("up"));
   $("#ab-out")?.addEventListener("click", () => auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));
@@ -305,7 +346,7 @@ async function initFirebase() {
     const isAdmin = await fs.getDocs(fs.query(fs.collection(db, "users"), fs.limit(1))).then(() => true, () => false);
     auth.status = isAdmin ? "admin" : snap?.data()?.approved ? "approved" : "pending";
     authbar(); render();
-    if (auth.status === "approved" || auth.status === "admin") {
+    if ((auth.status === "approved" || auth.status === "admin") && !globalThis.BEZ_PAKIETOW) {
       try {
         const packs = await fs.getDocs(fs.collection(db, "pakiety"));
         packs.forEach(p => JSON.parse(p.data().dane || "[]").forEach(z => { if (byId[z.id]) Object.assign(byId[z.id], z); }));
@@ -317,34 +358,7 @@ async function initFirebase() {
 
 // Аркуші: повні аркуші CKE, зібрані з завдань бази за джерелом («maj 2026 - zad. 8»).
 // Закриті завдання рахуються автоматично, відкриті учень оцінює сам за ключем. Результат іде в res["arkusz:<slug>"].
-const MIESIACE = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"];
-const slugify = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l").toLowerCase().replace(/[^a-z0-9]+/g, "-");
 const SZKIC = "arkusz-szkic";   // незавершені відповіді, лише в цьому браузері
-
-const ARKUSZE = (() => {
-  const g = {};
-  for (const t of all) {
-    const m = /^(\S+) (\d{4}) - zad\. (\d+)$/.exec(t.zrodlo || "");
-    if (!m || +m[2] < 2017 || !MIESIACE.includes(m[1])) continue;   // з 2017 — формат іспиту восьмикласника
-    const key = `${m[1]} ${m[2]}`;
-    const a = (g[key] ||= { nazwa: key, rok: +m[2], mies: MIESIACE.indexOf(m[1]), zadania: [] });
-    if (!a.zadania.some(z => z.nr === +m[3])) a.zadania.push({ t, nr: +m[3] });   // те саме завдання буває у двох темах
-  }
-  return Object.values(g)
-    .map(a => {
-      a.zadania.sort((x, y) => x.nr - y.nr);
-      const nums = a.zadania.map(z => z.nr);
-      a.braki = Math.max(...nums) - new Set(nums).size;
-      a.slug = slugify(a.nazwa);
-      a.max = a.zadania.reduce((s, z) => s + z.t.pkt, 0);
-      return a;
-    })
-    .filter(a => a.braki <= 1 && a.zadania.length >= 15)
-    .sort((a, b) => b.rok - a.rok || b.mies - a.mies);
-})();
-const bySlug = Object.fromEntries(ARKUSZE.map(a => [a.slug, a]));
-const label = a => a.nazwa[0].toUpperCase() + a.nazwa.slice(1);
-const dostepny = a => a.zadania.every(z => unlocked(z.t));
 
 let szkic = {}; try { szkic = JSON.parse(localStorage.getItem(SZKIC) || "{}"); } catch (e) {}
 const saveSzkic = () => { try { localStorage.setItem(SZKIC, JSON.stringify(szkic)); } catch (e) {} };
@@ -371,7 +385,12 @@ function render() {
 
 function renderList() {
   let rok = 0;
-  $("#list").innerHTML = `<div class="ark-grid">${ARKUSZE.map(a => {
+  const am = arkuszMiesiaca(), rm = res["miesiac:" + MIESIAC];
+  const top = `<section class="summary" style="margin-bottom:22px"><span class="pill">Arkusz miesiąca · ${nazwaMiesiaca(MIESIAC)}</span>
+    <div class="big"><b style="font-size:clamp(30px,6vw,44px)">${esc(label(am))}</b>${rm ? `<span>Twój wynik: ${rm.pkt}/${rm.max} pkt · ${proc(rm)}%</span>` : ""}</div>
+    <span style="color:var(--muted)">Co miesiąc jeden arkusz dla wszystkich. Pierwsza próba w tym miesiącu trafia do porównania w Twoim gabinecie.</span>
+    ${dostepny(am) ? `<a class="btn-s primary" href="#${am.slug}" style="justify-self:start;text-decoration:none">${rm ? "Zobacz arkusz" : "Rozwiąż arkusz miesiąca"}</a>` : `<button type="button" class="btn-s" data-open-auth="up" style="justify-self:start">🔒 Po rejestracji</button>`}</section>`;
+  $("#list").innerHTML = top + `<div class="ark-grid">${ARKUSZE.map(a => {
     const r = res["arkusz:" + a.slug], ok = dostepny(a);
     const sep = a.rok !== rok ? `<h2 class="year">${(rok = a.rok)}</h2>` : "";
     return `${sep}<article class="ark${ok ? "" : " locked-a"}"><h3>${esc(label(a))}</h3>
@@ -459,6 +478,9 @@ function zapisz(a) {
   const pts = a.zadania.map(z => punkty(z.t, s));
   res["arkusz:" + a.slug] = { pkt: pts.reduce((x, p) => x + (p || 0), 0), max: a.max, ocenione: pts.every(p => p !== undefined), data: s.koniec };
   a.zadania.forEach(({ t }, i) => { if (pts[i] !== undefined) res[t.id] = pts[i] === t.pkt ? "ok" : "bad"; });
+  const k = "miesiac:" + MIESIAC;
+  if (a === arkuszMiesiaca() && ym(new Date(s.koniec)) === MIESIAC && (!res[k] || res[k].data === s.koniec))
+    res[k] = { slug: a.slug, ...res["arkusz:" + a.slug] };
   save();
 }
 
