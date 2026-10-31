@@ -6,7 +6,7 @@
 <title>Arkusze egzaminacyjne · Iryna Wołoszko</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
 /* Layout: те саме, що головна (стиль Instagram iryna.voloshko): кремовий папір, антиква, барвінковий акцент. Стрічка завдань по одному, з фільтрами зверху. */
 :root {
@@ -156,15 +156,62 @@ dialog::backdrop { background: rgba(38, 32, 28, .35) }
 .muted-s { color: var(--muted); font-size: 13px; font-weight: 400 }
 .pr .st .btn-s { padding: 3px 12px; font-size: 12.5px }
 .pts.ok { color: var(--ok) } .pts.bad { color: var(--bad) } .pts.part { color: #8a5a12 }
+
+/* Motyw «Wołoszko/Math» (обрала Ірина 2026-10-31): широкий гротеск Unbounded, чорні рамки, кольорові блоки, жорсткі тіні.
+   build.py дописує цей файл у кінець стилів кожної сторінки, тож він перекриває старі значення. */
+:root {
+  --cream: #f4efe4; --card: #fffdf8; --ink: #1c1712; --muted: #5f5850;
+  --blue: #5157d6; --blue-soft: #e3e4fa; --sage: #cdd38a; --lime: #cdd38a; --coral: #f0a78c;
+  --display: "Unbounded", system-ui, sans-serif; --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --shadow: 5px 5px 0 var(--ink);
+}
+body { background: var(--cream) }
+h1 { font-family: var(--display); font-weight: 800; letter-spacing: -.03em; line-height: .95; font-size: clamp(30px, 6.4vw, 68px) }
+h2, h3 { font-family: var(--display); letter-spacing: -.02em }
+
+/* спільне меню: логотип, пігулки, вхід */
+header.site { border-bottom: 1.5px solid var(--ink); background: var(--cream) }
+header.site .in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 8px; padding: 14px max(18px, env(safe-area-inset-left, 0px)) }
+header.site .logo { font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: .02em; color: var(--ink); text-decoration: none; margin-right: auto; white-space: nowrap }
+header.site .pills { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none }
+header.site .pills a { font-weight: 600; font-size: 13px; text-decoration: none; color: var(--ink); border: 1.5px solid var(--ink); border-radius: 999px; padding: 5px 12px; white-space: nowrap }
+header.site .pills a[aria-current] { background: var(--ink); color: var(--cream) }
+header.site .authbar { margin-left: 6px }
+@media (max-width: 760px) {
+  header.site .in { flex-wrap: wrap; padding-inline: 16px }
+  header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
+}
+
+/* картки: чорна рамка й жорстка тінь замість м'якої */
+.tile, .task, .prog, .notice, .ark, .summary, .card, .box, dialog { border: 1.5px solid var(--ink); box-shadow: var(--shadow); border-radius: 16px }
+.tile b, .summary .big b, .stats b { font-family: var(--display); font-weight: 800; color: var(--ink) }
+.pill { background: var(--lime); color: var(--ink); border: 1.5px solid var(--ink) }
+.chip { border: 1.5px solid var(--ink); background: var(--card) }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--cream) }
+.opt { border-color: var(--ink) }
+.opt[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff }
+.task-h .t { background: var(--ink); color: var(--cream) }
+.btn-s, .authbar button, .btn { border: 1.5px solid var(--ink) }
+.btn-s.primary, .authbar .primary, button.primary, .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff }
+.go::before { box-shadow: none }
+.sheet { border: 1.5px solid var(--line) }
+.sheetbar { border-bottom: 1.5px solid var(--ink) }
+.ark h3 { font-weight: 800; font-size: 22px }
+.year { font-family: var(--display); color: var(--ink) }
+.more { background: var(--ink) }
+.sign { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: .04em }
+.sign::before, .sign::after { display: none }
+header.site .join { margin-left: 6px; font-weight: 700; font-size: 13px; text-decoration: none; white-space: nowrap; background: var(--blue); color: #fff; border: 1.5px solid var(--blue); border-radius: 999px; padding: 6px 14px }
+header.top { border-bottom: 1.5px solid var(--ink) }
 </style>
 </head>
 <body>
-<nav class="site" aria-label="Strona"><div class="wrap"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../arkusze/" aria-current="page">Arkusze</a><a href="../materialy/">Materiały</a><a href="../konto/">Mój gabinet</a><div class="authbar" id="authbar"></div></div></nav>
+<header class="site"><div class="in"><a class="logo" href="../">WOŁOSZKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../arkusze/" aria-current="page">Arkusze</a><a href="../materialy/">Materiały</a><a href="../konto/">Mój gabinet</a></nav><div class="authbar" id="authbar"></div></div></header>
 
 <header class="top"><div class="wrap">
   <span class="pill">Egzamin ósmoklasisty · pełne arkusze CKE</span>
   <h1 id="ark-title">Arkusze egzaminacyjne</h1>
-  <div class="sub">Математика · Польська програма <span class="flag" aria-hidden="true"></span></div>
+  <div class="sub">Matematyka · polski program nauczania <span class="flag" aria-hidden="true"></span></div>
   <p style="margin:0;max-width:62ch" id="ark-lede">Całe arkusze egzaminu ósmoklasisty, zadanie po zadaniu. Zaznacz odpowiedzi, a na końcu zobaczysz wynik w punktach i procentach. Na egzaminie z matematyki masz 125 minut.</p>
   <div class="tiles" id="tiles"></div>
 </div></header>
