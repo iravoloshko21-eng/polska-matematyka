@@ -136,6 +136,30 @@ header.site .authbar { margin-left: 6px }
 .sign::before, .sign::after { display: none }
 header.site .join { margin-left: 6px; font-weight: 700; font-size: 13px; text-decoration: none; white-space: nowrap; background: var(--blue); color: #fff; border: 1.5px solid var(--blue); border-radius: 999px; padding: 6px 14px }
 header.top { border-bottom: 1.5px solid var(--ink) }
+
+/* режим уроку з учнем і кабінет вчителя */
+.lekcja { position: sticky; top: 0; z-index: 30; display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: space-between; align-items: center; background: var(--blue); color: #fff; padding: 9px max(18px, env(safe-area-inset-left, 0px)); font-size: 14px }
+.lekcja a { color: #fff; font-weight: 700 }
+.uczniowie { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 18px; margin: 18px 0 }
+.uczen { background: var(--card); border: 1.5px solid var(--ink); box-shadow: var(--shadow); border-radius: 16px; padding: 16px 18px; display: grid; gap: 8px; text-decoration: none; color: var(--ink) }
+.uczen h3 { margin: 0; font-size: 20px }
+.uczen .muted-s, .muted-s { color: var(--muted); font-size: 13px }
+.form-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end }
+.form-row label { display: grid; gap: 3px; font-size: 12.5px; font-weight: 600 }
+.form-row input, .form-row select, textarea.notatki { font: inherit; font-size: 14px; padding: 8px 10px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fff; color: var(--ink) }
+textarea.notatki { width: 100%; min-height: 90px; resize: vertical }
+table.proby { width: 100%; border-collapse: collapse; font-size: 14px }
+table.proby th, table.proby td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line, #e4ded3) }
+table.proby td.num { font-variant-numeric: tabular-nums; white-space: nowrap }
+.akcje { display: flex; flex-wrap: wrap; gap: 8px }
+.akcje a.btn-s { text-decoration: none }
+button.link-del { background: none; border: 0; color: #b3261e; font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline }
+header.site .authbar { flex-wrap: nowrap; gap: 6px }
+header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; padding: 5px 11px; white-space: nowrap }
+@media (max-width: 1240px) {
+  header.site .in { flex-wrap: wrap }
+  header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
+}
 </style>
 
 <header class="site"><div class="in"><a class="logo" href="../">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../matura/">Matura</a><a href="../arkusze/">Arkusze</a><a href="../materialy/" aria-current="page">Materiały</a><a href="../konto/">Mój gabinet</a></nav><a class="join" href="../konto/">Załóż konto</a></div></header>

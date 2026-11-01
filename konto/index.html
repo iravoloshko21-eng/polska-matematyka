@@ -203,6 +203,30 @@ header.site .authbar { margin-left: 6px }
 .sign::before, .sign::after { display: none }
 header.site .join { margin-left: 6px; font-weight: 700; font-size: 13px; text-decoration: none; white-space: nowrap; background: var(--blue); color: #fff; border: 1.5px solid var(--blue); border-radius: 999px; padding: 6px 14px }
 header.top { border-bottom: 1.5px solid var(--ink) }
+
+/* режим уроку з учнем і кабінет вчителя */
+.lekcja { position: sticky; top: 0; z-index: 30; display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: space-between; align-items: center; background: var(--blue); color: #fff; padding: 9px max(18px, env(safe-area-inset-left, 0px)); font-size: 14px }
+.lekcja a { color: #fff; font-weight: 700 }
+.uczniowie { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 18px; margin: 18px 0 }
+.uczen { background: var(--card); border: 1.5px solid var(--ink); box-shadow: var(--shadow); border-radius: 16px; padding: 16px 18px; display: grid; gap: 8px; text-decoration: none; color: var(--ink) }
+.uczen h3 { margin: 0; font-size: 20px }
+.uczen .muted-s, .muted-s { color: var(--muted); font-size: 13px }
+.form-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end }
+.form-row label { display: grid; gap: 3px; font-size: 12.5px; font-weight: 600 }
+.form-row input, .form-row select, textarea.notatki { font: inherit; font-size: 14px; padding: 8px 10px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fff; color: var(--ink) }
+textarea.notatki { width: 100%; min-height: 90px; resize: vertical }
+table.proby { width: 100%; border-collapse: collapse; font-size: 14px }
+table.proby th, table.proby td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line, #e4ded3) }
+table.proby td.num { font-variant-numeric: tabular-nums; white-space: nowrap }
+.akcje { display: flex; flex-wrap: wrap; gap: 8px }
+.akcje a.btn-s { text-decoration: none }
+button.link-del { background: none; border: 0; color: #b3261e; font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline }
+header.site .authbar { flex-wrap: nowrap; gap: 6px }
+header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; padding: 5px 11px; white-space: nowrap }
+@media (max-width: 1240px) {
+  header.site .in { flex-wrap: wrap }
+  header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
+}
 </style>
 </head>
 <body>
@@ -244,10 +268,12 @@ const FB = {"apiKey":"AIzaSyB3805-WbIEjbE6R62Di6irvn9-iUzpdxM","authDomain":"pol
 const TYPY = { abcd: "Wybór A–D", pf: "Prawda / fałsz", dwa: "Uzupełnij zdania", tn: "Tak / nie + uzasadnienie", otwarte: "Otwarte" };
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+// Режим уроку: Ірина (адмін) відкриває сторінку з ?uczen=<id> — відповіді пишуться в картку учня (uczniowie/{id}), а не в її власний прогрес
+const UCZEN = new URLSearchParams(location.search).get("uczen");
 const STORE = "e8-wyniki";
-let res = {}; try { res = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) {}
+let res = {}; if (!UCZEN) try { res = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) {}
 let cloud = null;   // зберігання прогресу учня в базі (postepy/{uid}), коли він увійшов
-const save = () => { try { localStorage.setItem(STORE, JSON.stringify(res)); } catch (e) {} cloud?.(); };
+const save = () => { if (!UCZEN) try { localStorage.setItem(STORE, JSON.stringify(res)); } catch (e) {} cloud?.(); };
 
 const all = D.zadania;                       // закриті завдання тут без змісту, поки не прийдуть з бази
 const byId = Object.fromEntries(all.map(t => [t.id, t]));
@@ -319,7 +345,7 @@ function authbar() {
   const b = $("#authbar");
   if (!FB) { b.innerHTML = ""; return; }
   if (!auth.user) b.innerHTML = `<button type="button" id="ab-in">Zaloguj się</button><button type="button" class="primary" id="ab-up">Zarejestruj się</button>`;
-  else b.innerHTML = `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
+  else b.innerHTML = `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>${auth.status === "admin" ? `<a class="btn-s" href="../nauczyciel/">Uczniowie</a><a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
   $("#ab-in")?.addEventListener("click", () => openAuth("in"));
   $("#ab-up")?.addEventListener("click", () => openAuth("up"));
   $("#ab-out")?.addEventListener("click", () => auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));
@@ -379,6 +405,17 @@ async function initFirebase() {
       await fs.setDoc(ref, { email: user.email, name: user.displayName || $("#f-name").value.trim() || "", approved: false, created: fs.serverTimestamp() }).catch(() => {});
       snap = await fs.getDoc(ref).catch(() => null);
     }
+    const isAdmin = await fs.getDocs(fs.query(fs.collection(db, "users"), fs.limit(1))).then(() => true, () => false);
+    Object.assign(auth, { db, fs });
+    if (UCZEN && isAdmin) {
+      // урок з учнем: беремо його результати і зберігаємо туди ж
+      const uref = fs.doc(db, "uczniowie", UCZEN);
+      const u = await fs.getDoc(uref).then(d => d.exists() ? d.data() : null, () => null);
+      res = u?.wyniki || {};
+      let timer;
+      cloud = () => { clearTimeout(timer); timer = setTimeout(() => fs.setDoc(uref, { wyniki: res, updated: fs.serverTimestamp() }, { merge: true }).catch(e => console.warn(e)), 800); };
+      lekcjaBar(u);
+    } else {
     // прогрес: зливаємо локальні результати з тими, що на акаунті, і далі зберігаємо в базу
     const pref = fs.doc(db, "postepy", user.uid);
     const remote = await fs.getDoc(pref).then(d => d.exists() ? d.data().wyniki || {} : {}, () => null);
@@ -389,7 +426,7 @@ async function initFirebase() {
       cloud = () => { clearTimeout(timer); timer = setTimeout(() => fs.setDoc(pref, { wyniki: res, updated: fs.serverTimestamp() }).catch(e => console.warn(e)), 1200); };
       if (Object.keys(res).length !== Object.keys(remote).length) cloud();
     }
-    const isAdmin = await fs.getDocs(fs.query(fs.collection(db, "users"), fs.limit(1))).then(() => true, () => false);
+    }
     auth.status = isAdmin ? "admin" : snap?.data()?.approved ? "approved" : "pending";
     authbar(); render();
     if ((auth.status === "approved" || auth.status === "admin") && !globalThis.BEZ_PAKIETOW) {
@@ -402,6 +439,42 @@ async function initFirebase() {
       render();
     }
   });
+}
+
+// смужка «Lekcja z …» над сторінкою в режимі уроку
+function lekcjaBar(u) {
+  const bar = document.createElement("div");
+  bar.className = "lekcja";
+  bar.innerHTML = u ? `<span>Lekcja z: <b>${esc(u.imie)}</b> · odpowiedzi zapisują się w karcie ucznia</span><a href="../nauczyciel/#${encodeURIComponent(UCZEN)}">Zakończ lekcję →</a>`
+                    : `<span>Nie znaleziono ucznia.</span><a href="../nauczyciel/">Wróć →</a>`;
+  document.body.prepend(bar);
+  auth.uczen = u;
+  // посилання на завдання, аркуші й кабінет усередині сторінки лишаються в режимі уроку
+  document.addEventListener("click", e => {
+    const a = e.target.closest("a[href]");
+    if (!a || a.closest("header.site, .lekcja") || !/\/(e8|arkusze|matura|konto)\//.test(a.href)) return;
+    const x = new URL(a.href); x.searchParams.set("uczen", UCZEN); a.href = x.href;
+  }, true);
+}
+
+// PDF для домашнього: відкриває сторінку для друку з поточними завданнями (браузер зберігає її як PDF)
+function drukuj(lista, tytul) {
+  const l = lista.filter(t => unlocked(t) && t.img);
+  if (!l.length) { alert("Brak dostępnych zadań do wydruku."); return; }
+  const w = window.open("", "_blank");
+  if (!w) { alert("Przeglądarka zablokowała nowe okno. Zezwól na wyskakujące okna dla tej strony."); return; }
+  const src = t => new URL(t.img, location.href).href;
+  w.document.write(`<!doctype html><html lang="pl"><head><meta charset="utf-8"><title>${esc(tytul)}</title><style>
+    body{font-family:Inter,system-ui,sans-serif;margin:0;padding:18mm 14mm;color:#1c1712}
+    h1{font-size:20px;margin:0 0 4px} p.sub{margin:0 0 14px;color:#5f5850;font-size:12px}
+    .z{break-inside:avoid;margin:0 0 10px;padding:8px 0 10px;border-bottom:1px solid #ddd}
+    .z b{font-size:12px} .z img{display:block;max-width:100%;margin-top:4px}
+    .miejsce{height:28mm;border:1px dashed #bbb;border-radius:6px;margin-top:6px}
+    @page{margin:0} @media print{body{padding:14mm}}<\/style></head><body>
+    <h1>${esc(tytul)}</h1><p class="sub">${l.length} zadań · Voloshko Iryna · Matematyka</p>
+    ${l.map((t, i) => `<div class="z"><b>${i + 1}. ${esc(t.temat)} · ${esc(t.zrodlo || "")} · ${t.pkt} pkt</b><img src="${src(t)}" alt=""><div class="miejsce"></div></div>`).join("")}
+    <script>Promise.all([...document.images].map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r}))).then(()=>setTimeout(()=>print(),300))<\/script></body></html>`);
+  w.document.close();
 }
 
 // Кабінет учня: щомісячні аркуші для порівняння, прогрес по темах (що зроблено, що ні) та історія аркушів.
@@ -423,7 +496,8 @@ function render() {
       <button type="button" class="btn-s primary" data-open-auth="in" style="justify-self:start">Zaloguj się</button></section>`;
     return;
   }
-  if (auth.user) $("#k-title").textContent = `Mój gabinet${auth.user.displayName ? " · " + auth.user.displayName.split(" ")[0] : ""}`;
+  if (UCZEN && auth.uczen) $("#k-title").textContent = `Karta ucznia · ${auth.uczen.imie}`;
+  else if (auth.user) $("#k-title").textContent = `Mój gabinet${auth.user.displayName ? " · " + auth.user.displayName.split(" ")[0] : ""}`;
   $("#list").innerHTML = miesiace() + tematy() + historia();
 }
 
