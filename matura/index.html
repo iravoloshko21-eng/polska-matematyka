@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Matura podstawowa · Voloshko Iryna</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: те саме, що головна (стиль Instagram iryna.voloshko): кремовий папір, антиква, барвінковий акцент. Стрічка завдань по одному, з фільтрами зверху. */
+:root {
+  color-scheme: light;
+  --cream: #f7f4ee; --card: #fbfaf6; --ink: #26201c; --muted: #6b645d; --line: #e4ded3;
+  --blue: #5468f0; --blue-soft: #e9ebfd; --sage: #b9bfae; --flag: #d7263d;
+  --ok: #2f8a57; --ok-soft: #e3f3e9; --bad: #c8323a; --bad-soft: #fbe6e7;
+  --shadow: 0 10px 24px -12px rgba(60, 45, 30, .28), 0 2px 6px rgba(60, 45, 30, .06);
+  --display: "Fraunces", Georgia, serif;
+  --body: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px) }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--cream); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55 }
+img { max-width: 100% }
+[hidden] { display: none !important }
+.wrap { max-width: 900px; margin: 0 auto; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)) }
+
+nav.site .wrap { display: flex; gap: 6px; flex-wrap: wrap; padding-block: 16px 0 }
+nav.site a { padding: 6px 14px; border-radius: 999px; color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 600 }
+nav.site a[aria-current] { background: var(--card); box-shadow: var(--shadow) }
+nav.site a:not([aria-current]):hover { background: var(--card) }
+
+header.top .wrap { padding-block: 28px 18px; display: grid; gap: 12px }
+.pill { justify-self: start; font-size: 12.5px; font-weight: 600; padding: 5px 14px; border-radius: 999px; background: var(--sage); color: #3d4235 }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 6.5vw, 60px); line-height: 1.02; margin: 0; text-wrap: balance }
+.sub { display: flex; align-items: center; gap: 10px; color: var(--muted) }
+.flag { display: inline-block; width: 16px; height: 9px; background: linear-gradient(#fff 50%, var(--flag) 50%); box-shadow: 0 0 0 1px var(--line); border-radius: 1px }
+.tiles { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px }
+.tile { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 12px 18px; min-width: 112px; text-align: center }
+.tile b { display: block; font-family: var(--display); font-weight: 700; color: var(--blue); font-size: 30px; line-height: 1.1 }
+.tile span { font-size: 12.5px; font-weight: 600 }
+
+.filters { display: grid; gap: 10px; padding-block: 8px 4px }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.row .lbl { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-right: 4px }
+.chip { font: inherit; font-size: 13.5px; font-weight: 600; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff }
+.chip .n { opacity: .65; font-weight: 500; margin-left: 4px }
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding-block: 10px 0; font-size: 14px; color: var(--muted) }
+.tools button { font: inherit; font-size: 13.5px; font-weight: 600; background: none; border: 0; color: var(--blue); cursor: pointer; padding: 4px 0 }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px }
+
+main { display: grid; gap: 22px; padding-block: 20px 40px }
+.task { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 18px; display: grid; gap: 14px; min-width: 0 }
+.task-h { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 12.5px; color: var(--muted) }
+.task-h .t { font-weight: 700; color: var(--blue); background: var(--blue-soft); padding: 3px 10px; border-radius: 999px }
+.task-h .done { margin-left: auto; font-weight: 700 }
+.task-h .done.ok { color: var(--ok) } .task-h .done.bad { color: var(--bad) }
+.sheet { background: #fff; border-radius: 10px; padding: 10px; overflow-x: auto }
+.sheet img { display: block; height: auto; margin: 0 auto }
+
+.ans { display: grid; gap: 10px }
+.q { font-size: 13px; font-weight: 700; color: var(--muted) }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.opt { font: inherit; font-weight: 700; font-size: 15px; min-width: 46px; height: 42px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; color: var(--ink); cursor: pointer }
+.opt:hover { border-color: var(--blue) }
+.opt[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-soft); color: var(--blue) }
+.opt.right { border-color: var(--ok); background: var(--ok-soft); color: var(--ok) }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad) }
+.opt:disabled { cursor: default }
+.go { font: inherit; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; background: none; border: 0; color: var(--ink); cursor: pointer; padding: 0; justify-self: start }
+.go::before { content: "→"; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 17px; box-shadow: 0 6px 14px -6px var(--blue) }
+.go:disabled { opacity: .45; cursor: default }
+.fb { font-size: 14px; font-weight: 600 }
+.fb.ok { color: var(--ok) } .fb.bad { color: var(--bad) }
+.open-in { font: inherit; padding: 9px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; color: var(--ink); min-width: 0; flex: 1 1 200px }
+.key { background: var(--blue-soft); border-radius: 12px; padding: 10px 14px; font-weight: 600 }
+.more { justify-self: center; font: inherit; font-weight: 700; padding: 10px 22px; border-radius: 999px; border: 0; background: var(--ink); color: var(--cream); cursor: pointer }
+.empty { text-align: center; color: var(--muted); padding: 40px 0 }
+
+.prog { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 14px 18px; margin-bottom: 10px }
+.prog summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; list-style: none }
+.prog summary::-webkit-details-marker { display: none }
+.prog summary::after { content: "▾"; margin-left: auto; color: var(--muted) }
+.prog[open] summary::after { content: "▴" }
+.prog summary b { font-family: var(--display); font-size: 22px }
+.prog summary span { font-size: 13.5px; color: var(--muted) }
+.prog .sync { font-size: 12.5px; color: var(--muted); margin: 8px 0 0 }
+.pt { display: grid; gap: 4px; margin-top: 12px }
+.pr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line) }
+.pr button { font: inherit; font-size: 14px; font-weight: 600; text-align: left; background: none; border: 0; padding: 0; color: var(--ink); cursor: pointer; overflow-wrap: anywhere }
+.pr button:hover { color: var(--blue) }
+.pr .st { font-size: 13px; color: var(--muted); white-space: nowrap; text-align: right }
+.pr .st .ok { color: var(--ok); font-weight: 700 } .pr .st .bad { color: var(--bad); font-weight: 700 }
+.pr .pc { font-weight: 800; color: var(--ink); margin-left: 6px }
+.bar { grid-column: 1 / -1; display: flex; height: 8px; border-radius: 999px; background: var(--line); overflow: hidden }
+.bar i { display: block; height: 100% } .bar .ok { background: var(--ok) } .bar .bad { background: var(--bad) }
+@media (max-width: 520px) { .pr { grid-template-columns: 1fr } .pr .st { text-align: left } }
+
+footer .wrap { padding-block: 10px 44px; display: grid; gap: 10px; justify-items: center; text-align: center; color: var(--muted); font-size: 13px }
+.sign { display: flex; align-items: center; gap: 14px; color: var(--ink); font-size: 16px }
+.sign::before, .sign::after { content: ""; width: 60px; height: 1px; background: var(--ink) }
+@media (max-width: 520px) { .task { padding: 12px; border-radius: 16px } .sheet { padding: 4px } }
+
+.authbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-left: auto; font-size: 13.5px; color: var(--muted) }
+.authbar button, .btn-s { font: inherit; font-size: 13.5px; font-weight: 700; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer }
+.authbar .primary, .btn-s.primary { background: var(--blue); border-color: var(--blue); color: #fff }
+.notice { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between }
+.notice p { margin: 0; max-width: 60ch }
+.locked { display: grid; gap: 10px; justify-items: start; padding: 22px; border: 1.5px dashed var(--line); border-radius: 14px; background: repeating-linear-gradient(135deg, transparent 0 12px, rgba(84,104,240,.04) 12px 24px) }
+.locked b { font-family: var(--display); font-size: 19px }
+.locked span { color: var(--muted); font-size: 14px }
+dialog { border: 0; border-radius: 22px; padding: 0; box-shadow: 0 30px 60px -20px rgba(40,30,20,.45); background: var(--card); color: var(--ink); width: min(420px, calc(100vw - 32px)) }
+dialog::backdrop { background: rgba(38, 32, 28, .35) }
+.dlg { padding: 24px; display: grid; gap: 12px }
+.dlg h2 { font-family: var(--display); margin: 0; font-size: 26px }
+.dlg label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; color: var(--muted) }
+.dlg input { font: inherit; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; color: var(--ink) }
+.dlg .alt { display: flex; gap: 6px; font-size: 13.5px; color: var(--muted) }
+.dlg .alt button { font: inherit; font-weight: 700; color: var(--blue); background: none; border: 0; padding: 0; cursor: pointer }
+.dlg .err { color: var(--bad); font-size: 13.5px; min-height: 1em }
+.gbtn { font: inherit; font-weight: 700; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; color: var(--ink); cursor: pointer }
+.or { text-align: center; font-size: 12px; color: var(--muted) }
+
+/* Аркуші: список карток і режим розв'язування з підсумком */
+.ark-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px }
+.ark { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 18px; display: grid; gap: 8px; align-content: start }
+.ark h3 { font-family: var(--display); font-size: 26px; margin: 0; line-height: 1.1 }
+.ark .meta { font-size: 13px; color: var(--muted) }
+.ark .wynik { font-size: 13.5px; font-weight: 700; color: var(--ok); background: var(--ok-soft); border-radius: 999px; padding: 3px 10px; justify-self: start }
+.ark .btn-s, .sheetbar .btn-s { justify-self: start; margin-top: 6px; text-decoration: none }
+.ark.locked-a { opacity: .75 }
+.year { grid-column: 1 / -1; font-family: var(--display); font-size: 20px; margin: 10px 0 -4px; color: var(--muted) }
+.sheetbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--cream) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line) }
+.sheetbar .wrap { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding-block: 10px }
+.sheetbar .clock { font-variant-numeric: tabular-nums; font-weight: 700 }
+.sheetbar .cnt { color: var(--muted); font-size: 14px }
+.sheetbar .sp { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap }
+.summary { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 22px; display: grid; gap: 12px }
+.summary .big { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px }
+.summary .big b { font-family: var(--display); font-size: clamp(40px, 8vw, 64px); line-height: 1; color: var(--blue) }
+.summary .big span { font-size: 18px; font-weight: 700 }
+.summary .bar { height: 12px }
+.nums { display: flex; flex-wrap: wrap; gap: 6px }
+.nums a { min-width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; color: var(--ink); background: #fff; border: 1.5px solid var(--line) }
+.nums a.ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok) }
+.nums a.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad) }
+.nums a.part { background: #f6ecd9; border-color: #c99a45; color: #8a5a12 }
+.nums a.todo { border-style: dashed }
+.self { display: grid; gap: 8px; background: var(--blue-soft); border-radius: 12px; padding: 12px 14px }
+.self .q { color: var(--ink) }
+.task { scroll-margin-top: 70px }
+.pts { margin-left: auto; font-weight: 700 }
+.etap { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: 6px; white-space: nowrap }
+.etap.wait { background: #ece8df; color: var(--muted) } .etap.mid { background: #f6ecd9; color: #8a5a12 } .etap.okp { background: var(--ok-soft); color: var(--ok) }
+.muted-s { color: var(--muted); font-size: 13px; font-weight: 400 }
+.pr .st .btn-s { padding: 3px 12px; font-size: 12.5px }
+.pts.ok { color: var(--ok) } .pts.bad { color: var(--bad) } .pts.part { color: #8a5a12 }
+
+/* Motyw «Wołoszko/Math» (обрала Ірина 2026-10-31): широкий гротеск Unbounded, чорні рамки, кольорові блоки, жорсткі тіні.
+   build.py дописує цей файл у кінець стилів кожної сторінки, тож він перекриває старі значення. */
+:root {
+  --cream: #f4efe4; --card: #fffdf8; --ink: #1c1712; --muted: #5f5850;
+  --blue: #5157d6; --blue-soft: #e3e4fa; --sage: #cdd38a; --lime: #cdd38a; --coral: #f0a78c;
+  --display: "Unbounded", system-ui, sans-serif; --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --shadow: 5px 5px 0 var(--ink);
+}
+body { background: var(--cream) }
+h1 { font-family: var(--display); font-weight: 800; letter-spacing: -.03em; line-height: .95; font-size: clamp(30px, 6.4vw, 68px) }
+h2, h3 { font-family: var(--display); letter-spacing: -.02em }
+
+/* спільне меню: логотип, пігулки, вхід */
+header.site { border-bottom: 1.5px solid var(--ink); background: var(--cream) }
+header.site .in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 8px; padding: 14px max(18px, env(safe-area-inset-left, 0px)) }
+header.site .logo { font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: .02em; color: var(--ink); text-decoration: none; margin-right: auto; white-space: nowrap }
+header.site .pills { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none }
+header.site .pills a { font-weight: 600; font-size: 13px; text-decoration: none; color: var(--ink); border: 1.5px solid var(--ink); border-radius: 999px; padding: 5px 12px; white-space: nowrap }
+header.site .pills a[aria-current] { background: var(--ink); color: var(--cream) }
+header.site .authbar { margin-left: 6px }
+@media (max-width: 760px) {
+  header.site .in { flex-wrap: wrap; padding-inline: 16px }
+  header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
+}
+
+/* картки: чорна рамка й жорстка тінь замість м'якої */
+.tile, .task, .prog, .notice, .ark, .summary, .card, .box, dialog { border: 1.5px solid var(--ink); box-shadow: var(--shadow); border-radius: 16px }
+.tile b, .summary .big b, .stats b { font-family: var(--display); font-weight: 800; color: var(--ink) }
+.pill { background: var(--lime); color: var(--ink); border: 1.5px solid var(--ink) }
+.chip { border: 1.5px solid var(--ink); background: var(--card) }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--cream) }
+.opt { border-color: var(--ink) }
+.opt[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff }
+.task-h .t { background: var(--ink); color: var(--cream) }
+.btn-s, .authbar button, .btn { border: 1.5px solid var(--ink) }
+.btn-s.primary, .authbar .primary, button.primary, .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff }
+.go::before { box-shadow: none }
+.sheet { border: 1.5px solid var(--line) }
+.sheetbar { border-bottom: 1.5px solid var(--ink) }
+.ark h3 { font-weight: 800; font-size: 22px }
+.year { font-family: var(--display); color: var(--ink) }
+.more { background: var(--ink) }
+.sign { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: .04em }
+.sign::before, .sign::after { display: none }
+header.site .join { margin-left: 6px; font-weight: 700; font-size: 13px; text-decoration: none; white-space: nowrap; background: var(--blue); color: #fff; border: 1.5px solid var(--blue); border-radius: 999px; padding: 6px 14px }
+header.top { border-bottom: 1.5px solid var(--ink) }
+</style>
+</head>
+<body>
+<header class="site"><div class="in"><a class="logo" href="../">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../matura/" aria-current="page">Matura</a><a href="../arkusze/">Arkusze</a><a href="../materialy/">Materiały</a><a href="../konto/">Mój gabinet</a></nav><div class="authbar" id="authbar"></div></div></header>
+
+<header class="top"><div class="wrap">
+  <span class="pill">Liceum i technikum · poziom podstawowy</span>
+  <h1>Matura podstawowa</h1>
+  <div class="sub">Matematyka · polski program nauczania <span class="flag" aria-hidden="true"></span></div>
+  <p style="margin:0;max-width:62ch">Zadania maturalne CKE z poziomu podstawowego, ułożone według tematów. Nowe tematy będą dochodzić. Wybierz dział i typ zadania, zaznacz odpowiedź i sprawdź od razu.</p>
+  <div class="tiles" id="tiles"></div>
+</div></header>
+
+<div class="wrap">
+  <details class="prog" id="prog" hidden><summary id="prog-sum"></summary><div class="pt" id="prog-list"></div><p class="sync" id="prog-sync"></p></details>
+  <div class="filters">
+    <div class="row" id="f-temat"><span class="lbl">Dział</span></div>
+    <div class="row" id="f-typ"><span class="lbl">Typ</span></div>
+  </div>
+  <div class="tools">
+    <span id="count"></span>
+    <span style="display:flex;gap:16px;flex-wrap:wrap">
+      <button type="button" id="shuffle">Losowa kolejność</button>
+      <button type="button" id="hide-done">Ukryj rozwiązane</button>
+      <button type="button" id="reset">Wyczyść moje wyniki</button>
+    </span>
+  </div>
+</div>
+
+<div class="wrap" id="notice-wrap" style="padding-top:14px"></div>
+<main class="wrap" id="list"></main>
+
+
+<dialog id="dlg"><form class="dlg" id="auth-form" method="dialog">
+  <h2 id="dlg-title">Zaloguj się</h2>
+  <button type="button" class="gbtn" id="g-login">Kontynuuj z Google</button>
+  <div class="or">albo e-mailem</div>
+  <label id="name-row" hidden>Imię i nazwisko<input id="f-name" autocomplete="name"></label>
+  <label>E-mail<input id="f-email" type="email" autocomplete="email" required></label>
+  <label>Hasło<input id="f-pass" type="password" autocomplete="current-password" minlength="6" required></label>
+  <div class="err" id="f-err" aria-live="polite"></div>
+  <button class="btn-s primary" id="f-submit" type="submit">Zaloguj się</button>
+  <div class="alt"><span id="alt-text">Nie masz konta?</span><button type="button" id="alt-btn">Zarejestruj się</button></div>
+  <div class="alt"><button type="button" id="f-close">Zamknij</button></div>
+</form></dialog>
+
+<footer><div class="wrap">
+  <span class="sign">iryna.voloshko</span>
+  <span>Zadania: Centralna Komisja Egzaminacyjna, zestawienie tematyczne matematykaszkolna.pl.</span>
+</div></footer>
+
+<script type="module">
+// Спільне для сторінок E8 і аркушів: дані, результати учня, вхід через Firebase і закриті завдання.
+const D = {"zrodlo": "matematykaszkolna.pl, zadania CKE", "tematy": [{"temat": "Procenty", "liczba": 45}, {"temat": "Błąd względny i bezwzględny", "liczba": 5}, {"temat": "Kapitalizacja odsetek", "liczba": 8}, {"temat": "Potęgi i pierwiastki", "liczba": 78}, {"temat": "Wartość bezwzględna", "liczba": 12}], "zadania": [{"id": "mp-procenty-1", "temat": "Procenty", "nr": 1, "pkt": 1, "zrodlo": "wrzesień 2022 - zad. 24.3", "img": "img/procenty-01.png", "w": 1181, "h": 736, "tekst": "Zad. 1 (1 pkt) (wrzesień 2022 - zad. 24.3) Firma F zatrudnia 160 osób. Rozkład płac brutto pracowników tej firmy przedstawia poniższy diagram. Na osi poziomej podano – wyrażoną w złotych – miesięczną płacę brutto, a na osi pionowej podano liczbę pracowników firmy F , którzy otrzymują płacę miesięczną w danej wysokości. 75 pracowników 80 70 60 50 50 40 30 Liczba 20 20 10 5 10 0 4000 4800 5000 6000 7000 Płaca miesięczna brutto (w złotych) Liczba pracowników firmy F, których miesięczna płaca brutto nie przewyższa 5 000 zł, stanowi (w zaokrągle- niu do 1%) A. 91% liczby wszystkich pracowników tej ", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "A"}, {"id": "mp-procenty-2", "temat": "Procenty", "nr": 2, "pkt": 1, "zrodlo": "sierpień 2022 - zad. 4", "img": "img/procenty-02.png", "w": 1181, "h": 142, "tekst": "Zad. 2 (1 pkt) (sierpień 2022 - zad. 4) Cenę x (w złotych) pewnego towaru obniżono najpierw o 30%, a następnie obniżono o 20% w odniesieniu do ceny obowiązującej w danym momencie. Po obydwu tych obniżkach cena towaru jest równa A. 0,36 · x złotych. B. 0,44 · x złotych. C. 0,50 · x złotych. D. 0,56 · x złotych.", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "D"}, {"id": "mp-procenty-3", "temat": "Procenty", "nr": 3, "pkt": 1, "zrodlo": "czerwiec 2022 - zad. 4", "img": "img/procenty-03.png", "w": 1181, "h": 109, "tekst": "Zad. 3 (1 pkt) (czerwiec 2022 - zad. 4) 30% liczby x jest o 2730 mniejsze od liczby x. Liczba x jest równa A. 3900 B. 1911 C. 9100 D. 2100", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "A"}, {"id": "mp-procenty-4", "temat": "Procenty", "nr": 4, "pkt": 1, "zrodlo": "maj 2021 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-5", "temat": "Procenty", "nr": 5, "pkt": 1, "zrodlo": "czerwiec 2021 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-6", "temat": "Procenty", "nr": 6, "pkt": 1, "zrodlo": "maj 2021 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-7", "temat": "Procenty", "nr": 7, "pkt": 1, "zrodlo": "marzec 2021 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-8", "temat": "Procenty", "nr": 8, "pkt": 1, "zrodlo": "sierpień 2020 - zad. 6", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-9", "temat": "Procenty", "nr": 9, "pkt": 1, "zrodlo": "maj 2020 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-10", "temat": "Procenty", "nr": 10, "pkt": 1, "zrodlo": "maj 2019 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-11", "temat": "Procenty", "nr": 11, "pkt": 1, "zrodlo": "czerwiec 2019 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-12", "temat": "Procenty", "nr": 12, "pkt": 1, "zrodlo": "sierpień 2019 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-13", "temat": "Procenty", "nr": 13, "pkt": 1, "zrodlo": "sierpień 2018 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-14", "temat": "Procenty", "nr": 14, "pkt": 1, "zrodlo": "czerwiec 2018 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-15", "temat": "Procenty", "nr": 15, "pkt": 1, "zrodlo": "maj 2018 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-16", "temat": "Procenty", "nr": 16, "pkt": 1, "zrodlo": "sierpień 2017 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-17", "temat": "Procenty", "nr": 17, "pkt": 1, "zrodlo": "czerwiec 2017 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-18", "temat": "Procenty", "nr": 18, "pkt": 1, "zrodlo": "sierpień 2016 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-19", "temat": "Procenty", "nr": 19, "pkt": 1, "zrodlo": "czerwiec 2016 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-20", "temat": "Procenty", "nr": 20, "pkt": 1, "zrodlo": "maj 2016 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-21", "temat": "Procenty", "nr": 21, "pkt": 1, "zrodlo": "sierpień 2015 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-22", "temat": "Procenty", "nr": 22, "pkt": 1, "zrodlo": "czerwiec 2015 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-23", "temat": "Procenty", "nr": 23, "pkt": 1, "zrodlo": "maj 2015 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-24", "temat": "Procenty", "nr": 24, "pkt": 1, "zrodlo": "grudzień 2014 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-25", "temat": "Procenty", "nr": 25, "pkt": 1, "zrodlo": "sierpień 2014 - zad. 5", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-26", "temat": "Procenty", "nr": 26, "pkt": 1, "zrodlo": "czerwiec 2014 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-27", "temat": "Procenty", "nr": 27, "pkt": 1, "zrodlo": "maj 2014 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-28", "temat": "Procenty", "nr": 28, "pkt": 1, "zrodlo": "grudzień 2013 - zad. 9", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-29", "temat": "Procenty", "nr": 29, "pkt": 1, "zrodlo": "sierpień 2013 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-30", "temat": "Procenty", "nr": 30, "pkt": 1, "zrodlo": "czerwiec 2013 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-31", "temat": "Procenty", "nr": 31, "pkt": 1, "zrodlo": "maj 2013 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-32", "temat": "Procenty", "nr": 32, "pkt": 1, "zrodlo": "marzec 2012 - zad. 5", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-33", "temat": "Procenty", "nr": 33, "pkt": 1, "zrodlo": "sierpień 2011 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-34", "temat": "Procenty", "nr": 34, "pkt": 1, "zrodlo": "maj 2011 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-35", "temat": "Procenty", "nr": 35, "pkt": 1, "zrodlo": "listopad 2010 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-36", "temat": "Procenty", "nr": 36, "pkt": 1, "zrodlo": "sierpień 2010 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-37", "temat": "Procenty", "nr": 37, "pkt": 1, "zrodlo": "maj 2010 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-38", "temat": "Procenty", "nr": 38, "pkt": 1, "zrodlo": "listopad 2009 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-39", "temat": "Procenty", "nr": 39, "pkt": 1, "zrodlo": "listopad 2009 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-40", "temat": "Procenty", "nr": 40, "pkt": 2, "zrodlo": "informator CKE", "format": "dwa", "zamkniete": true}, {"id": "mp-procenty-41", "temat": "Procenty", "nr": 41, "pkt": 1, "zrodlo": "informator CKE", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-42", "temat": "Procenty", "nr": 42, "pkt": 1, "zrodlo": "informator CKE", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-43", "temat": "Procenty", "nr": 43, "pkt": 1, "zrodlo": "informator CKE", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-44", "temat": "Procenty", "nr": 44, "pkt": 1, "zrodlo": "informator CKE", "format": "abcd", "zamkniete": true}, {"id": "mp-procenty-45", "temat": "Procenty", "nr": 45, "pkt": 1, "zrodlo": "informator CKE", "format": "abcd", "zamkniete": true}, {"id": "mp-blad-wzgledny-i-bezwzgledny-1", "temat": "Błąd względny i bezwzględny", "nr": 1, "pkt": 1, "zrodlo": "sierpień 2020 - zad. 5", "img": "img/blad-wzgledny-i-bezwzgledny-01.png", "w": 1181, "h": 172, "tekst": "Zad. 1 (1 pkt) (sierpień 2020 - zad. 5) W zestawie 250 liczb występują jedynie liczby 4 i 2. Liczba 4 występuje 128 razy, a liczba 2 występuje 122 razy. Przyjęto przybliżenie średniej arytmetycznej zestawu tych wszystkich liczb do liczby 3. Błąd bezwzględny tego przybliżenia jest równy A. 0,024 B. 0,24 C. 0,0024 D. 0,00024", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "A"}, {"id": "mp-blad-wzgledny-i-bezwzgledny-2", "temat": "Błąd względny i bezwzględny", "nr": 2, "pkt": 1, "zrodlo": "czerwiec 2020 - zad. 4", "img": "img/blad-wzgledny-i-bezwzgledny-02.png", "w": 1181, "h": 113, "tekst": "Zad. 2 (1 pkt) (czerwiec 2020 - zad. 4) Masę Słońca równą 1,989 · 10 30 kg przybliżono do 2 · 10 30 kg. Błąd bezwzględny tego przybliżenia jest równy A. 0,0011 · 10 30 kg B. 1,1 · 10 30 kg C. 0,11 · 10 30 kg D. 0,011 · 10 30 kg", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "D"}, {"id": "mp-blad-wzgledny-i-bezwzgledny-3", "temat": "Błąd względny i bezwzględny", "nr": 3, "pkt": 1, "zrodlo": "czerwiec 2015 - zad. 22", "img": "img/blad-wzgledny-i-bezwzgledny-03.png", "w": 1181, "h": 154, "tekst": "Zad. 3 (1 pkt) (czerwiec 2015 - zad. 22) 5 Liczba 0,3 jest jednym z przybliżeń liczby . Błąd względny tego przybliżenia, wyrażony w procentach, jest 16 równy A. 4% B. 0,04% C. 2,5% D. 0,025%", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "A"}, {"id": "mp-blad-wzgledny-i-bezwzgledny-4", "temat": "Błąd względny i bezwzględny", "nr": 4, "pkt": 1, "zrodlo": "grudzień 2014 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-blad-wzgledny-i-bezwzgledny-5", "temat": "Błąd względny i bezwzględny", "nr": 5, "pkt": 1, "zrodlo": "grudzień 2013 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-kapitalizacja-odsetek-1", "temat": "Kapitalizacja odsetek", "nr": 1, "pkt": 1, "zrodlo": "maj 2026 - zad. 2", "img": "img/kapitalizacja-odsetek-01.png", "w": 1181, "h": 197, "tekst": "Zad. 1 (1 pkt) (maj 2026 - zad. 2) Klient wpłacił do banku 10 000 zł na lokatę dwuletnią. Po każdym rocznym okresie oszczędzania bank dolicza odsetki w wysokości 6% od kwoty bieżącego kapitału znajdującego się na lokacie – zgodnie z procentem składanym. Po dwóch latach oszczędzania łączna wartość doliczonych odsetek na tej lokacie (bez uwzględ- niania podatków) jest równa A. 1200 zł B. 1236 zł C. 1836 zł D. 3600 zł", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "B"}, {"id": "mp-kapitalizacja-odsetek-2", "temat": "Kapitalizacja odsetek", "nr": 2, "pkt": 1, "zrodlo": "grudzień 2024 - zad. 5", "img": "img/kapitalizacja-odsetek-02.png", "w": 1181, "h": 202, "tekst": "Zad. 2 (1 pkt) (grudzień 2024 - zad. 5) Pani Aniela wpłaciła do banku kwotę 60 000 zł na lokatę dwuletnią. Po każdym rocznym okresie oszczędzania bank doliczał odsetki w wysokości p% w skali roku od kwoty bieżącego kapitału znajdującego się na lokacie – zgodnie z procentem składanym. Na koniec okresu oszczędzania kwota na tej lokacie była równa 67 925,76 zł wraz z odsetkami (bez uwzględniania podatków). Oprocentowanie lokaty w skali roku było równe A. 6% B. 6,4% C. 6,5% D. 7%", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "B"}, {"id": "mp-kapitalizacja-odsetek-3", "temat": "Kapitalizacja odsetek", "nr": 3, "pkt": 1, "zrodlo": "czerwiec 2024 - zad. 4", "img": "img/kapitalizacja-odsetek-03.png", "w": 1181, "h": 202, "tekst": "Zad. 3 (1 pkt) (czerwiec 2024 - zad. 4) Klient wpłacił do banku na trzyletnią lokatę kwotę w wysokości K zł. Po każdym rocznym okresie oszczędza- 0 nia bank dolicza odsetki w wysokości 6% od kwoty bieżącego kapitału znajdującego się na lokacie – zgodnie z procentem składanym. Po trzech latach oszczędzania w tym banku kwota na lokacie (bez uwzględniania podatków) jest równa A. K · (1,06) 3 B. K · (1,02) 3 C. K · (1,03) 6 D. K · 1,18 0 0 0 0", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "A"}, {"id": "mp-kapitalizacja-odsetek-4", "temat": "Kapitalizacja odsetek", "nr": 4, "pkt": 1, "zrodlo": "grudzień 2023 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-kapitalizacja-odsetek-5", "temat": "Kapitalizacja odsetek", "nr": 5, "pkt": 1, "zrodlo": "czerwiec 2023 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-kapitalizacja-odsetek-6", "temat": "Kapitalizacja odsetek", "nr": 6, "pkt": 1, "zrodlo": "pokazowy 2023 - zad. 14", "format": "abcd", "zamkniete": true}, {"id": "mp-kapitalizacja-odsetek-7", "temat": "Kapitalizacja odsetek", "nr": 7, "pkt": 1, "zrodlo": "grudzień 2022 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-kapitalizacja-odsetek-8", "temat": "Kapitalizacja odsetek", "nr": 8, "pkt": 1, "zrodlo": "informator CKE", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-1", "temat": "Potęgi i pierwiastki", "nr": 1, "pkt": 1, "zrodlo": "sierpień 2026 - zad. 1", "img": "img/potegi-i-pierwiastki-01.png", "w": 1180, "h": 115, "tekst": "Zad. 1 (1 pkt) (sierpień 2026 - zad. 1) √ √ Liczba 3 −27 + 5 −1 jest równa A. (−4) B. (−2) C. 2 D. 4", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "A"}, {"id": "mp-potegi-i-pierwiastki-2", "temat": "Potęgi i pierwiastki", "nr": 2, "pkt": 1, "zrodlo": "sierpień 2026 - zad. 2", "img": "img/potegi-i-pierwiastki-02.png", "w": 1180, "h": 169, "tekst": "Zad. 2 (1 pkt) (sierpień 2026 - zad. 2) 3 −1 · 4 0,5 Liczba jest równa 3 −2 · 2 −1 1 1 A. B. 12 C. D. 18 12 18", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "B"}, {"id": "mp-potegi-i-pierwiastki-3", "temat": "Potęgi i pierwiastki", "nr": 3, "pkt": 1, "zrodlo": "czerwiec 2026 - zad. 1", "img": "img/potegi-i-pierwiastki-03.png", "w": 1180, "h": 182, "tekst": "Zad. 3 (1 pkt) (czerwiec 2026 - zad. 1) √ √ 3 −64 + 3 27 Liczba √ jest równa 5 −32 \u0012 1 \u0013 1 A. (−2) B. − C. D. 2 2 2", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "C"}, {"id": "mp-potegi-i-pierwiastki-4", "temat": "Potęgi i pierwiastki", "nr": 4, "pkt": 1, "zrodlo": "czerwiec 2026 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-5", "temat": "Potęgi i pierwiastki", "nr": 5, "pkt": 1, "zrodlo": "maj 2026 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-6", "temat": "Potęgi i pierwiastki", "nr": 6, "pkt": 1, "zrodlo": "maj 2026 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-7", "temat": "Potęgi i pierwiastki", "nr": 7, "pkt": 1, "zrodlo": "maj 2026 - zad. 5", "format": "pf", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-8", "temat": "Potęgi i pierwiastki", "nr": 8, "pkt": 1, "zrodlo": "marzec 2026 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-9", "temat": "Potęgi i pierwiastki", "nr": 9, "pkt": 1, "zrodlo": "marzec 2026 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-10", "temat": "Potęgi i pierwiastki", "nr": 10, "pkt": 1, "zrodlo": "sierpień 2025 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-11", "temat": "Potęgi i pierwiastki", "nr": 11, "pkt": 1, "zrodlo": "sierpień 2025 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-12", "temat": "Potęgi i pierwiastki", "nr": 12, "pkt": 1, "zrodlo": "czerwiec 2025 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-13", "temat": "Potęgi i pierwiastki", "nr": 13, "pkt": 1, "zrodlo": "czerwiec 2025 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-14", "temat": "Potęgi i pierwiastki", "nr": 14, "pkt": 1, "zrodlo": "maj 2025 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-15", "temat": "Potęgi i pierwiastki", "nr": 15, "pkt": 1, "zrodlo": "maj 2025 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-16", "temat": "Potęgi i pierwiastki", "nr": 16, "pkt": 1, "zrodlo": "grudzień 2024 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-17", "temat": "Potęgi i pierwiastki", "nr": 17, "pkt": 1, "zrodlo": "sierpień 2024 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-18", "temat": "Potęgi i pierwiastki", "nr": 18, "pkt": 1, "zrodlo": "czerwiec 2024 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-19", "temat": "Potęgi i pierwiastki", "nr": 19, "pkt": 1, "zrodlo": "maj 2024 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-20", "temat": "Potęgi i pierwiastki", "nr": 20, "pkt": 1, "zrodlo": "grudzień 2023 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-21", "temat": "Potęgi i pierwiastki", "nr": 21, "pkt": 1, "zrodlo": "sierpień 2023 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-22", "temat": "Potęgi i pierwiastki", "nr": 22, "pkt": 1, "zrodlo": "sierpień 2023 - zad. 5", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-23", "temat": "Potęgi i pierwiastki", "nr": 23, "pkt": 1, "zrodlo": "czerwiec 2023 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-24", "temat": "Potęgi i pierwiastki", "nr": 24, "pkt": 1, "zrodlo": "maj 2023 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-25", "temat": "Potęgi i pierwiastki", "nr": 25, "pkt": 1, "zrodlo": "pokazowy 2023 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-26", "temat": "Potęgi i pierwiastki", "nr": 26, "pkt": 1, "zrodlo": "grudzień 2022 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-27", "temat": "Potęgi i pierwiastki", "nr": 27, "pkt": 1, "zrodlo": "wrzesień 2022 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-28", "temat": "Potęgi i pierwiastki", "nr": 28, "pkt": 1, "zrodlo": "sierpień 2022 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-29", "temat": "Potęgi i pierwiastki", "nr": 29, "pkt": 1, "zrodlo": "czerwiec 2022 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-30", "temat": "Potęgi i pierwiastki", "nr": 30, "pkt": 1, "zrodlo": "czerwiec 2022 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-31", "temat": "Potęgi i pierwiastki", "nr": 31, "pkt": 1, "zrodlo": "maj 2022 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-32", "temat": "Potęgi i pierwiastki", "nr": 32, "pkt": 1, "zrodlo": "maj 2022 - zad. 5", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-33", "temat": "Potęgi i pierwiastki", "nr": 33, "pkt": 1, "zrodlo": "czerwiec 2021 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-34", "temat": "Potęgi i pierwiastki", "nr": 34, "pkt": 1, "zrodlo": "czerwiec 2021 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-35", "temat": "Potęgi i pierwiastki", "nr": 35, "pkt": 1, "zrodlo": "maj 2021 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-36", "temat": "Potęgi i pierwiastki", "nr": 36, "pkt": 1, "zrodlo": "marzec 2021 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-37", "temat": "Potęgi i pierwiastki", "nr": 37, "pkt": 1, "zrodlo": "czerwiec 2020 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-38", "temat": "Potęgi i pierwiastki", "nr": 38, "pkt": 1, "zrodlo": "maj 2020 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-39", "temat": "Potęgi i pierwiastki", "nr": 39, "pkt": 1, "zrodlo": "sierpień 2019 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-40", "temat": "Potęgi i pierwiastki", "nr": 40, "pkt": 1, "zrodlo": "sierpień 2019 - zad. 9", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-41", "temat": "Potęgi i pierwiastki", "nr": 41, "pkt": 1, "zrodlo": "maj 2019 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-42", "temat": "Potęgi i pierwiastki", "nr": 42, "pkt": 1, "zrodlo": "sierpień 2018 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-43", "temat": "Potęgi i pierwiastki", "nr": 43, "pkt": 1, "zrodlo": "sierpień 2018 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-44", "temat": "Potęgi i pierwiastki", "nr": 44, "pkt": 1, "zrodlo": "czerwiec 2018 - zad. 8", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-45", "temat": "Potęgi i pierwiastki", "nr": 45, "pkt": 1, "zrodlo": "maj 2018 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-46", "temat": "Potęgi i pierwiastki", "nr": 46, "pkt": 1, "zrodlo": "maj 2018 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-47", "temat": "Potęgi i pierwiastki", "nr": 47, "pkt": 1, "zrodlo": "sierpień 2017 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-48", "temat": "Potęgi i pierwiastki", "nr": 48, "pkt": 1, "zrodlo": "czerwiec 2017 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-49", "temat": "Potęgi i pierwiastki", "nr": 49, "pkt": 1, "zrodlo": "sierpień 2016 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-50", "temat": "Potęgi i pierwiastki", "nr": 50, "pkt": 1, "zrodlo": "czerwiec 2016 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-51", "temat": "Potęgi i pierwiastki", "nr": 51, "pkt": 1, "zrodlo": "czerwiec 2016 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-52", "temat": "Potęgi i pierwiastki", "nr": 52, "pkt": 1, "zrodlo": "maj 2016 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-53", "temat": "Potęgi i pierwiastki", "nr": 53, "pkt": 1, "zrodlo": "sierpień 2015 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-54", "temat": "Potęgi i pierwiastki", "nr": 54, "pkt": 1, "zrodlo": "sierpień 2015 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-55", "temat": "Potęgi i pierwiastki", "nr": 55, "pkt": 1, "zrodlo": "czerwiec 2015 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-56", "temat": "Potęgi i pierwiastki", "nr": 56, "pkt": 1, "zrodlo": "czerwiec 2015 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-57", "temat": "Potęgi i pierwiastki", "nr": 57, "pkt": 1, "zrodlo": "maj 2015 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-58", "temat": "Potęgi i pierwiastki", "nr": 58, "pkt": 1, "zrodlo": "grudzień 2014 - zad. 7", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-59", "temat": "Potęgi i pierwiastki", "nr": 59, "pkt": 1, "zrodlo": "sierpień 2014 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-60", "temat": "Potęgi i pierwiastki", "nr": 60, "pkt": 1, "zrodlo": "sierpień 2014 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-61", "temat": "Potęgi i pierwiastki", "nr": 61, "pkt": 1, "zrodlo": "czerwiec 2014 - zad. 8", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-62", "temat": "Potęgi i pierwiastki", "nr": 62, "pkt": 1, "zrodlo": "maj 2014 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-63", "temat": "Potęgi i pierwiastki", "nr": 63, "pkt": 1, "zrodlo": "maj 2014 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-64", "temat": "Potęgi i pierwiastki", "nr": 64, "pkt": 1, "zrodlo": "grudzień 2013 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-65", "temat": "Potęgi i pierwiastki", "nr": 65, "pkt": 1, "zrodlo": "grudzień 2013 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-66", "temat": "Potęgi i pierwiastki", "nr": 66, "pkt": 1, "zrodlo": "grudzień 2013 - zad. 7", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-67", "temat": "Potęgi i pierwiastki", "nr": 67, "pkt": 1, "zrodlo": "sierpień 2013 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-68", "temat": "Potęgi i pierwiastki", "nr": 68, "pkt": 1, "zrodlo": "czerwiec 2013 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-69", "temat": "Potęgi i pierwiastki", "nr": 69, "pkt": 1, "zrodlo": "maj 2013 - zad. 23", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-70", "temat": "Potęgi i pierwiastki", "nr": 70, "pkt": 1, "zrodlo": "marzec 2012 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-71", "temat": "Potęgi i pierwiastki", "nr": 71, "pkt": 1, "zrodlo": "listopad 2010 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-72", "temat": "Potęgi i pierwiastki", "nr": 72, "pkt": 1, "zrodlo": "sierpień 2010 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-73", "temat": "Potęgi i pierwiastki", "nr": 73, "pkt": 1, "zrodlo": "maj 2010 - zad. 3", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-74", "temat": "Potęgi i pierwiastki", "nr": 74, "pkt": 1, "zrodlo": "listopad 2009 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-75", "temat": "Potęgi i pierwiastki", "nr": 75, "pkt": 1, "zrodlo": "informator CKE", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-76", "temat": "Potęgi i pierwiastki", "nr": 76, "pkt": 1, "zrodlo": "informator CKE", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-77", "temat": "Potęgi i pierwiastki", "nr": 77, "pkt": 1, "zrodlo": "informator CKE", "format": "abcd", "zamkniete": true}, {"id": "mp-potegi-i-pierwiastki-78", "temat": "Potęgi i pierwiastki", "nr": 78, "pkt": 1, "zrodlo": "informator CKE", "format": "abcd", "zamkniete": true}, {"id": "mp-wartosc-bezwzgledna-1", "temat": "Wartość bezwzględna", "nr": 1, "pkt": 1, "zrodlo": "sierpień 2025 - zad. 1", "img": "img/wartosc-bezwzgledna-01.png", "w": 1149, "h": 113, "tekst": "Zad. 1 (1 pkt) (sierpień 2025 - zad. 1) √ √ Liczba | 5 − 3| + | 5 − 1| jest równa √ √ A. 2 5 − 4 B. 2 5 + 4 C. 2 D. 4", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "C"}, {"id": "mp-wartosc-bezwzgledna-2", "temat": "Wartość bezwzględna", "nr": 2, "pkt": 1, "zrodlo": "czerwiec 2025 - zad. 1", "img": "img/wartosc-bezwzgledna-02.png", "w": 1149, "h": 110, "tekst": "Zad. 2 (1 pkt) (czerwiec 2025 - zad. 1) Liczby x i x są różnymi rozwiązaniami równania |x − 6| = 4. Iloczyn x · x jest równy 1 2 1 2 A. 4 B. 20 C. 24 D. 100", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "B"}, {"id": "mp-wartosc-bezwzgledna-3", "temat": "Wartość bezwzględna", "nr": 3, "pkt": 1, "zrodlo": "grudzień 2024 - zad. 1", "img": "img/wartosc-bezwzgledna-03.png", "w": 1149, "h": 115, "tekst": "Zad. 3 (1 pkt) (grudzień 2024 - zad. 1) Liczby x i x są różnymi rozwiązaniami równania |x + 4| = 7. Suma x + x jest równa 1 2 1 2 A. (−14) B. (−8) C. 3 D. 8", "format": "abcd", "options": ["A", "B", "C", "D"], "answer": "B"}, {"id": "mp-wartosc-bezwzgledna-4", "temat": "Wartość bezwzględna", "nr": 4, "pkt": 1, "zrodlo": "czerwiec 2017 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-wartosc-bezwzgledna-5", "temat": "Wartość bezwzględna", "nr": 5, "pkt": 1, "zrodlo": "sierpień 2016 - zad. 13", "format": "abcd", "zamkniete": true}, {"id": "mp-wartosc-bezwzgledna-6", "temat": "Wartość bezwzględna", "nr": 6, "pkt": 1, "zrodlo": "maj 2015 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-wartosc-bezwzgledna-7", "temat": "Wartość bezwzględna", "nr": 7, "pkt": 1, "zrodlo": "maj 2012 - zad. 5", "format": "abcd", "zamkniete": true}, {"id": "mp-wartosc-bezwzgledna-8", "temat": "Wartość bezwzględna", "nr": 8, "pkt": 1, "zrodlo": "czerwiec 2012 - zad. 2", "format": "abcd", "zamkniete": true}, {"id": "mp-wartosc-bezwzgledna-9", "temat": "Wartość bezwzględna", "nr": 9, "pkt": 1, "zrodlo": "maj 2011 - zad. 1", "format": "abcd", "zamkniete": true}, {"id": "mp-wartosc-bezwzgledna-10", "temat": "Wartość bezwzględna", "nr": 10, "pkt": 1, "zrodlo": "czerwiec 2011 - zad. 4", "format": "abcd", "zamkniete": true}, {"id": "mp-wartosc-bezwzgledna-11", "temat": "Wartość bezwzględna", "nr": 11, "pkt": 1, "zrodlo": "sierpień 2011 - zad. 8", "format": "abcd", "zamkniete": true}, {"id": "mp-wartosc-bezwzgledna-12", "temat": "Wartość bezwzględna", "nr": 12, "pkt": 1, "zrodlo": "listopad 2010 - zad. 1", "format": "abcd", "zamkniete": true}], "pakiety": ["m00", "m01"]};
+const FB = {"apiKey":"AIzaSyB3805-WbIEjbE6R62Di6irvn9-iUzpdxM","authDomain":"polska-matematyka.firebaseapp.com","projectId":"polska-matematyka","storageBucket":"polska-matematyka.firebasestorage.app","messagingSenderId":"325870615029","appId":"1:325870615029:web:aa5237f6d943b9649a88bc"};   // налаштування Firebase (не секретні); null — вхід вимкнено
+const TYPY = { abcd: "Wybór A–D", pf: "Prawda / fałsz", dwa: "Uzupełnij zdania", tn: "Tak / nie + uzasadnienie", otwarte: "Otwarte" };
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const STORE = "e8-wyniki";
+let res = {}; try { res = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) {}
+let cloud = null;   // зберігання прогресу учня в базі (postepy/{uid}), коли він увійшов
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(res)); } catch (e) {} cloud?.(); };
+
+const all = D.zadania;                       // закриті завдання тут без змісту, поки не прийдуть з бази
+const byId = Object.fromEntries(all.map(t => [t.id, t]));
+const auth = { user: null, status: "out", fb: null };   // status: out | pending | approved | admin
+
+const unlocked = t => !t.zamkniete || t.img;
+const openCount = () => all.filter(unlocked).length;
+
+// Повні аркуші CKE, зібрані з завдань бази за джерелом («maj 2026 - zad. 8»); потрібні сторінкам аркушів і кабінету.
+const MIESIACE = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"];
+const slugify = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+const ARKUSZE = (() => {
+  const g = {};
+  for (const t of all) {
+    const m = /^(\S+) (\d{4}) - zad\. (\d+)$/.exec(t.zrodlo || "");
+    if (!m || +m[2] < 2017 || !MIESIACE.includes(m[1])) continue;   // з 2017 — формат іспиту восьмикласника
+    const key = `${m[1]} ${m[2]}`;
+    const a = (g[key] ||= { nazwa: key, rok: +m[2], mies: MIESIACE.indexOf(m[1]), zadania: [] });
+    if (!a.zadania.some(z => z.nr === +m[3])) a.zadania.push({ t, nr: +m[3] });   // те саме завдання буває у двох темах
+  }
+  return Object.values(g)
+    .map(a => {
+      a.zadania.sort((x, y) => x.nr - y.nr);
+      const nums = a.zadania.map(z => z.nr);
+      a.braki = Math.max(...nums) - new Set(nums).size;
+      a.slug = slugify(a.nazwa);
+      a.max = a.zadania.reduce((s, z) => s + z.t.pkt, 0);
+      return a;
+    })
+    .filter(a => a.braki <= 1 && a.zadania.length >= 15)
+    .sort((a, b) => b.rok - a.rok || b.mies - a.mies);
+})();
+const bySlug = Object.fromEntries(ARKUSZE.map(a => [a.slug, a]));
+const label = a => a.nazwa[0].toUpperCase() + a.nazwa.slice(1);
+const dostepny = a => a.zadania.every(z => unlocked(z.t));
+
+// Arkusz miesiąca: щомісяця всі учні пишуть той самий аркуш (по колу, від найстарішого).
+// Перша спроба, завершена в цьому місяці, зберігається в res["miesiac:РРРР-ММ"] — для порівняння місяців.
+const ym = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+const MIESIAC = ym(new Date());
+const arkuszMiesiaca = (m = MIESIAC) => { const [y, mm] = m.split("-").map(Number), l = ARKUSZE.slice().reverse(); return l[(y * 12 + mm - 1) % l.length]; };
+const nazwaMiesiaca = m => { const [y, mm] = m.split("-").map(Number); return MIESIACE[mm - 1][0].toUpperCase() + MIESIACE[mm - 1].slice(1) + " " + y; };
+const proc = r => Math.round(100 * r.pkt / r.max);
+
+function lockedBody() {
+  if (!FB) return `<div class="locked"><b>Zadanie dla zarejestrowanych</b><span>Dostęp wkrótce.</span></div>`;
+  if (auth.status === "pending") return `<div class="locked"><b>Czekasz na akceptację</b><span>Iryna sprawdzi Twoje konto i otworzy dostęp.</span></div>`;
+  if (auth.status === "approved" || auth.status === "admin") return `<div class="locked"><b>Ładowanie…</b></div>`;
+  return `<div class="locked"><b>Zadanie dla zarejestrowanych</b><span>Zarejestruj się, a po akceptacji zobaczysz wszystkie zadania.</span><button type="button" class="btn-s primary" data-open-auth="up">Zarejestruj się</button></div>`;
+}
+
+function group(name, opts, q) {
+  return `<div class="opts" role="group" aria-label="${esc(q || "Odpowiedź")}">${q ? `<span class="q">${esc(q)}</span>` : ""}${opts.map(o => `<button type="button" class="opt" data-g="${name}" data-v="${o}" aria-pressed="false">${o}</button>`).join("")}</div>`;
+}
+
+/* ---------- Вхід і закриті завдання (Firebase) ---------- */
+
+function notice() {
+  const w = $("#notice-wrap"), closed = all.length - openCount();
+  if (!FB || !closed) { w.innerHTML = ""; return; }
+  if (auth.status === "out") w.innerHTML = `<div class="notice"><p><b>${closed} zadań</b> jest dostępnych tylko dla zarejestrowanych uczniów. Załóż konto, a po akceptacji otworzą się wszystkie.</p><button type="button" class="btn-s primary" data-open-auth="up">Zarejestruj się</button></div>`;
+  else if (auth.status === "pending") w.innerHTML = `<div class="notice"><p>Konto <b>${esc(auth.user.email)}</b> czeka na akceptację. Gdy Iryna je zatwierdzi, odśwież stronę.</p></div>`;
+  else w.innerHTML = "";
+  w.querySelector("[data-open-auth]")?.addEventListener("click", () => openAuth("up"));
+}
+
+function authbar() {
+  const b = $("#authbar");
+  if (!FB) { b.innerHTML = ""; return; }
+  if (!auth.user) b.innerHTML = `<button type="button" id="ab-in">Zaloguj się</button><button type="button" class="primary" id="ab-up">Zarejestruj się</button>`;
+  else b.innerHTML = `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
+  $("#ab-in")?.addEventListener("click", () => openAuth("in"));
+  $("#ab-up")?.addEventListener("click", () => openAuth("up"));
+  $("#ab-out")?.addEventListener("click", () => auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));
+}
+
+let mode = "in";
+function openAuth(m) {
+  mode = m;
+  $("#dlg-title").textContent = m === "up" ? "Załóż konto" : "Zaloguj się";
+  $("#f-submit").textContent = m === "up" ? "Zarejestruj się" : "Zaloguj się";
+  $("#name-row").hidden = m !== "up";
+  $("#f-pass").autocomplete = m === "up" ? "new-password" : "current-password";
+  $("#alt-text").textContent = m === "up" ? "Masz już konto?" : "Nie masz konta?";
+  $("#alt-btn").textContent = m === "up" ? "Zaloguj się" : "Zarejestruj się";
+  $("#f-err").textContent = "";
+  $("#dlg").showModal();
+}
+$("#alt-btn").onclick = () => openAuth(mode === "up" ? "in" : "up");
+$("#f-close").onclick = () => $("#dlg").close();
+
+const ERR = {
+  "auth/invalid-credential": "Nieprawidłowy e-mail lub hasło.", "auth/wrong-password": "Nieprawidłowe hasło.",
+  "auth/user-not-found": "Nie ma konta z tym e-mailem.", "auth/email-already-in-use": "To konto już istnieje. Zaloguj się.",
+  "auth/weak-password": "Hasło musi mieć co najmniej 6 znaków.", "auth/invalid-email": "Sprawdź adres e-mail.",
+  "auth/popup-closed-by-user": "", "auth/too-many-requests": "Za dużo prób. Spróbuj za kilka minut."
+};
+const showErr = e => { $("#f-err").textContent = ERR[e.code] ?? "Coś poszło nie tak. Spróbuj ponownie."; };
+
+async function initFirebase() {
+  if (!FB) { authbar(); return; }
+  const V = "10.12.2", base = `https://www.gstatic.com/firebasejs/${V}/`;
+  const [app, a, fs] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]);
+  const fbApp = app.initializeApp(FB);
+  const fauth = a.getAuth(fbApp), db = fs.getFirestore(fbApp);
+  auth.fb = { auth: fauth, signOut: a.signOut };
+
+  $("#g-login").onclick = () => a.signInWithPopup(fauth, new a.GoogleAuthProvider()).then(() => $("#dlg").close(), showErr);
+  $("#auth-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const email = $("#f-email").value.trim(), pass = $("#f-pass").value;
+    try {
+      if (mode === "up") {
+        const cred = await a.createUserWithEmailAndPassword(fauth, email, pass);
+        const name = $("#f-name").value.trim();
+        if (name) await a.updateProfile(cred.user, { displayName: name });
+      } else await a.signInWithEmailAndPassword(fauth, email, pass);
+      $("#dlg").close();
+    } catch (err) { showErr(err); }
+  });
+
+  a.onAuthStateChanged(fauth, async user => {
+    auth.user = user;
+    if (!user) { auth.status = "out"; authbar(); render(); return; }
+    const ref = fs.doc(db, "users", user.uid);
+    let snap = await fs.getDoc(ref).catch(() => null);
+    if (!snap || !snap.exists()) {
+      await fs.setDoc(ref, { email: user.email, name: user.displayName || $("#f-name").value.trim() || "", approved: false, created: fs.serverTimestamp() }).catch(() => {});
+      snap = await fs.getDoc(ref).catch(() => null);
+    }
+    // прогрес: зливаємо локальні результати з тими, що на акаунті, і далі зберігаємо в базу
+    const pref = fs.doc(db, "postepy", user.uid);
+    const remote = await fs.getDoc(pref).then(d => d.exists() ? d.data().wyniki || {} : {}, () => null);
+    if (remote) {
+      res = { ...res, ...remote };
+      try { localStorage.setItem(STORE, JSON.stringify(res)); } catch (e) {}
+      let timer;
+      cloud = () => { clearTimeout(timer); timer = setTimeout(() => fs.setDoc(pref, { wyniki: res, updated: fs.serverTimestamp() }).catch(e => console.warn(e)), 1200); };
+      if (Object.keys(res).length !== Object.keys(remote).length) cloud();
+    }
+    const isAdmin = await fs.getDocs(fs.query(fs.collection(db, "users"), fs.limit(1))).then(() => true, () => false);
+    auth.status = isAdmin ? "admin" : snap?.data()?.approved ? "approved" : "pending";
+    authbar(); render();
+    if ((auth.status === "approved" || auth.status === "admin") && !globalThis.BEZ_PAKIETOW) {
+      try {
+        // лише пакети цього розділу (D.pakiety), щоб сторінка не тягнула закриті завдання інших розділів
+        const packs = D.pakiety ? await Promise.all(D.pakiety.map(id => fs.getDoc(fs.doc(db, "pakiety", id)).catch(() => null)))
+                                : (await fs.getDocs(fs.collection(db, "pakiety"))).docs;
+        packs.forEach(p => p?.exists?.() !== false && JSON.parse(p?.data()?.dane || "[]").forEach(z => { if (byId[z.id]) Object.assign(byId[z.id], z); }));
+      } catch (e) { console.warn(e); }
+      render();
+    }
+  });
+}
+
+
+const state = { temat: "", typ: "", order: null, hideDone: false, shown: 15 };
+// посилання з кабінету: #temat=<назва> одразу відкриває розділ і ховає вже розв'язані
+{ const h = new URLSearchParams(location.hash.slice(1)); if (D.tematy.some(t => t.temat === h.get("temat"))) Object.assign(state, { temat: h.get("temat"), hideDone: true }); }
+
+function chips(el, items, key) {
+  el.insertAdjacentHTML("beforeend", items.map(([v, label, n]) =>
+    `<button type="button" class="chip" data-k="${key}" data-v="${esc(v)}" aria-pressed="${state[key] === v}">${esc(label)}<span class="n">${n}</span></button>`).join(""));
+}
+chips($("#f-temat"), [["", "Wszystkie", all.length], ...D.tematy.map(t => [t.temat, t.temat, t.liczba])], "temat");
+chips($("#f-typ"), [["", "Wszystkie", all.length], ...Object.entries(TYPY).map(([k, l]) => [k, l, all.filter(t => t.format === k).length])], "typ");
+
+document.addEventListener("click", e => {
+  const c = e.target.closest(".chip");
+  if (!c) return;
+  state[c.dataset.k] = c.dataset.v; state.shown = 15;
+  document.querySelectorAll(`.chip[data-k="${c.dataset.k}"]`).forEach(b => b.setAttribute("aria-pressed", b === c));
+  render();
+});
+$("#shuffle").onclick = () => { state.order = all.map(t => [Math.random(), t.id]).sort().map(x => x[1]); state.shown = 15; $("#shuffle").textContent = "Wylosuj ponownie"; render(); };
+$("#hide-done").onclick = () => { state.hideDone = !state.hideDone; $("#hide-done").textContent = state.hideDone ? "Pokaż rozwiązane" : "Ukryj rozwiązane"; render(); };
+if (state.hideDone) $("#hide-done").textContent = "Pokaż rozwiązane";
+$("#reset").onclick = () => { if (!confirm("Usunąć wszystkie Twoje wyniki?")) return; res = Object.fromEntries(Object.entries(res).filter(([k]) => k.includes(":"))); save(); render(); };
+
+
+const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
+const score = l => { const r = l.map(t => res[t.id]).filter(Boolean); return { done: r.length, ok: r.filter(v => v === "ok").length }; };
+
+function tiles() {
+  const s = score(all);
+  $("#tiles").innerHTML = `<div class="tile"><b>${all.length}</b><span>zadań</span></div><div class="tile"><b>${openCount()}</b><span>dostępnych dla Ciebie</span></div>
+    <div class="tile"><b>${s.done}</b><span>rozwiązanych</span></div><div class="tile"><b>${s.done ? pct(s.ok, s.done) + "%" : "—"}</b><span>poprawnie</span></div>`;
+  progress();
+}
+
+// Мій прогрес: загалом і по кожному розділу (правильно / неправильно у відсотках)
+function progress() {
+  const s = score(all), box = $("#prog");
+  box.hidden = !s.done;
+  if (!s.done) return;
+  $("#prog-sum").innerHTML = `<b>Mój postęp</b><span>rozwiązane ${s.done} z ${openCount()} · ✓ ${s.ok} poprawnie · ✗ ${s.done - s.ok} błędnie · ${pct(s.ok, s.done)}% poprawnych</span>`;
+  $("#prog-list").innerHTML = D.tematy.map(({ temat }) => {
+    const l = all.filter(t => t.temat === temat), n = l.filter(unlocked).length || l.length, r = score(l);
+    return `<div class="pr"><button type="button" data-temat="${esc(temat)}">${esc(temat)}</button>
+      <span class="st">${r.done ? `<span class="ok">✓ ${r.ok}</span> · <span class="bad">✗ ${r.done - r.ok}</span> · ${r.done}/${n}<span class="pc">${pct(r.ok, r.done)}%</span>` : `0/${n}`}</span>
+      <div class="bar" role="img" aria-label="${esc(temat)}: ${r.ok} poprawnie, ${r.done - r.ok} błędnie z ${n}"><i class="ok" style="width:${pct(r.ok, n)}%"></i><i class="bad" style="width:${pct(r.done - r.ok, n)}%"></i></div></div>`;
+  }).join("");
+  $("#prog-sync").textContent = !FB ? "" : auth.user ? "Wyniki zapisują się na Twoim koncie i są widoczne na każdym urządzeniu." : "Wyniki są zapisane tylko w tej przeglądarce. Zaloguj się, aby zachować je na koncie.";
+}
+$("#prog-list").addEventListener("click", e => {
+  const b = e.target.closest("[data-temat]"); if (!b) return;
+  document.querySelector(`.chip[data-k="temat"][data-v="${CSS.escape(b.dataset.temat)}"]`)?.click();
+  $("#f-temat").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+function list() {
+  let l = all.filter(t => (!state.temat || t.temat === state.temat) && (!state.typ || t.format === state.typ) && !(state.hideDone && res[t.id]));
+  if (state.order) { const pos = Object.fromEntries(state.order.map((id, i) => [id, i])); l = l.slice().sort((a, b) => pos[a.id] - pos[b.id]); }
+  else l = l.slice().sort((a, b) => (unlocked(b) - unlocked(a)));   // спершу доступні
+  return l;
+}
+
+function render() {
+  tiles(); notice();
+  const l = list();
+  const n = l.length;
+  $("#count").textContent = `${n} ${n === 1 ? "zadanie" : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? "zadania" : "zadań"}`;
+  const box = $("#list");
+  if (!n) { box.innerHTML = `<p class="empty">Brak zadań dla tych filtrów.</p>`; return; }
+  box.innerHTML = l.slice(0, state.shown).map(card).join("") + (n > state.shown ? `<button type="button" class="more" id="more">Pokaż kolejne (${Math.min(15, n - state.shown)})</button>` : "");
+  const m = $("#more"); if (m) m.onclick = () => { state.shown += 15; render(); };
+}
+
+
+function card(t) {
+  const r = res[t.id];
+  const head = `<div class="task-h"><span class="t">${esc(t.temat)}</span><span>${esc(t.zrodlo)}</span><span>· ${t.pkt} pkt</span><span>· ${TYPY[t.format]}</span>
+      ${!unlocked(t) ? `<span class="done">🔒</span>` : r ? `<span class="done ${r}">${r === "ok" ? "✓ poprawnie" : "✗ do powtórki"}</span>` : ""}</div>`;
+  if (!unlocked(t)) return `<article class="task">${head}${lockedBody()}</article>`;
+  return `<article class="task" data-id="${esc(t.id)}">${head}
+    <div class="sheet"><img src="${esc(t.img)}" width="${Math.round(t.w * 0.6)}" height="${Math.round(t.h * 0.6)}" alt="Treść zadania: ${esc((t.tekst || "").slice(0, 160))}" loading="lazy"></div>
+    <div class="ans">${answerUI(t)}</div>
+  </article>`;
+}
+
+
+function answerUI(t) {
+  if (t.format === "abcd") return group("0", t.options, "") + `<div class="fb" aria-live="polite"></div>`;
+  if (t.format === "pf") return t.answer.map((_, i) => group(String(i), ["P", "F"], `Zdanie ${i + 1}`)).join("") + `<button type="button" class="go" data-check disabled>Sprawdź</button><div class="fb" aria-live="polite"></div>`;
+  if (t.format === "dwa") return t.options.map((o, i) => group(String(i), o, `Zdanie ${i + 1}`)).join("") + `<button type="button" class="go" data-check disabled>Sprawdź</button><div class="fb" aria-live="polite"></div>`;
+  if (t.format === "tn") return group("0", ["T", "N"], "Odpowiedź") + group("1", t.options, "Uzasadnienie") + `<button type="button" class="go" data-check disabled>Sprawdź</button><div class="fb" aria-live="polite"></div>`;
+  return `<div class="opts"><input class="open-in" id="in-${esc(t.id)}" placeholder="Twoja odpowiedź (np. 57 albo 3,60 zł)" aria-label="Twoja odpowiedź"></div>
+    <button type="button" class="go" data-reveal>Pokaż odpowiedź</button><div class="fb" aria-live="polite"></div>`;
+}
+
+const norm = s => String(s).toLowerCase().replace(/\s+/g, "").replace(/zł|cm|km|kg|g$|m$|%/g, "").replace(".", ",");
+
+$("#list").addEventListener("click", e => {
+  if (e.target.closest("[data-open-auth]")) return openAuth(e.target.closest("[data-open-auth]").dataset.openAuth);
+  const art = e.target.closest(".task[data-id]"); if (!art) return;
+  const t = byId[art.dataset.id], fb = art.querySelector(".fb");
+  const opt = e.target.closest(".opt");
+  if (opt && !opt.disabled) {
+    art.querySelectorAll(`.opt[data-g="${opt.dataset.g}"]`).forEach(b => b.setAttribute("aria-pressed", b === opt));
+    if (t.format === "abcd") return finish(art, t, [opt.dataset.v]);
+    const groups = new Set([...art.querySelectorAll(".opt")].map(b => b.dataset.g));
+    art.querySelector("[data-check]").disabled = ![...groups].every(g => art.querySelector(`.opt[data-g="${g}"][aria-pressed="true"]`));
+    return;
+  }
+  if (e.target.closest("[data-check]")) {
+    const groups = [...new Set([...art.querySelectorAll(".opt")].map(b => b.dataset.g))];
+    return finish(art, t, groups.map(g => art.querySelector(`.opt[data-g="${g}"][aria-pressed="true"]`).dataset.v));
+  }
+  if (e.target.closest("[data-reveal]")) {
+    const val = art.querySelector(".open-in").value.trim();
+    if (!t.answer) { fb.className = "fb"; fb.innerHTML = `<div class="key">To zadanie nie ma krótkiej odpowiedzi w kluczu. Pokaż rozwiązanie nauczycielowi.</div>`; return; }
+    let verdict = "";
+    if (val) {
+      const good = norm(val) === norm(t.answer);
+      verdict = good ? `<span class="fb ok">✓ Zgadza się!</span>` : `<span class="fb bad">Porównaj ze swoim wynikiem:</span>`;
+      res[t.id] = good ? "ok" : "bad"; save(); tiles();
+    }
+    fb.className = "fb"; fb.innerHTML = `${verdict}<div class="key">Odpowiedź: ${esc(t.answer)}</div>`;
+  }
+});
+
+function finish(art, t, chosen) {
+  const correct = Array.isArray(t.answer) ? t.answer : [t.answer];
+  const groups = [...new Set([...art.querySelectorAll(".opt")].map(b => b.dataset.g))];
+  let good = true;
+  groups.forEach((g, i) => {
+    art.querySelectorAll(`.opt[data-g="${g}"]`).forEach(b => {
+      b.disabled = true;
+      if (b.dataset.v === correct[i]) b.classList.add("right");
+      else if (b.dataset.v === chosen[i]) b.classList.add("wrong");
+    });
+    if (chosen[i] !== correct[i]) good = false;
+  });
+  const chk = art.querySelector("[data-check]"); if (chk) chk.hidden = true;
+  const fb = art.querySelector(".fb");
+  fb.className = "fb " + (good ? "ok" : "bad");
+  fb.textContent = good ? "✓ Dobrze!" : `✗ Poprawna odpowiedź: ${correct.join(", ")}`;
+  res[t.id] = good ? "ok" : "bad"; save(); tiles();
+  art.querySelector(".task-h .done")?.remove();
+  art.querySelector(".task-h").insertAdjacentHTML("beforeend", `<span class="done ${good ? "ok" : "bad"}">${good ? "✓ poprawnie" : "✗ do powtórki"}</span>`);
+}
+
+render();
+initFirebase().catch(e => { console.warn("Firebase niedostępny", e); $("#authbar").innerHTML = `<span>Logowanie chwilowo niedostępne</span>`; });
+
+</script>
+</body>
+</html>
