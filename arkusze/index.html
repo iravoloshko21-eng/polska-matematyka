@@ -260,6 +260,7 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
 <footer><div class="wrap">
   <span class="sign">iryna.voloshko</span>
   <span>Zadania: Centralna Komisja Egzaminacyjna, zestawienie tematyczne matematykaszkolna.pl.</span>
+  <a href="../dla-nauczycieli/">Dla nauczycieli: gabinet z subskrypcją</a>
 </div></footer>
 
 <script type="module">
@@ -292,6 +293,9 @@ function czytajLiczbe(v) {
 }
 const zgodna = (t, v) => { const x = czytajLiczbe(v); return Number.isFinite(x) && Math.abs(x - t.liczba) < 1e-6 * Math.max(1, Math.abs(t.liczba)); };
 const odpLiczba = t => t.ulamek || String(t.liczba).replace(".", ",") + (t.jedn ? " " + t.jedn : "");
+
+const nauczyciel = () => auth.status === "admin" || auth.status === "teacher";
+const dostep = () => auth.status === "approved" || nauczyciel();
 
 const unlocked = t => !t.zamkniete || t.img;
 const openCount = () => all.filter(unlocked).length;
@@ -336,7 +340,7 @@ const proc = r => Math.round(100 * r.pkt / r.max);
 function lockedBody() {
   if (!FB) return `<div class="locked"><b>Zadanie dla zarejestrowanych</b><span>Dostęp wkrótce.</span></div>`;
   if (auth.status === "pending") return `<div class="locked"><b>Czekasz na akceptację</b><span>Iryna sprawdzi Twoje konto i otworzy dostęp.</span></div>`;
-  if (auth.status === "approved" || auth.status === "admin") return `<div class="locked"><b>Ładowanie…</b></div>`;
+  if (dostep()) return `<div class="locked"><b>Ładowanie…</b></div>`;
   return `<div class="locked"><b>Zadanie dla zarejestrowanych</b><span>Zarejestruj się, a po akceptacji zobaczysz wszystkie zadania.</span><button type="button" class="btn-s primary" data-open-auth="up">Zarejestruj się</button></div>`;
 }
 
@@ -359,7 +363,7 @@ function authbar() {
   const b = $("#authbar");
   if (!FB) { b.innerHTML = ""; return; }
   if (!auth.user) b.innerHTML = `<button type="button" id="ab-in">Zaloguj się</button><button type="button" class="primary" id="ab-up">Zarejestruj się</button>`;
-  else b.innerHTML = `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>${auth.status === "admin" ? `<a class="btn-s" href="../nauczyciel/">Uczniowie</a><a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
+  else b.innerHTML = `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>${nauczyciel() ? `<a class="btn-s" href="../nauczyciel/">Uczniowie</a>` : ""}${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
   $("#ab-in")?.addEventListener("click", () => openAuth("in"));
   $("#ab-up")?.addEventListener("click", () => openAuth("up"));
   $("#ab-out")?.addEventListener("click", () => auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));
@@ -420,8 +424,12 @@ async function initFirebase() {
       snap = await fs.getDoc(ref).catch(() => null);
     }
     const isAdmin = await fs.getDocs(fs.query(fs.collection(db, "users"), fs.limit(1))).then(() => true, () => false);
+    // підписка вчителя: дата «оплачено до» в його профілі (ставить Ірина в Panel)
+    const doK = snap?.data()?.nauczycielDo;
+    auth.nauczycielDo = doK?.toDate ? doK.toDate() : doK ? new Date(doK) : null;
+    const isTeacher = !isAdmin && !!auth.nauczycielDo && auth.nauczycielDo > new Date();
     Object.assign(auth, { db, fs });
-    if (UCZEN && isAdmin) {
+    if (UCZEN && (isAdmin || isTeacher)) {
       // урок з учнем: беремо його результати і зберігаємо туди ж
       const uref = fs.doc(db, "uczniowie", UCZEN);
       const u = await fs.getDoc(uref).then(d => d.exists() ? d.data() : null, () => null);
@@ -441,9 +449,9 @@ async function initFirebase() {
       if (Object.keys(res).length !== Object.keys(remote).length) cloud();
     }
     }
-    auth.status = isAdmin ? "admin" : snap?.data()?.approved ? "approved" : "pending";
+    auth.status = isAdmin ? "admin" : isTeacher ? "teacher" : snap?.data()?.approved ? "approved" : "pending";
     authbar(); render();
-    if ((auth.status === "approved" || auth.status === "admin") && !globalThis.BEZ_PAKIETOW) {
+    if (dostep() && !globalThis.BEZ_PAKIETOW) {
       try {
         // лише пакети цього розділу (D.pakiety), щоб сторінка не тягнула закриті завдання інших розділів
         const packs = D.pakiety ? await Promise.all(D.pakiety.map(id => fs.getDoc(fs.doc(db, "pakiety", id)).catch(() => null)))

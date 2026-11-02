@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Gabinet nauczyciela · Voloshko Iryna</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: те саме, що головна (стиль Instagram iryna.voloshko): кремовий папір, антиква, барвінковий акцент. Стрічка завдань по одному, з фільтрами зверху. */
+:root {
+  color-scheme: light;
+  --cream: #f7f4ee; --card: #fbfaf6; --ink: #26201c; --muted: #6b645d; --line: #e4ded3;
+  --blue: #5468f0; --blue-soft: #e9ebfd; --sage: #b9bfae; --flag: #d7263d;
+  --ok: #2f8a57; --ok-soft: #e3f3e9; --bad: #c8323a; --bad-soft: #fbe6e7;
+  --shadow: 0 10px 24px -12px rgba(60, 45, 30, .28), 0 2px 6px rgba(60, 45, 30, .06);
+  --display: "Fraunces", Georgia, serif;
+  --body: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px) }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--cream); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55 }
+img { max-width: 100% }
+[hidden] { display: none !important }
+.wrap { max-width: 900px; margin: 0 auto; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)) }
+
+nav.site .wrap { display: flex; gap: 6px; flex-wrap: wrap; padding-block: 16px 0 }
+nav.site a { padding: 6px 14px; border-radius: 999px; color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 600 }
+nav.site a[aria-current] { background: var(--card); box-shadow: var(--shadow) }
+nav.site a:not([aria-current]):hover { background: var(--card) }
+
+header.top .wrap { padding-block: 28px 18px; display: grid; gap: 12px }
+.pill { justify-self: start; font-size: 12.5px; font-weight: 600; padding: 5px 14px; border-radius: 999px; background: var(--sage); color: #3d4235 }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 6.5vw, 60px); line-height: 1.02; margin: 0; text-wrap: balance }
+.sub { display: flex; align-items: center; gap: 10px; color: var(--muted) }
+.flag { display: inline-block; width: 16px; height: 9px; background: linear-gradient(#fff 50%, var(--flag) 50%); box-shadow: 0 0 0 1px var(--line); border-radius: 1px }
+.tiles { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px }
+.tile { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 12px 18px; min-width: 112px; text-align: center }
+.tile b { display: block; font-family: var(--display); font-weight: 700; color: var(--blue); font-size: 30px; line-height: 1.1 }
+.tile span { font-size: 12.5px; font-weight: 600 }
+
+.filters { display: grid; gap: 10px; padding-block: 8px 4px }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.row .lbl { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-right: 4px }
+.chip { font: inherit; font-size: 13.5px; font-weight: 600; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff }
+.chip .n { opacity: .65; font-weight: 500; margin-left: 4px }
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding-block: 10px 0; font-size: 14px; color: var(--muted) }
+.tools button { font: inherit; font-size: 13.5px; font-weight: 600; background: none; border: 0; color: var(--blue); cursor: pointer; padding: 4px 0 }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px }
+
+main { display: grid; gap: 22px; padding-block: 20px 40px }
+.task { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 18px; display: grid; gap: 14px; min-width: 0 }
+.task-h { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 12.5px; color: var(--muted) }
+.task-h .t { font-weight: 700; color: var(--blue); background: var(--blue-soft); padding: 3px 10px; border-radius: 999px }
+.task-h .done { margin-left: auto; font-weight: 700 }
+.task-h .done.ok { color: var(--ok) } .task-h .done.bad { color: var(--bad) }
+.sheet { background: #fff; border-radius: 10px; padding: 10px; overflow-x: auto }
+.sheet img { display: block; height: auto; margin: 0 auto }
+
+.ans { display: grid; gap: 10px }
+.q { font-size: 13px; font-weight: 700; color: var(--muted) }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.opt { font: inherit; font-weight: 700; font-size: 15px; min-width: 46px; height: 42px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; color: var(--ink); cursor: pointer }
+.opt:hover { border-color: var(--blue) }
+.opt[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-soft); color: var(--blue) }
+.opt.right { border-color: var(--ok); background: var(--ok-soft); color: var(--ok) }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad) }
+.opt:disabled { cursor: default }
+.go { font: inherit; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 10px; background: none; border: 0; color: var(--ink); cursor: pointer; padding: 0; justify-self: start }
+.go::before { content: "→"; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 17px; box-shadow: 0 6px 14px -6px var(--blue) }
+.go:disabled { opacity: .45; cursor: default }
+.fb { font-size: 14px; font-weight: 600 }
+.fb.ok { color: var(--ok) } .fb.bad { color: var(--bad) }
+.open-in { font: inherit; padding: 9px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; color: var(--ink); min-width: 0; flex: 1 1 200px }
+.key { background: var(--blue-soft); border-radius: 12px; padding: 10px 14px; font-weight: 600 }
+.more { justify-self: center; font: inherit; font-weight: 700; padding: 10px 22px; border-radius: 999px; border: 0; background: var(--ink); color: var(--cream); cursor: pointer }
+.empty { text-align: center; color: var(--muted); padding: 40px 0 }
+
+.prog { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 14px 18px; margin-bottom: 10px }
+.prog summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; list-style: none }
+.prog summary::-webkit-details-marker { display: none }
+.prog summary::after { content: "▾"; margin-left: auto; color: var(--muted) }
+.prog[open] summary::after { content: "▴" }
+.prog summary b { font-family: var(--display); font-size: 22px }
+.prog summary span { font-size: 13.5px; color: var(--muted) }
+.prog .sync { font-size: 12.5px; color: var(--muted); margin: 8px 0 0 }
+.pt { display: grid; gap: 4px; margin-top: 12px }
+.pr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line) }
+.pr button { font: inherit; font-size: 14px; font-weight: 600; text-align: left; background: none; border: 0; padding: 0; color: var(--ink); cursor: pointer; overflow-wrap: anywhere }
+.pr button:hover { color: var(--blue) }
+.pr .st { font-size: 13px; color: var(--muted); white-space: nowrap; text-align: right }
+.pr .st .ok { color: var(--ok); font-weight: 700 } .pr .st .bad { color: var(--bad); font-weight: 700 }
+.pr .pc { font-weight: 800; color: var(--ink); margin-left: 6px }
+.bar { grid-column: 1 / -1; display: flex; height: 8px; border-radius: 999px; background: var(--line); overflow: hidden }
+.bar i { display: block; height: 100% } .bar .ok { background: var(--ok) } .bar .bad { background: var(--bad) }
+@media (max-width: 520px) { .pr { grid-template-columns: 1fr } .pr .st { text-align: left } }
+
+footer .wrap { padding-block: 10px 44px; display: grid; gap: 10px; justify-items: center; text-align: center; color: var(--muted); font-size: 13px }
+.sign { display: flex; align-items: center; gap: 14px; color: var(--ink); font-size: 16px }
+.sign::before, .sign::after { content: ""; width: 60px; height: 1px; background: var(--ink) }
+@media (max-width: 520px) { .task { padding: 12px; border-radius: 16px } .sheet { padding: 4px } }
+
+.authbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-left: auto; font-size: 13.5px; color: var(--muted) }
+.authbar button, .btn-s { font: inherit; font-size: 13.5px; font-weight: 700; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer }
+.authbar .primary, .btn-s.primary { background: var(--blue); border-color: var(--blue); color: #fff }
+.notice { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between }
+.notice p { margin: 0; max-width: 60ch }
+.locked { display: grid; gap: 10px; justify-items: start; padding: 22px; border: 1.5px dashed var(--line); border-radius: 14px; background: repeating-linear-gradient(135deg, transparent 0 12px, rgba(84,104,240,.04) 12px 24px) }
+.locked b { font-family: var(--display); font-size: 19px }
+.locked span { color: var(--muted); font-size: 14px }
+dialog { border: 0; border-radius: 22px; padding: 0; box-shadow: 0 30px 60px -20px rgba(40,30,20,.45); background: var(--card); color: var(--ink); width: min(420px, calc(100vw - 32px)) }
+dialog::backdrop { background: rgba(38, 32, 28, .35) }
+.dlg { padding: 24px; display: grid; gap: 12px }
+.dlg h2 { font-family: var(--display); margin: 0; font-size: 26px }
+.dlg label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; color: var(--muted) }
+.dlg input { font: inherit; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; color: var(--ink) }
+.dlg .alt { display: flex; gap: 6px; font-size: 13.5px; color: var(--muted) }
+.dlg .alt button { font: inherit; font-weight: 700; color: var(--blue); background: none; border: 0; padding: 0; cursor: pointer }
+.dlg .err { color: var(--bad); font-size: 13.5px; min-height: 1em }
+.gbtn { font: inherit; font-weight: 700; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; color: var(--ink); cursor: pointer }
+.or { text-align: center; font-size: 12px; color: var(--muted) }
+
+/* Аркуші: список карток і режим розв'язування з підсумком */
+.ark-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px }
+.ark { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 18px; display: grid; gap: 8px; align-content: start }
+.ark h3 { font-family: var(--display); font-size: 26px; margin: 0; line-height: 1.1 }
+.ark .meta { font-size: 13px; color: var(--muted) }
+.ark .wynik { font-size: 13.5px; font-weight: 700; color: var(--ok); background: var(--ok-soft); border-radius: 999px; padding: 3px 10px; justify-self: start }
+.ark .btn-s, .sheetbar .btn-s { justify-self: start; margin-top: 6px; text-decoration: none }
+.ark.locked-a { opacity: .75 }
+.year { grid-column: 1 / -1; font-family: var(--display); font-size: 20px; margin: 10px 0 -4px; color: var(--muted) }
+.sheetbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--cream) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line) }
+.sheetbar .wrap { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding-block: 10px }
+.sheetbar .clock { font-variant-numeric: tabular-nums; font-weight: 700 }
+.sheetbar .cnt { color: var(--muted); font-size: 14px }
+.sheetbar .sp { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap }
+.summary { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 22px; display: grid; gap: 12px }
+.summary .big { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px }
+.summary .big b { font-family: var(--display); font-size: clamp(40px, 8vw, 64px); line-height: 1; color: var(--blue) }
+.summary .big span { font-size: 18px; font-weight: 700 }
+.summary .bar { height: 12px }
+.nums { display: flex; flex-wrap: wrap; gap: 6px }
+.nums a { min-width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; color: var(--ink); background: #fff; border: 1.5px solid var(--line) }
+.nums a.ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok) }
+.nums a.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad) }
+.nums a.part { background: #f6ecd9; border-color: #c99a45; color: #8a5a12 }
+.nums a.todo { border-style: dashed }
+.self { display: grid; gap: 8px; background: var(--blue-soft); border-radius: 12px; padding: 12px 14px }
+.self .q { color: var(--ink) }
+.task { scroll-margin-top: 70px }
+.pts { margin-left: auto; font-weight: 700 }
+.etap { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: 6px; white-space: nowrap }
+.etap.wait { background: #ece8df; color: var(--muted) } .etap.mid { background: #f6ecd9; color: #8a5a12 } .etap.okp { background: var(--ok-soft); color: var(--ok) }
+.muted-s { color: var(--muted); font-size: 13px; font-weight: 400 }
+.pr .st .btn-s { padding: 3px 12px; font-size: 12.5px }
+.pts.ok { color: var(--ok) } .pts.bad { color: var(--bad) } .pts.part { color: #8a5a12 }
+
+/* Motyw «Wołoszko/Math» (обрала Ірина 2026-10-31): широкий гротеск Unbounded, чорні рамки, кольорові блоки, жорсткі тіні.
+   build.py дописує цей файл у кінець стилів кожної сторінки, тож він перекриває старі значення. */
+:root {
+  --cream: #f4efe4; --card: #fffdf8; --ink: #1c1712; --muted: #5f5850;
+  --blue: #5157d6; --blue-soft: #e3e4fa; --sage: #cdd38a; --lime: #cdd38a; --coral: #f0a78c;
+  --display: "Unbounded", system-ui, sans-serif; --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --shadow: 5px 5px 0 var(--ink);
+}
+body { background: var(--cream) }
+h1 { font-family: var(--display); font-weight: 800; letter-spacing: -.03em; line-height: .95; font-size: clamp(30px, 6.4vw, 68px) }
+h2, h3 { font-family: var(--display); letter-spacing: -.02em }
+
+/* спільне меню: логотип, пігулки, вхід */
+header.site { border-bottom: 1.5px solid var(--ink); background: var(--cream) }
+header.site .in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 8px; padding: 14px max(18px, env(safe-area-inset-left, 0px)) }
+header.site .logo { font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: .02em; color: var(--ink); text-decoration: none; margin-right: auto; white-space: nowrap }
+header.site .pills { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none }
+header.site .pills a { font-weight: 600; font-size: 13px; text-decoration: none; color: var(--ink); border: 1.5px solid var(--ink); border-radius: 999px; padding: 5px 12px; white-space: nowrap }
+header.site .pills a[aria-current] { background: var(--ink); color: var(--cream) }
+header.site .authbar { margin-left: 6px }
+@media (max-width: 760px) {
+  header.site .in { flex-wrap: wrap; padding-inline: 16px }
+  header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
+}
+
+/* картки: чорна рамка й жорстка тінь замість м'якої */
+.tile, .task, .prog, .notice, .ark, .summary, .card, .box, dialog { border: 1.5px solid var(--ink); box-shadow: var(--shadow); border-radius: 16px }
+.tile b, .summary .big b, .stats b { font-family: var(--display); font-weight: 800; color: var(--ink) }
+.pill { background: var(--lime); color: var(--ink); border: 1.5px solid var(--ink) }
+.chip { border: 1.5px solid var(--ink); background: var(--card) }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--cream) }
+.opt { border-color: var(--ink) }
+.opt[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff }
+.task-h .t { background: var(--ink); color: var(--cream) }
+.btn-s, .authbar button, .btn { border: 1.5px solid var(--ink) }
+.btn-s.primary, .authbar .primary, button.primary, .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff }
+.go::before { box-shadow: none }
+.sheet { border: 1.5px solid var(--line) }
+.sheetbar { border-bottom: 1.5px solid var(--ink) }
+.ark h3 { font-weight: 800; font-size: 22px }
+.year { font-family: var(--display); color: var(--ink) }
+.more { background: var(--ink) }
+.sign { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: .04em }
+.sign::before, .sign::after { display: none }
+header.site .join { margin-left: 6px; font-weight: 700; font-size: 13px; text-decoration: none; white-space: nowrap; background: var(--blue); color: #fff; border: 1.5px solid var(--blue); border-radius: 999px; padding: 6px 14px }
+header.top { border-bottom: 1.5px solid var(--ink) }
+
+/* режим уроку з учнем і кабінет вчителя */
+.lekcja { position: sticky; top: 0; z-index: 30; display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: space-between; align-items: center; background: var(--blue); color: #fff; padding: 9px max(18px, env(safe-area-inset-left, 0px)); font-size: 14px }
+.lekcja a { color: #fff; font-weight: 700 }
+.uczniowie { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 18px; margin: 18px 0 }
+.uczen { background: var(--card); border: 1.5px solid var(--ink); box-shadow: var(--shadow); border-radius: 16px; padding: 16px 18px; display: grid; gap: 8px; text-decoration: none; color: var(--ink) }
+.uczen h3 { margin: 0; font-size: 20px }
+.uczen .muted-s, .muted-s { color: var(--muted); font-size: 13px }
+.form-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end }
+.form-row label { display: grid; gap: 3px; font-size: 12.5px; font-weight: 600 }
+.form-row input, .form-row select, textarea.notatki { font: inherit; font-size: 14px; padding: 8px 10px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fff; color: var(--ink) }
+textarea.notatki { width: 100%; min-height: 90px; resize: vertical }
+table.proby { width: 100%; border-collapse: collapse; font-size: 14px }
+table.proby th, table.proby td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line, #e4ded3) }
+table.proby td.num { font-variant-numeric: tabular-nums; white-space: nowrap }
+.akcje { display: flex; flex-wrap: wrap; gap: 8px }
+.akcje a.btn-s { text-decoration: none }
+button.link-del { background: none; border: 0; color: #b3261e; font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline }
+header.site .authbar { flex-wrap: nowrap; gap: 6px }
+header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; padding: 5px 11px; white-space: nowrap }
+@media (max-width: 1240px) {
+  header.site .in { flex-wrap: wrap }
+  header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
+}
+</style>
+</head>
+<body>
+<header class="site"><div class="in"><a class="logo" href="../">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../matura/">Matura</a><a href="../arkusze/">Arkusze</a><a href="../materialy/">Materiały</a><a href="../konto/">Mój gabinet</a></nav><div class="authbar" id="authbar"></div></div></header>
+
+<header class="top"><div class="wrap">
+  <span class="pill">Dla nauczycieli i korepetytorów</span>
+  <h1>Gabinet nauczyciela</h1>
+  <p style="margin:0;max-width:62ch">Prowadź lekcje na gotowych zadaniach CKE, zapisuj wyniki każdego ucznia i wysyłaj prace domowe w PDF. Subskrypcja miesięczna.</p>
+</div></header>
+
+<div class="wrap" id="notice-wrap" style="padding-top:6px"></div>
+<main class="wrap" id="list">
+  <div class="uczniowie">
+    <div class="uczen"><h3>Karty uczniów</h3><span>Każdy uczeń ma własną kartę: postęp po tematach, wyniki arkuszy i notatki z lekcji.</span></div>
+    <div class="uczen"><h3>Lekcja z uczniem</h3><span>Otwierasz zadania w trybie lekcji, a odpowiedzi zapisują się w karcie ucznia.</span></div>
+    <div class="uczen"><h3>Ponad 700 zadań CKE</h3><span>Egzamin ósmoklasisty i matura podstawowa, według tematów, z automatycznym sprawdzaniem.</span></div>
+    <div class="uczen"><h3>Pełne arkusze</h3><span>Arkusze egzaminacyjne z liczeniem punktów i procentów.</span></div>
+    <div class="uczen"><h3>Egzaminy próbne</h3><span>Wpisujesz wyniki próbnych egzaminów i widzisz zmianę z miesiąca na miesiąc.</span></div>
+    <div class="uczen"><h3>PDF na pracę domową</h3><span>Zadania z wybranego tematu, których uczeń jeszcze nie rozwiązał, jednym kliknięciem w PDF.</span></div>
+  </div>
+  <section class="summary" id="cena-box" style="margin:10px 0 30px"></section>
+</main>
+
+
+<dialog id="dlg"><form class="dlg" id="auth-form" method="dialog">
+  <h2 id="dlg-title">Zaloguj się</h2>
+  <button type="button" class="gbtn" id="g-login">Kontynuuj z Google</button>
+  <div class="or">albo e-mailem</div>
+  <label id="name-row" hidden>Imię i nazwisko<input id="f-name" autocomplete="name"></label>
+  <label>E-mail<input id="f-email" type="email" autocomplete="email" required></label>
+  <label>Hasło<input id="f-pass" type="password" autocomplete="current-password" minlength="6" required></label>
+  <div class="err" id="f-err" aria-live="polite"></div>
+  <button class="btn-s primary" id="f-submit" type="submit">Zaloguj się</button>
+  <div class="alt"><span id="alt-text">Nie masz konta?</span><button type="button" id="alt-btn">Zarejestruj się</button></div>
+  <div class="alt"><button type="button" id="f-close">Zamknij</button></div>
+</form></dialog>
+
+<footer><div class="wrap">
+  <span class="sign">iryna.voloshko</span>
+  <span>Zadania: Centralna Komisja Egzaminacyjna, zestawienie tematyczne matematykaszkolna.pl.</span>
+  <a href="../dla-nauczycieli/">Dla nauczycieli: gabinet z subskrypcją</a>
+</div></footer>
+
+<script type="module">
+// Спільне для сторінок E8 і аркушів: дані, результати учня, вхід через Firebase і закриті завдання.
+const D = {"tematy": [], "zadania": []};
+const FB = {"apiKey":"AIzaSyB3805-WbIEjbE6R62Di6irvn9-iUzpdxM","authDomain":"polska-matematyka.firebaseapp.com","projectId":"polska-matematyka","storageBucket":"polska-matematyka.firebasestorage.app","messagingSenderId":"325870615029","appId":"1:325870615029:web:aa5237f6d943b9649a88bc"};   // налаштування Firebase (не секретні); null — вхід вимкнено
+const TYPY = { abcd: "Wybór A–D", pf: "Prawda / fałsz", dwa: "Uzupełnij zdania", tn: "Tak / nie + uzasadnienie", otwarte: "Otwarte" };
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+// Режим уроку: Ірина (адмін) відкриває сторінку з ?uczen=<id> — відповіді пишуться в картку учня (uczniowie/{id}), а не в її власний прогрес
+const UCZEN = new URLSearchParams(location.search).get("uczen");
+const STORE = "e8-wyniki";
+let res = {}; if (!UCZEN) try { res = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) {}
+let cloud = null;   // зберігання прогресу учня в базі (postepy/{uid}), коли він увійшов
+const save = () => { if (!UCZEN) try { localStorage.setItem(STORE, JSON.stringify(res)); } catch (e) {} cloud?.(); };
+
+const all = D.zadania;                       // закриті завдання тут без змісту, поки не прийдуть з бази
+const byId = Object.fromEntries(all.map(t => [t.id, t]));
+const auth = { user: null, status: "out", fb: null };   // status: out | pending | approved | admin
+
+// Числова відповідь у відкритому завданні: приймаємо кому чи крапку, дріб через «/», мішаний дріб «1 1/2», пробіли в тисячах, одиниці.
+function czytajLiczbe(v) {
+  let x = String(v ?? "").toLowerCase().replace(/[−–]/g, "-").replace(/[cdmk]?m\s*[23²³](?!\d)/g, " ").replace(/km\/h|[a-ząćęłńóśźż²³%]+\.?/g, " ").trim();
+  if (/^-?\d{1,3}( \d{3})+([,.]\d+)?$/.test(x)) x = x.replace(/ /g, "");          // 1 200 → 1200
+  let m = /^(-?)(\d+) (\d+)\/(\d+)$/.exec(x);                                         // 1 1/2
+  if (m) return (m[1] ? -1 : 1) * (+m[2] + m[3] / m[4]);
+  m = /^(-?\d+(?:[,.]\d+)?)\s*\/\s*(\d+(?:[,.]\d+)?)$/.exec(x);                      // 3/4, 1,5/2
+  if (m) return parseFloat(m[1].replace(",", ".")) / parseFloat(m[2].replace(",", "."));
+  return /^-?\d+(?:[,.]\d+)?$/.test(x) ? parseFloat(x.replace(",", ".")) : NaN;
+}
+const zgodna = (t, v) => { const x = czytajLiczbe(v); return Number.isFinite(x) && Math.abs(x - t.liczba) < 1e-6 * Math.max(1, Math.abs(t.liczba)); };
+const odpLiczba = t => t.ulamek || String(t.liczba).replace(".", ",") + (t.jedn ? " " + t.jedn : "");
+
+const nauczyciel = () => auth.status === "admin" || auth.status === "teacher";
+const dostep = () => auth.status === "approved" || nauczyciel();
+
+const unlocked = t => !t.zamkniete || t.img;
+const openCount = () => all.filter(unlocked).length;
+
+// Повні аркуші CKE, зібрані з завдань бази за джерелом («maj 2026 - zad. 8»); потрібні сторінкам аркушів і кабінету.
+const MIESIACE = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"];
+const slugify = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+const ARKUSZE = (() => {
+  const g = {};
+  for (const t of all) {
+    const m = /^(\S+) (\d{4}) - zad\. (\d+)$/.exec(t.zrodlo || "");
+    if (!m || +m[2] < 2017 || !MIESIACE.includes(m[1])) continue;   // з 2017 — формат іспиту восьмикласника
+    const key = `${m[1]} ${m[2]}`;
+    const a = (g[key] ||= { nazwa: key, rok: +m[2], mies: MIESIACE.indexOf(m[1]), zadania: [] });
+    if (!a.zadania.some(z => z.nr === +m[3])) a.zadania.push({ t, nr: +m[3] });   // те саме завдання буває у двох темах
+  }
+  return Object.values(g)
+    .map(a => {
+      a.zadania.sort((x, y) => x.nr - y.nr);
+      const nums = a.zadania.map(z => z.nr);
+      a.braki = Math.max(...nums) - new Set(nums).size;
+      a.slug = slugify(a.nazwa);
+      a.max = a.zadania.reduce((s, z) => s + z.t.pkt, 0);
+      return a;
+    })
+    .filter(a => a.braki <= 1 && a.zadania.length >= 15)
+    .sort((a, b) => b.rok - a.rok || b.mies - a.mies);
+})();
+const bySlug = Object.fromEntries(ARKUSZE.map(a => [a.slug, a]));
+const label = a => a.nazwa[0].toUpperCase() + a.nazwa.slice(1);
+const dostepny = a => a.zadania.every(z => unlocked(z.t));
+
+// Arkusz miesiąca: щомісяця всі учні пишуть той самий аркуш (по колу, від найстарішого).
+// Перша спроба, завершена в цьому місяці, зберігається в res["miesiac:РРРР-ММ"] — для порівняння місяців.
+const ym = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+const MIESIAC = ym(new Date());
+const arkuszMiesiaca = (m = MIESIAC) => { const [y, mm] = m.split("-").map(Number), l = ARKUSZE.slice().reverse(); return l[(y * 12 + mm - 1) % l.length]; };
+const nazwaMiesiaca = m => { const [y, mm] = m.split("-").map(Number); return MIESIACE[mm - 1][0].toUpperCase() + MIESIACE[mm - 1].slice(1) + " " + y; };
+const proc = r => Math.round(100 * r.pkt / r.max);
+
+function lockedBody() {
+  if (!FB) return `<div class="locked"><b>Zadanie dla zarejestrowanych</b><span>Dostęp wkrótce.</span></div>`;
+  if (auth.status === "pending") return `<div class="locked"><b>Czekasz na akceptację</b><span>Iryna sprawdzi Twoje konto i otworzy dostęp.</span></div>`;
+  if (dostep()) return `<div class="locked"><b>Ładowanie…</b></div>`;
+  return `<div class="locked"><b>Zadanie dla zarejestrowanych</b><span>Zarejestruj się, a po akceptacji zobaczysz wszystkie zadania.</span><button type="button" class="btn-s primary" data-open-auth="up">Zarejestruj się</button></div>`;
+}
+
+function group(name, opts, q) {
+  return `<div class="opts" role="group" aria-label="${esc(q || "Odpowiedź")}">${q ? `<span class="q">${esc(q)}</span>` : ""}${opts.map(o => `<button type="button" class="opt" data-g="${name}" data-v="${o}" aria-pressed="false">${o}</button>`).join("")}</div>`;
+}
+
+/* ---------- Вхід і закриті завдання (Firebase) ---------- */
+
+function notice() {
+  const w = $("#notice-wrap"), closed = all.length - openCount();
+  if (!FB || !closed) { w.innerHTML = ""; return; }
+  if (auth.status === "out") w.innerHTML = `<div class="notice"><p><b>${closed} zadań</b> jest dostępnych tylko dla zarejestrowanych uczniów. Załóż konto, a po akceptacji otworzą się wszystkie.</p><button type="button" class="btn-s primary" data-open-auth="up">Zarejestruj się</button></div>`;
+  else if (auth.status === "pending") w.innerHTML = `<div class="notice"><p>Konto <b>${esc(auth.user.email)}</b> czeka na akceptację. Gdy Iryna je zatwierdzi, odśwież stronę.</p></div>`;
+  else w.innerHTML = "";
+  w.querySelector("[data-open-auth]")?.addEventListener("click", () => openAuth("up"));
+}
+
+function authbar() {
+  const b = $("#authbar");
+  if (!FB) { b.innerHTML = ""; return; }
+  if (!auth.user) b.innerHTML = `<button type="button" id="ab-in">Zaloguj się</button><button type="button" class="primary" id="ab-up">Zarejestruj się</button>`;
+  else b.innerHTML = `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>${nauczyciel() ? `<a class="btn-s" href="../nauczyciel/">Uczniowie</a>` : ""}${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
+  $("#ab-in")?.addEventListener("click", () => openAuth("in"));
+  $("#ab-up")?.addEventListener("click", () => openAuth("up"));
+  $("#ab-out")?.addEventListener("click", () => auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));
+}
+
+let mode = "in";
+function openAuth(m) {
+  mode = m;
+  $("#dlg-title").textContent = m === "up" ? "Załóż konto" : "Zaloguj się";
+  $("#f-submit").textContent = m === "up" ? "Zarejestruj się" : "Zaloguj się";
+  $("#name-row").hidden = m !== "up";
+  $("#f-pass").autocomplete = m === "up" ? "new-password" : "current-password";
+  $("#alt-text").textContent = m === "up" ? "Masz już konto?" : "Nie masz konta?";
+  $("#alt-btn").textContent = m === "up" ? "Zaloguj się" : "Zarejestruj się";
+  $("#f-err").textContent = "";
+  $("#dlg").showModal();
+}
+$("#alt-btn").onclick = () => openAuth(mode === "up" ? "in" : "up");
+$("#f-close").onclick = () => $("#dlg").close();
+
+const ERR = {
+  "auth/invalid-credential": "Nieprawidłowy e-mail lub hasło.", "auth/wrong-password": "Nieprawidłowe hasło.",
+  "auth/user-not-found": "Nie ma konta z tym e-mailem.", "auth/email-already-in-use": "To konto już istnieje. Zaloguj się.",
+  "auth/weak-password": "Hasło musi mieć co najmniej 6 znaków.", "auth/invalid-email": "Sprawdź adres e-mail.",
+  "auth/popup-closed-by-user": "", "auth/too-many-requests": "Za dużo prób. Spróbuj za kilka minut."
+};
+const showErr = e => { $("#f-err").textContent = ERR[e.code] ?? "Coś poszło nie tak. Spróbuj ponownie."; };
+
+async function initFirebase() {
+  if (!FB) { authbar(); return; }
+  const V = "10.12.2", base = `https://www.gstatic.com/firebasejs/${V}/`;
+  const [app, a, fs] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]);
+  const fbApp = app.initializeApp(FB);
+  const fauth = a.getAuth(fbApp), db = fs.getFirestore(fbApp);
+  auth.fb = { auth: fauth, signOut: a.signOut };
+
+  $("#g-login").onclick = () => a.signInWithPopup(fauth, new a.GoogleAuthProvider()).then(() => $("#dlg").close(), showErr);
+  $("#auth-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const email = $("#f-email").value.trim(), pass = $("#f-pass").value;
+    try {
+      if (mode === "up") {
+        const cred = await a.createUserWithEmailAndPassword(fauth, email, pass);
+        const name = $("#f-name").value.trim();
+        if (name) await a.updateProfile(cred.user, { displayName: name });
+      } else await a.signInWithEmailAndPassword(fauth, email, pass);
+      $("#dlg").close();
+    } catch (err) { showErr(err); }
+  });
+
+  a.onAuthStateChanged(fauth, async user => {
+    auth.user = user;
+    if (!user) { auth.status = "out"; authbar(); render(); return; }
+    const ref = fs.doc(db, "users", user.uid);
+    let snap = await fs.getDoc(ref).catch(() => null);
+    if (!snap || !snap.exists()) {
+      await fs.setDoc(ref, { email: user.email, name: user.displayName || $("#f-name").value.trim() || "", approved: false, created: fs.serverTimestamp() }).catch(() => {});
+      snap = await fs.getDoc(ref).catch(() => null);
+    }
+    const isAdmin = await fs.getDocs(fs.query(fs.collection(db, "users"), fs.limit(1))).then(() => true, () => false);
+    // підписка вчителя: дата «оплачено до» в його профілі (ставить Ірина в Panel)
+    const doK = snap?.data()?.nauczycielDo;
+    auth.nauczycielDo = doK?.toDate ? doK.toDate() : doK ? new Date(doK) : null;
+    const isTeacher = !isAdmin && !!auth.nauczycielDo && auth.nauczycielDo > new Date();
+    Object.assign(auth, { db, fs });
+    if (UCZEN && (isAdmin || isTeacher)) {
+      // урок з учнем: беремо його результати і зберігаємо туди ж
+      const uref = fs.doc(db, "uczniowie", UCZEN);
+      const u = await fs.getDoc(uref).then(d => d.exists() ? d.data() : null, () => null);
+      res = u?.wyniki || {};
+      let timer;
+      cloud = () => { clearTimeout(timer); timer = setTimeout(() => fs.setDoc(uref, { wyniki: res, updated: fs.serverTimestamp() }, { merge: true }).catch(e => console.warn(e)), 800); };
+      lekcjaBar(u);
+    } else {
+    // прогрес: зливаємо локальні результати з тими, що на акаунті, і далі зберігаємо в базу
+    const pref = fs.doc(db, "postepy", user.uid);
+    const remote = await fs.getDoc(pref).then(d => d.exists() ? d.data().wyniki || {} : {}, () => null);
+    if (remote) {
+      res = { ...res, ...remote };
+      try { localStorage.setItem(STORE, JSON.stringify(res)); } catch (e) {}
+      let timer;
+      cloud = () => { clearTimeout(timer); timer = setTimeout(() => fs.setDoc(pref, { wyniki: res, updated: fs.serverTimestamp() }).catch(e => console.warn(e)), 1200); };
+      if (Object.keys(res).length !== Object.keys(remote).length) cloud();
+    }
+    }
+    auth.status = isAdmin ? "admin" : isTeacher ? "teacher" : snap?.data()?.approved ? "approved" : "pending";
+    authbar(); render();
+    if (dostep() && !globalThis.BEZ_PAKIETOW) {
+      try {
+        // лише пакети цього розділу (D.pakiety), щоб сторінка не тягнула закриті завдання інших розділів
+        const packs = D.pakiety ? await Promise.all(D.pakiety.map(id => fs.getDoc(fs.doc(db, "pakiety", id)).catch(() => null)))
+                                : (await fs.getDocs(fs.collection(db, "pakiety"))).docs;
+        packs.forEach(p => p?.exists?.() !== false && JSON.parse(p?.data()?.dane || "[]").forEach(z => { if (byId[z.id]) Object.assign(byId[z.id], z); }));
+      } catch (e) { console.warn(e); }
+      render();
+    }
+  });
+}
+
+// смужка «Lekcja z …» над сторінкою в режимі уроку
+function lekcjaBar(u) {
+  const bar = document.createElement("div");
+  bar.className = "lekcja";
+  bar.innerHTML = u ? `<span>Lekcja z: <b>${esc(u.imie)}</b> · odpowiedzi zapisują się w karcie ucznia</span><a href="../nauczyciel/#${encodeURIComponent(UCZEN)}">Zakończ lekcję →</a>`
+                    : `<span>Nie znaleziono ucznia.</span><a href="../nauczyciel/">Wróć →</a>`;
+  document.body.prepend(bar);
+  auth.uczen = u;
+  // посилання на завдання, аркуші й кабінет усередині сторінки лишаються в режимі уроку
+  document.addEventListener("click", e => {
+    const a = e.target.closest("a[href]");
+    if (!a || a.closest("header.site, .lekcja") || !/\/(e8|arkusze|matura|konto)\//.test(a.href)) return;
+    const x = new URL(a.href); x.searchParams.set("uczen", UCZEN); a.href = x.href;
+  }, true);
+}
+
+// PDF для домашнього: сторінки A4 у вигляді аркушів matematykaszkolna.pl (заголовок, «Zad. 1 (1 pkt) (джерело)», номер сторінки),
+// складаються на canvas і зберігаються jsPDF як файл. Нумерація завдань — своя, від 1.
+async function drukuj(lista, { sekcja, temat, podpis }) {
+  const l = lista.filter(t => unlocked(t) && t.img);
+  if (!l.length) { alert("Brak dostępnych zadań do pobrania."); return; }
+  const zOdp = confirm(`PDF: ${l.length} zadań.\n\nDodać na końcu stronę z odpowiedziami (dla nauczyciela)?\nOK — z odpowiedziami, Anuluj — bez odpowiedzi.`);
+  if (!globalThis.jspdf) await new Promise((ok, err) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"; s.onload = ok; s.onerror = err; document.head.append(s); });
+  const W = 1323, H = 1871, M = 71, TOP = 90, BOT = 150;          // A4 при 160 dpi — так само, як вирізані картинки завдань
+  const load = t => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = new URL(t.img, location.href).href; });
+  const imgs = await Promise.all(l.map(load));
+  const strony = []; let c, x, y;
+  const nowa = () => {
+    c = document.createElement("canvas"); c.width = W; c.height = H; x = c.getContext("2d");
+    x.fillStyle = "#fff"; x.fillRect(0, 0, W, H); x.fillStyle = "#000"; x.textBaseline = "alphabetic"; strony.push(c); y = TOP;
+  };
+  const srodek = (txt, font, yy) => { x.font = font; x.fillText(txt, (W - x.measureText(txt).width) / 2, yy); };
+  nowa();
+  srodek(sekcja, "30px 'Times New Roman', Times, serif", y + 30); srodek(temat, "30px 'Times New Roman', Times, serif", y + 68); y += 90;
+  if (podpis) { srodek(podpis, "italic 22px 'Times New Roman', Times, serif", y + 6); y += 30; }
+  y += 16;
+  l.forEach((t, i) => {
+    const im = imgs[i]; if (!im) return;
+    let w = im.naturalWidth, h = im.naturalHeight;
+    const maxH = H - TOP - BOT - 40; if (h > maxH) { w = w * maxH / h; h = maxH; }
+    if (w > W - 2 * M + 30) { h = h * (W - 2 * M + 30) / w; w = W - 2 * M + 30; }
+    if (y + 34 + h > H - BOT) nowa();
+    x.font = "bold 24px 'Times New Roman', Times, serif"; const z = `Zad. ${i + 1}`; x.fillText(z, M, y + 24);
+    let xx = M + x.measureText(z).width;
+    x.font = "24px 'Times New Roman', Times, serif"; x.fillText(` (${t.pkt} pkt)`, xx, y + 24); xx += x.measureText(` (${t.pkt} pkt)`).width;
+    if (t.zrodlo) x.fillText(`   (${t.zrodlo})`, xx, y + 24);
+    x.drawImage(im, M - 15, y + 32, w, h);
+    y += 32 + h + 22;
+  });
+  if (zOdp) {
+    const odp = t => Array.isArray(t.answer) ? t.answer.join(", ") : t.answer ?? "—";
+    nowa(); srodek("Odpowiedzi", "30px 'Times New Roman', Times, serif", y + 30); y += 70;
+    const kol = 4, sz = (W - 2 * M) / kol;
+    l.forEach((t, i) => {
+      const k = i % kol; if (k === 0 && i) y += 44;
+      if (y > H - BOT) { nowa(); }
+      x.font = "bold 22px 'Times New Roman', Times, serif"; x.fillText(`Zad. ${i + 1}`, M + k * sz, y);
+      x.font = "22px 'Times New Roman', Times, serif"; x.fillText(String(odp(t)).slice(0, 18), M + k * sz + 82, y);
+    });
+  }
+  const n = strony.length;
+  strony.forEach((s, i) => { const g = s.getContext("2d"); g.fillStyle = "#000";
+    g.font = "22px 'Times New Roman', Times, serif"; const p = `– ${i + 1} –`; g.fillText(p, (W - g.measureText(p).width) / 2, H - 92);
+    g.font = "18px Inter, Arial, sans-serif"; const v = "Voloshko Iryna · Matematyka"; g.fillText(v, (W - g.measureText(v).width) / 2, H - 62); });
+  const pdf = new jspdf.jsPDF({ unit: "mm", format: "a4" });
+  strony.forEach((s, i) => { if (i) pdf.addPage(); pdf.addImage(s.toDataURL("image/png"), "PNG", 0, 0, 210, 297, undefined, "FAST"); });
+  pdf.save(`${temat} - zadania${zOdp ? " z odpowiedziami" : ""}.pdf`.replace(/[\\/:*?"<>|]/g, "-"));
+}
+
+// Сторінка пропозиції для вчителів: ціна і кнопка оплати WayForPay з oferta.json (build.py підставляє).
+globalThis.BEZ_PAKIETOW = true;
+const OFERTA = {"cena": "", "waluta": "zł", "link": "", "kontakt": "https://www.instagram.com/iryna.voloshko/"};
+function render() {
+  const o = OFERTA || {}, kup = o.link
+    ? `<a class="btn-s primary" href="${esc(o.link)}" target="_blank" rel="noopener" style="justify-self:start;font-size:15px;padding:10px 22px">Kup dostęp</a>`
+    : `<a class="btn-s primary" href="${esc(o.kontakt)}" target="_blank" rel="noopener" style="justify-self:start;font-size:15px;padding:10px 22px">Napisz, aby kupić dostęp</a>`;
+  $("#cena-box").innerHTML = `<div class="big"><b style="font-size:clamp(30px,6vw,46px)">${o.cena ? `${esc(o.cena)} ${esc(o.waluta)}` : "Subskrypcja"}</b>${o.cena ? "<span>miesięcznie</span>" : ""}</div>
+    ${kup}
+    <ol style="margin:4px 0 0;padding-left:20px;display:grid;gap:4px">
+      <li>Załóż konto na stronie${auth.user ? " (już masz: " + esc(auth.user.email) + ")" : ""}.</li>
+      <li>Opłać subskrypcję, podając ten sam e-mail. Płatność odnawia się co miesiąc, możesz ją anulować w każdej chwili.</li>
+      <li>W ciągu 24 godzin otworzę Ci gabinet nauczyciela: przycisk <b>Uczniowie</b> pojawi się w menu.</li>
+    </ol>
+    ${auth.status === "teacher" ? `<span class="fb ok">Twój dostęp jest aktywny do ${auth.nauczycielDo.toLocaleDateString("pl-PL")}. <a href="../nauczyciel/">Przejdź do gabinetu →</a></span>` : ""}
+    ${!auth.user && FB ? `<button type="button" class="btn-s" data-open-auth="up" style="justify-self:start">Załóż konto</button>` : ""}`;
+  $("#cena-box").querySelector("[data-open-auth]")?.addEventListener("click", () => openAuth("up"));
+}
+render();
+initFirebase().catch(e => { console.warn("Firebase niedostępny", e); $("#authbar").innerHTML = `<span>Logowanie chwilowo niedostępne</span>`; });
+
+</script>
+</body>
+</html>

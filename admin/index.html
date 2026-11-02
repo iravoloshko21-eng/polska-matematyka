@@ -120,7 +120,7 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
   <section class="box" id="users" hidden>
     <div class="row" style="justify-content:space-between"><h2>Учні</h2>
       <div class="row tabs"><button data-f="wait" aria-pressed="true">Очікують</button><button data-f="ok" aria-pressed="false">Схвалені</button><button data-f="all" aria-pressed="false">Усі</button></div></div>
-    <div class="scroll"><table><thead><tr><th>Ім'я</th><th>E-mail</th><th>Дата</th><th>Статус</th><th>Прогрес</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
+    <div class="scroll"><table><thead><tr><th>Ім'я</th><th>E-mail</th><th>Дата</th><th>Статус</th><th>Прогрес</th><th>Вчитель (оплачено до)</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
     <p class="muted" id="empty" style="margin:0" hidden>Нікого немає в цьому списку.</p>
   </section>
 
@@ -171,9 +171,21 @@ else {
       <td>${u.created ? new Date(u.created.seconds * 1000).toLocaleDateString("uk-UA") : ""}</td>
       <td><span class="pill ${u.approved ? "ok" : "wait"}">${u.approved ? "схвалено" : "очікує"}</span></td>
       <td>${stat(prog[u.id])}</td>
+      <td style="white-space:nowrap"><input type="date" data-do="${u.id}" value="${u.nauczycielDo ? new Date(u.nauczycielDo.seconds * 1000).toISOString().slice(0, 10) : ""}" style="font:inherit;padding:4px 6px">
+        <button data-zapisz-do="${u.id}">Зберегти</button>${u.nauczycielDo ? (u.nauczycielDo.seconds * 1000 > Date.now() ? ` <span class="pill ok">активний</span>` : ` <span class="pill wait">закінчився</span>`) : ""}</td>
       <td>${u.approved ? `<button data-id="${u.id}" data-v="0">Закрити доступ</button>` : `<button class="primary" data-id="${u.id}" data-v="1">Схвалити</button>`}</td></tr>`).join("");
   }
   $("#tb").addEventListener("click", async e => {
+    // підписка вчителя: дата «оплачено до» (включно до кінця дня); порожня дата — закрити доступ вчителя
+    const z = e.target.closest("button[data-zapisz-do]");
+    if (z) {
+      const id = z.dataset.zapiszDo, v = document.querySelector(`input[data-do="${id}"]`).value;
+      z.disabled = true;
+      const val = v ? fs.Timestamp.fromDate(new Date(v + "T23:59:59")) : null;
+      await fs.updateDoc(fs.doc(db, "users", id), v ? { nauczycielDo: val, approved: true } : { nauczycielDo: null });
+      Object.assign(users.find(u => u.id === id), v ? { nauczycielDo: val, approved: true } : { nauczycielDo: null }); draw();
+      return;
+    }
     const b = e.target.closest("button[data-id]"); if (!b) return;
     b.disabled = true;
     await fs.updateDoc(fs.doc(db, "users", b.dataset.id), { approved: b.dataset.v === "1" });
