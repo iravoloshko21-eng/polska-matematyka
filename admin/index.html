@@ -155,11 +155,13 @@ else {
   // аркуші лежать у тих самих результатах під ключами «arkusz:…», аркуш місяця — «miesiac:РРРР-ММ»
   const stat = w => {
     const e = Object.entries(w || {}), v = e.filter(([k]) => !k.includes(":")).map(([, x]) => x), ark = e.filter(([k]) => k.startsWith("arkusz:")).map(([, x]) => x);
-    const mies = e.filter(([k]) => k.startsWith("miesiac:")).sort(([a], [b]) => a.localeCompare(b)).map(([k, r]) => `${k.slice(13)}.${k.slice(10, 12)}: ${Math.round(100 * r.pkt / r.max)}%`);
+    // дані пише сам учень, тому все екрануємо й рахуємо як числа (захист від шкідливого коду в Panel)
+    const pr = r => { const m = Number(r?.max); return m ? Math.round(100 * (Number(r?.pkt) || 0) / m) : 0; };
+    const mies = e.filter(([k]) => k.startsWith("miesiac:")).sort(([a], [b]) => a.localeCompare(b)).map(([k, r]) => `${esc(k.slice(13))}.${esc(k.slice(10, 12))}: ${pr(r)}%`);
     if (!v.length && !ark.length) return "—";
     const ok = v.filter(x => x === "ok").length;
     const m = mies.length ? `<br><span class="muted">аркуш місяця: ${mies.join(" · ")}</span>` : "";
-    const a = ark.length ? `<br><span class="muted">аркушів: ${ark.length}, середній ${Math.round(100 * ark.reduce((s, r) => s + r.pkt / r.max, 0) / ark.length)}%</span>` : "";
+    const a = ark.length ? `<br><span class="muted">аркушів: ${ark.length}, середній ${Math.round(ark.reduce((s, r) => s + pr(r), 0) / ark.length)}%</span>` : "";
     return `<span style="white-space:nowrap">${v.length} розв. · <b style="color:var(--ok)">✓ ${ok}</b> · <b style="color:var(--bad)">✗ ${v.length - ok}</b> · <b>${v.length ? Math.round(100 * ok / v.length) : 0}%</b></span>${a}${m}`;
   };
 
