@@ -613,9 +613,10 @@ function list() {
   return l;
 }
 
-// PDF (лише для Ірини): усі завдання за поточними фільтрами; з «Ukryj rozwiązane» — лише ті, що учень ще не розв'язав
+// PDF (лише для Ірини; вчителям-підписникам прибрано 2026-11-03, щоб не роздавали базу): усі завдання за поточними фільтрами; з «Ukryj rozwiązane» — лише ті, що учень ще не розв'язав
 if (UCZEN) $("#reset").textContent = "Wyczyść wyniki ucznia";
 $("#pdf").onclick = async e => {
+  if (auth.status !== "admin") return;
   const b = e.target; b.disabled = true; b.textContent = "Tworzę PDF…";
   try { await drukuj(list(), { sekcja: location.pathname.includes("/matura/") ? "Zadania maturalne · poziom podstawowy" : "Zadania do egzaminu ósmoklasisty",
     temat: state.temat || "Różne tematy", podpis: auth.uczen ? `Praca domowa · ${auth.uczen.imie}` : "" }); }
@@ -625,7 +626,7 @@ $("#pdf").onclick = async e => {
 
 function render() {
   tiles(); notice();
-  $("#pdf").hidden = !nauczyciel();
+  $("#pdf").hidden = auth.status !== "admin";
   const l = list();
   const n = l.length;
   $("#count").textContent = `${n} ${n === 1 ? "zadanie" : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? "zadania" : "zadań"}`;

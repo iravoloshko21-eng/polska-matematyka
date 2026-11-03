@@ -559,7 +559,7 @@ function render() {
     $("#tiles").innerHTML = "";
     const wygasl = auth.nauczycielDo && auth.nauczycielDo <= new Date();
     box.innerHTML = `<section class="summary"><b style="font-family:var(--display);font-size:22px">${!auth.user ? "Zaloguj się jako nauczyciel." : wygasl ? `Twój dostęp nauczyciela wygasł ${auth.nauczycielDo.toLocaleDateString("pl-PL")}.` : "Gabinet nauczyciela jest dostępny w subskrypcji."}</b>
-      <span class="muted-s">Karty uczniów, lekcje z zadaniami CKE, egzaminy próbne i PDF z zadaniami na pracę domową.</span>
+      <span class="muted-s">Karty uczniów, lekcje z zadaniami CKE, egzaminy próbne i tematy do powtórki.</span>
       <div class="akcje">${auth.user ? "" : `<button type="button" class="btn-s" data-open-auth="in">Zaloguj się</button>`}<a class="btn-s primary" href="../dla-nauczycieli/">${wygasl ? "Przedłuż dostęp" : "Zobacz ofertę"}</a></div></section>`;
     box.querySelector("[data-open-auth]")?.addEventListener("click", () => openAuth("in"));
     return;
@@ -602,7 +602,7 @@ function karta(u) {
     .filter(t => t.n >= 3).sort((a, b) => a.p - b.p).slice(0, 5);
   $("#list").innerHTML = `<p><a href="#">← Wszyscy uczniowie</a></p>
     <section class="summary"><b style="font-family:var(--display);font-size:20px">Lekcja z uczniem</b>
-      <span class="muted-s">Otwórz zadania w trybie lekcji: odpowiedzi zapiszą się w karcie ucznia. «Ukryj rozwiązane» + «Pobierz PDF» da Ci zadania, których jeszcze nie zrobiliście, na pracę domową.</span>
+      <span class="muted-s">Otwórz zadania w trybie lekcji: odpowiedzi zapiszą się w karcie ucznia.${auth.status === "admin" ? " «Ukryj rozwiązane» + «Pobierz PDF» da Ci zadania, których jeszcze nie zrobiliście, na pracę domową." : " «Ukryj rozwiązane» pokaże zadania, których jeszcze nie zrobiliście."}</span>
       <div class="akcje"><a class="btn-s primary" href="../e8/${q}">Zadania E8</a><a class="btn-s" href="../matura/${q}">Matura podstawowa</a><a class="btn-s" href="../arkusze/${q}">Arkusz</a><a class="btn-s" href="../konto/${q}">Postęp po tematach</a></div>
       ${tem.length ? `<span><b>Do powtórki:</b> ${tem.map(t => `<a href="../e8/${q}#temat=${encodeURIComponent(t.temat)}">${esc(t.temat)}</a> (${t.p}%)`).join(" · ")}</span>` : ""}</section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Egzaminy próbne</b>
