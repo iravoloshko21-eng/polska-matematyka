@@ -42,6 +42,8 @@ a.karta:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--in
 
 .cta { margin-top: 40px; background: var(--ink); color: var(--cream); border-radius: 20px; padding: 22px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap }
 .cta b { font-family: var(--display); font-size: 18px }
+.cta-b { display: flex; gap: 8px; flex-wrap: wrap }
+.cta a.jasny { background: transparent; color: var(--cream); border: 1.5px solid var(--cream) }
 .cta a { background: var(--cream); color: var(--ink); font-weight: 700; font-size: 14px; text-decoration: none; border-radius: 999px; padding: 11px 20px }
 footer { border-top: 1.5px solid var(--ink) }
 footer .in2 { max-width: 1180px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 16px max(24px, env(safe-area-inset-left, 0px)) 34px; font-size: 12.5px }
@@ -128,7 +130,7 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
 </style>
 </head>
 <body>
-<header class="site"><div class="in"><a class="logo" href="./">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href="./" aria-current="page">Start</a><a href="e8/">Egzamin ósmoklasisty</a><a href="matura/">Matura</a><a href="arkusze/">Arkusze</a><a href="materialy/">Materiały</a><a href="konto/">Mój gabinet</a></nav><a class="join" href="konto/">Załóż konto</a></div></header>
+<header class="site"><div class="in"><a class="logo" href="./">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href="./" aria-current="page">Start</a><a href="e8/">Egzamin ósmoklasisty</a><a href="matura/">Matura</a><a href="arkusze/">Arkusze</a><a href="materialy/">Materiały</a><a href="konto/">Mój gabinet</a><a href="o-mnie/">O mnie</a></nav><a class="join" href="konto/">Załóż konto</a></div></header>
 
 <main class="wybor">
   <span class="kicker">Matematyka bez paniki</span>
@@ -147,9 +149,9 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
     <div class="karta"><span class="ic" aria-hidden="true">▶</span><span class="t"><b>Webinary</b><small>Dla uczniów i nauczycieli</small></span><span class="badge">wkrótce</span></div>
   </div>
 
-  <div class="cta"><b>Chcesz przerobić wszystko ze mną?</b><a href="https://www.instagram.com/iryna.voloshko/" target="_blank" rel="noopener">Zapisz się na zajęcia</a></div>
+  <div class="cta"><b>Chcesz przerobić wszystko ze mną?</b><span class="cta-b"><a class="jasny" href="o-mnie/">O mnie</a><a href="https://t.me/voloshko_tutor_math" target="_blank" rel="noopener">Zapisz się na zajęcia</a></span></div>
 </main>
 
-<footer><div class="in2"><span>© Voloshko Iryna</span><a href="dla-nauczycieli/">Dla nauczycieli: gabinet z subskrypcją</a><a href="https://www.instagram.com/iryna.voloshko/" target="_blank" rel="noopener">Instagram · iryna.voloshko</a></div></footer>
+<footer><div class="in2"><span>© Voloshko Iryna</span><a href="dla-nauczycieli/">Dla nauczycieli: gabinet z subskrypcją</a><a href="https://t.me/voloshko_tutor_math" target="_blank" rel="noopener">Telegram · voloshko_tutor_math</a><a href="https://www.instagram.com/iryna.voloshko/" target="_blank" rel="noopener">Instagram · iryna.voloshko</a></div></footer>
 </body>
 </html>

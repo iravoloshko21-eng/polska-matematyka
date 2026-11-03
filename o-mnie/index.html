@@ -1,0 +1,143 @@
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>O mnie · Voloshko Iryna · Matematyka</title>
+<meta name="description" content="Iryna Voloshko: polska matematyka dla szkoły i studiów — egzamin ósmoklasisty, matura i sesja. Zajęcia online po polsku, 5 lat pracy według polskiego programu.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* «O mnie» (Ірина, 2026-11-02): фото, факти, як працюємо, освіта, кейси (пости в Instagram), FAQ, запис у Telegram. Стиль styl-2 з motyw.css. */
+a{color:inherit}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+.w{max-width:980px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;margin:0}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:48px 0 40px}
+.kicker{display:inline-block;background:var(--ink);color:var(--cream);font-size:12px;font-weight:700;border-radius:999px;padding:4px 12px}
+.hero .h1{font-weight:800;font-size:clamp(34px,5.4vw,60px);line-height:.98;margin:14px 0 16px}.hero .h1 span{color:var(--blue)}
+.hero ul{list-style:none;padding:0;margin:0 0 22px;display:grid;gap:8px;font-size:16px}
+.hero li{display:flex;gap:10px;align-items:baseline}.hero li b{font-family:var(--display);font-size:13px;color:var(--blue)}
+.btn{display:inline-block;font-weight:700;font-size:14px;text-decoration:none;border-radius:999px;padding:13px 24px;border:1.5px solid var(--ink);background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.l{background:transparent;color:var(--ink);border-color:var(--ink);margin-left:8px}
+.foto{border:1.5px solid var(--ink);border-radius:22px;overflow:hidden;box-shadow:7px 7px 0 var(--ink);background:var(--coral)}.foto img{display:block;width:100%;height:auto}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border:1.5px solid var(--ink);border-radius:18px;overflow:hidden;background:var(--card)}
+.stats div{padding:18px 20px;border-right:1.5px solid var(--ink)}.stats div:last-child{border-right:0}
+.stats b{display:block;font-family:var(--display);font-weight:800;font-size:28px;line-height:1.1}.stats span{font-size:13px;font-weight:600;color:var(--muted)}
+section{padding:46px 0 0}h2{font-weight:800;font-size:clamp(24px,3.4vw,36px);margin-bottom:18px}
+.kroki{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.krok{background:var(--card);border:1.5px solid var(--ink);border-radius:18px;padding:18px;box-shadow:5px 5px 0 var(--ink)}
+.krok i{font-style:normal;display:inline-grid;place-items:center;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--ink);font-family:var(--display);font-weight:800;margin-bottom:10px}
+.krok h3{font-size:17px;margin-bottom:6px}.krok p{margin:0;color:var(--muted);font-size:14px}
+.k1 i{background:var(--blue);color:#fff}.k2 i{background:var(--lime)}.k3 i{background:var(--coral)}
+.edu{display:grid;gap:12px}.edu div{display:flex;gap:16px;align-items:flex-start;border-bottom:1.5px solid var(--ink);padding:0 0 12px}
+.edu small{flex:none;font-family:var(--display);font-weight:700;font-size:12px;background:var(--lime);border:1.5px solid var(--ink);border-radius:999px;padding:3px 10px}
+.edu p{margin:0}.edu p span{display:block;color:var(--muted);font-size:14px}
+.case{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.case a{display:flex;flex-direction:column;justify-content:space-between;min-height:150px;text-decoration:none;color:var(--ink);background:var(--card);border:1.5px solid var(--ink);border-radius:18px;padding:18px;box-shadow:5px 5px 0 var(--ink)}
+.case a:nth-child(1){background:var(--blue);color:#fff}.case a:nth-child(2){background:var(--lime)}.case a:nth-child(3){background:var(--coral)}
+.case b{font-family:var(--display);font-size:17px}.case span{font-weight:700;font-size:13px}
+.faq details{border-bottom:1.5px solid var(--ink);padding:14px 0}.faq summary{font-weight:700;cursor:pointer;font-size:16px}.faq p{margin:8px 0 0;color:var(--muted)}
+.cta{margin:50px 0 60px;background:var(--ink);color:var(--cream);border-radius:22px;padding:28px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.cta h2{color:var(--cream);margin:0}.cta .btn{background:var(--cream);color:var(--ink);border-color:var(--cream)}
+@media(max-width:760px){.hero{grid-template-columns:1fr;padding-top:28px}.foto{order:-1;max-width:320px}.stats,.kroki,.case{grid-template-columns:1fr}.stats div{border-right:0;border-bottom:1.5px solid var(--ink)}.stats div:last-child{border-bottom:0}.btn.l{margin:8px 0 0}}
+
+/* Motyw «Wołoszko/Math» (обрала Ірина 2026-10-31): широкий гротеск Unbounded, чорні рамки, кольорові блоки, жорсткі тіні.
+   build.py дописує цей файл у кінець стилів кожної сторінки, тож він перекриває старі значення. */
+:root {
+  --cream: #f4efe4; --card: #fffdf8; --ink: #1c1712; --muted: #5f5850;
+  --blue: #5157d6; --blue-soft: #e3e4fa; --sage: #cdd38a; --lime: #cdd38a; --coral: #f0a78c;
+  --display: "Unbounded", system-ui, sans-serif; --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --shadow: 5px 5px 0 var(--ink);
+}
+body { background: var(--cream) }
+h1 { font-family: var(--display); font-weight: 800; letter-spacing: -.03em; line-height: .95; font-size: clamp(30px, 6.4vw, 68px) }
+h2, h3 { font-family: var(--display); letter-spacing: -.02em }
+
+/* спільне меню: логотип, пігулки, вхід */
+header.site { border-bottom: 1.5px solid var(--ink); background: var(--cream) }
+header.site .in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 8px; padding: 14px max(18px, env(safe-area-inset-left, 0px)) }
+header.site .logo { font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: .02em; color: var(--ink); text-decoration: none; margin-right: auto; white-space: nowrap }
+header.site .pills { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none }
+header.site .pills a { font-weight: 600; font-size: 13px; text-decoration: none; color: var(--ink); border: 1.5px solid var(--ink); border-radius: 999px; padding: 5px 12px; white-space: nowrap }
+header.site .pills a[aria-current] { background: var(--ink); color: var(--cream) }
+header.site .authbar { margin-left: 6px }
+@media (max-width: 760px) {
+  header.site .in { flex-wrap: wrap; padding-inline: 16px }
+  header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
+}
+
+/* картки: чорна рамка й жорстка тінь замість м'якої */
+.tile, .task, .prog, .notice, .ark, .summary, .card, .box, dialog { border: 1.5px solid var(--ink); box-shadow: var(--shadow); border-radius: 16px }
+.tile b, .summary .big b, .stats b { font-family: var(--display); font-weight: 800; color: var(--ink) }
+.pill { background: var(--lime); color: var(--ink); border: 1.5px solid var(--ink) }
+.chip { border: 1.5px solid var(--ink); background: var(--card) }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--cream) }
+.opt { border-color: var(--ink) }
+.opt[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff }
+.task-h .t { background: var(--ink); color: var(--cream) }
+.btn-s, .authbar button, .btn { border: 1.5px solid var(--ink) }
+.btn-s.primary, .authbar .primary, button.primary, .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff }
+.go::before { box-shadow: none }
+.sheet { border: 1.5px solid var(--line) }
+.sheetbar { border-bottom: 1.5px solid var(--ink) }
+.ark h3 { font-weight: 800; font-size: 22px }
+.year { font-family: var(--display); color: var(--ink) }
+.more { background: var(--ink) }
+.sign { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: .04em }
+.sign::before, .sign::after { display: none }
+header.site .join { margin-left: 6px; font-weight: 700; font-size: 13px; text-decoration: none; white-space: nowrap; background: var(--blue); color: #fff; border: 1.5px solid var(--blue); border-radius: 999px; padding: 6px 14px }
+header.top { border-bottom: 1.5px solid var(--ink) }
+
+/* режим уроку з учнем і кабінет вчителя */
+.lekcja { position: sticky; top: 0; z-index: 30; display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: space-between; align-items: center; background: var(--blue); color: #fff; padding: 9px max(18px, env(safe-area-inset-left, 0px)); font-size: 14px }
+.lekcja a { color: #fff; font-weight: 700 }
+.uczniowie { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 18px; margin: 18px 0 }
+.uczen { background: var(--card); border: 1.5px solid var(--ink); box-shadow: var(--shadow); border-radius: 16px; padding: 16px 18px; display: grid; gap: 8px; text-decoration: none; color: var(--ink) }
+.uczen h3 { margin: 0; font-size: 20px }
+.uczen .muted-s, .muted-s { color: var(--muted); font-size: 13px }
+.form-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end }
+.form-row label { display: grid; gap: 3px; font-size: 12.5px; font-weight: 600 }
+.form-row input, .form-row select, textarea.notatki { font: inherit; font-size: 14px; padding: 8px 10px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fff; color: var(--ink) }
+textarea.notatki { width: 100%; min-height: 90px; resize: vertical }
+table.proby { width: 100%; border-collapse: collapse; font-size: 14px }
+table.proby th, table.proby td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line, #e4ded3) }
+table.proby td.num { font-variant-numeric: tabular-nums; white-space: nowrap }
+.akcje { display: flex; flex-wrap: wrap; gap: 8px }
+.akcje a.btn-s { text-decoration: none }
+button.link-del { background: none; border: 0; color: #b3261e; font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline }
+header.site .authbar { flex-wrap: nowrap; gap: 6px }
+header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; padding: 5px 11px; white-space: nowrap }
+@media (max-width: 1240px) {
+  header.site .in { flex-wrap: wrap }
+  header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
+}
+</style></head><body>
+<header class="site"><div class="in"><a class="logo" href="../">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../matura/">Matura</a><a href="../arkusze/">Arkusze</a><a href="../materialy/">Materiały</a><a href="../konto/">Mój gabinet</a><a href="../o-mnie/" aria-current="page">O mnie</a></nav><a class="join" href="../konto/">Załóż konto</a></div></header>
+<main class="w">
+<div class="hero"><div>
+<span class="kicker">O mnie</span>
+<h1 class="h1">Iryna Voloshko<span>.</span><br>Polska matematyka</h1>
+<ul><li><b>01</b>Szkoła i studia: E8, matura i sesja</li><li><b>02</b>Uczę po polsku, rozumiem też po ukraińsku</li><li><b>03</b>Od 5 lat pracuję według polskiego programu</li></ul>
+<a class="btn" href="https://t.me/voloshko_tutor_math" target="_blank" rel="noopener">Zapisz się na diagnozę</a><a class="btn l" href="#wyniki">Zobacz wyniki uczniów</a>
+</div><div class="foto"><img src="iryna.jpg" alt="Iryna Voloshko" width="720" height="828"></div></div>
+<div class="stats"><div><b>5 lat</b><span>z polskim programem</span></div><div><b>E8 · Matura</b><span>i sesja na studiach</span></div><div><b>2 dyplomy</b><span>w tym magister matematyki</span></div></div>
+<section><h2>Jak pracujemy</h2><div class="kroki">
+<div class="krok k1"><i>1</i><h3>Diagnoza</h3><p>Na początku sprawdzam, co już umiesz i gdzie są luki.</p></div>
+<div class="krok k2"><i>2</i><h3>Plan pracy</h3><p>Układam plan pod Twój cel: egzamin ósmoklasisty, maturę albo sesję.</p></div>
+<div class="krok k3"><i>3</i><h3>Postęp co miesiąc</h3><p>Wyniki widać w Twoim gabinecie ucznia: tematy, arkusze, porównanie miesięcy.</p></div>
+</div></section>
+<section><h2>Wykształcenie</h2><div class="edu">
+<div><small>Magister</small><p>Wołyński Uniwersytet Narodowy im. Łesi Ukrainki<span>Edukacja średnia: matematyka</span></p></div>
+<div><small>Licencjat</small><p>Drohobycki Państwowy Uniwersytet Pedagogiczny<span>Edukacja wczesnoszkolna i informatyka</span></p></div>
+</div></section>
+<section id="wyniki"><h2>Wyniki uczniów</h2><div class="case">
+<a href="https://www.instagram.com/p/Daan756imtk/" target="_blank" rel="noopener"><b>Historia ucznia 1</b><span>Zobacz na Instagramie →</span></a>
+<a href="https://www.instagram.com/p/DZ_53CACpL8/" target="_blank" rel="noopener"><b>Historia ucznia 2</b><span>Zobacz na Instagramie →</span></a>
+<a href="https://www.instagram.com/p/DeCHPZLDmAX/" target="_blank" rel="noopener"><b>Historia ucznia 3</b><span>Zobacz na Instagramie →</span></a>
+</div></section>
+<section class="faq"><h2>Częste pytania</h2>
+<details open><summary>Zajęcia są online?</summary><p>Tak, wszystkie zajęcia odbywają się online.</p></details>
+<details><summary>Ile trwa jedna lekcja?</summary><p>55 minut.</p></details>
+<details><summary>Jak zapłacić?</summary><p>Online przez WayForPay, kartą lub Apple / Google Pay.</p></details>
+<details><summary>Od czego zacząć?</summary><p>Od diagnozy: napisz do mnie na <a href="https://t.me/voloshko_tutor_math" target="_blank" rel="noopener">Telegramie</a>, a po diagnozie dostaniesz plan pracy.</p></details>
+</section>
+<div class="cta"><h2>Zaczynamy od diagnozy</h2><a class="btn" href="https://t.me/voloshko_tutor_math" target="_blank" rel="noopener">Napisz na Telegramie</a></div>
+</main>
+<footer style="border-top:1.5px solid var(--ink)"><div class="w" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-block:16px 34px;font-size:12.5px"><span>© Voloshko Iryna</span><a href="https://t.me/voloshko_tutor_math" target="_blank" rel="noopener">Telegram · voloshko_tutor_math</a><a href="https://www.instagram.com/iryna.voloshko/" target="_blank" rel="noopener">Instagram · iryna.voloshko</a></div></footer>
+</body></html>
