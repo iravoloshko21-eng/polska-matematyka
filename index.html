@@ -4,89 +4,58 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Voloshko Iryna · Matematyka</title>
-<meta name="description" content="Matematyka w polskiej szkole: zadania egzaminacyjne według tematów, arkusze z automatycznym wynikiem, materiały i webinary — Voloshko Iryna.">
+<meta name="description" content="Matematyka w polskiej szkole: egzamin ósmoklasisty, matura i materiały do lekcji — zadania według tematów i arkusze z wynikiem. Voloshko Iryna.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
-/* Головна в стилі, який обрала Ірина (макет «styl-2»): широкий гротеск, чорні лінії, кольорові блоки, жорсткі тіні.
-   Спільне меню й кольори — у motyw.css (build.py дописує його сюди). */
+/* Компактна головна (Ірина, 2026-11-02): лише вибір розділу великими картками, решта — на окремих сторінках.
+   Стиль Ірини «styl-2» (motyw.css дописує build.py): кремовий фон, чорні рамки, жорсткі тіні, синій/лайм/корал.
+   Zadanie dnia прибрано, Arkusz miesiąca — на сторінці arkusze/. */
 :root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px) }
 * { box-sizing: border-box }
-body { margin: 0; color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55 }
+body { margin: 0; color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5 }
 a { color: inherit }
-:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px }
-.in2 { max-width: 1180px; margin: 0 auto; padding-inline: max(28px, env(safe-area-inset-left, 0px)) }
-.line { border-bottom: 1.5px solid var(--ink) }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px }
 header.site .logo span { color: var(--blue) }
 
-.hero .in2 { padding-block: 46px 34px }
-.hero h1 { font-size: clamp(34px, 10.5vw, 124px); line-height: .92; margin: 0 }
-.hero h1 .dot { color: var(--blue) }
-.hero-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-top: 28px; flex-wrap: wrap }
-.hero-row p { max-width: 46ch; margin: 0; font-size: 16px }
-.big { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; text-decoration: none; border-radius: 999px; padding: 13px 24px; border: 1.5px solid var(--ink); cursor: pointer; font-family: inherit }
-.big.blue { background: var(--blue); border-color: var(--blue); color: #fff }
-.big.light { background: var(--cream); color: var(--ink) }
-.big.ink { background: var(--ink); color: var(--cream) }
-.big:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 var(--ink) }
-.big.light:hover { box-shadow: 3px 3px 0 var(--cream) }
+main.wybor { max-width: 640px; margin: 0 auto; padding: 44px 16px 60px }
+.kicker { display: inline-block; background: var(--ink); color: var(--cream); font-size: 12px; font-weight: 700; border-radius: 999px; padding: 4px 12px }
+main.wybor h1 { font-size: clamp(32px, 6vw, 56px); line-height: .98; margin: 14px 0 10px }
+main.wybor h1 span { color: var(--blue) }
+.lead { margin: 0 0 30px; color: var(--muted); font-size: 16px; max-width: 46ch }
 
-.stats .in2 { display: flex; padding: 0 }
-.stats .in2 > div { flex: 1; padding: 16px 28px; border-right: 1.5px solid var(--ink) }
-.stats .in2 > div:last-child { border-right: 0 }
-.stats b { font-family: var(--display); font-weight: 800; font-size: 34px; display: block; line-height: 1.1 }
-.stats span { font-size: 13px; font-weight: 600 }
+.lista { display: grid; gap: 14px }
+.karta { display: flex; align-items: center; gap: 18px; text-decoration: none; color: var(--ink); background: var(--card); border: 1.5px solid var(--ink); border-radius: 20px; padding: 16px 18px; box-shadow: 5px 5px 0 var(--ink); transition: transform .15s, box-shadow .15s }
+a.karta:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink) }
+.ic { flex: none; width: 58px; height: 58px; border-radius: 14px; border: 1.5px solid var(--ink); display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 22px }
+.t { flex: 1; min-width: 0 }
+.t b { display: block; font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: -.01em; line-height: 1.2 }
+.t small { display: block; color: var(--muted); font-size: 13.5px; margin-top: 4px }
+.ar { font-family: var(--display); font-weight: 800; font-size: 20px }
+.i-blue { background: var(--blue); color: #fff } .i-coral { background: var(--coral) } .i-lime { background: var(--lime) } .i-ink { background: var(--ink); color: var(--cream) }
+.badge { font-size: 11.5px; font-weight: 700; border: 1.5px solid var(--ink); border-radius: 999px; padding: 3px 10px; white-space: nowrap }
 
-.blocks .in2 { max-width: none; display: grid; grid-template-columns: repeat(4, 1fr); padding: 0 }
-.blk { min-height: 200px; padding: 18px 20px; border-right: 1.5px solid var(--ink); display: flex; flex-direction: column; justify-content: space-between; text-decoration: none; transition: transform .15s; background: var(--cream) }
-.blk:last-child { border-right: 0 }
-a.blk:hover { transform: translateY(-4px) }
-.blk small { font-size: 12px; font-weight: 700; letter-spacing: .02em }
-.blk h3 { font-family: var(--display); font-weight: 800; font-size: clamp(20px, 2.4vw, 32px); margin: 0; line-height: 1.02; letter-spacing: -.02em }
-.blk p { margin: 6px 0 0; font-size: 13.5px }
-.b-blue { background: var(--blue); color: #fff } .b-lime { background: var(--lime) } .b-coral { background: var(--coral) } .b-ink { background: var(--ink); color: var(--cream) }
-.soon { display: inline-block; font-size: 11px; font-weight: 700; border: 1.5px solid currentColor; border-radius: 999px; padding: 2px 8px; margin-top: 8px }
-div.blk { opacity: .92 }
+.sep { display: flex; align-items: center; gap: 14px; font-family: var(--display); font-weight: 700; font-size: 13px; margin: 34px 0 14px; letter-spacing: .04em; text-transform: uppercase }
+.sep::before, .sep::after { content: ""; flex: 1; height: 1.5px; background: var(--ink) }
+.wkrotce .karta { box-shadow: none; border-style: dashed; background: transparent }
+.wkrotce .ic { border-style: dashed }
 
-.two .in2, .month .in2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; padding-block: 50px }
-h2.big2 { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 4.4vw, 56px); line-height: .98; letter-spacing: -.02em; margin: 0 }
-.lead2 { margin: 14px 0 0; max-width: 40ch }
-.tag { display: inline-block; background: var(--ink); color: var(--cream); font-size: 11.5px; font-weight: 700; border-radius: 999px; padding: 3px 10px }
-.dzien { background: var(--card); border: 1.5px solid var(--ink); border-radius: 18px; padding: 20px; box-shadow: 7px 7px 0 var(--ink) }
-.dzien img { display: block; width: 100%; height: auto; margin: 14px 0; border-radius: 8px; background: #fff }
-.dzien .src { font-size: 12.5px; color: var(--muted); margin-left: 6px }
-.opts { display: flex; gap: 8px; flex-wrap: wrap }
-.opts button { font: inherit; font-weight: 700; font-size: 15px; min-width: 52px; border: 1.5px solid var(--ink); border-radius: 10px; padding: 8px 14px; background: var(--cream); color: var(--ink); cursor: pointer }
-.opts button:hover:not(:disabled) { background: var(--blue-soft) }
-.opts button.ok { background: var(--lime) } .opts button.bad { background: var(--coral) }
-.opts button:disabled { cursor: default }
-.fb { margin: 12px 0 0; font-weight: 600; min-height: 1.5em }
-.dzien a.next { font-weight: 700; font-size: 13.5px }
+.cta { margin-top: 40px; background: var(--ink); color: var(--cream); border-radius: 20px; padding: 22px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap }
+.cta b { font-family: var(--display); font-size: 18px }
+.cta-b { display: flex; gap: 8px; flex-wrap: wrap }
+.cta a.jasny { background: transparent; color: var(--cream); border: 1.5px solid var(--cream) }
+.cta a { background: var(--cream); color: var(--ink); font-weight: 700; font-size: 14px; text-decoration: none; border-radius: 999px; padding: 11px 20px }
+footer { border-top: 1.5px solid var(--ink) }
+footer .in2 { max-width: 1180px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 16px max(24px, env(safe-area-inset-left, 0px)) 34px; font-size: 12.5px }
 
-.month { background: var(--lime) }
-.bars { display: flex; align-items: flex-end; gap: 12px; height: 230px }
-.bars div { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; font-weight: 700; font-size: 12px; text-align: center }
-.bars i { display: block; width: 100%; background: var(--ink); border-radius: 10px 10px 0 0; min-height: 6px }
-.bars i.now { background: var(--blue) }
-.bars.pusty i { background: transparent; border: 1.5px dashed var(--ink); border-bottom: 0 }
-.bars-note { margin: 10px 0 0; font-size: 13px; font-weight: 600 }
-
-.cta { background: var(--ink); color: var(--cream) }
-.cta .in2 { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-block: 58px; flex-wrap: wrap }
-.cta h2.big2 { color: var(--cream) }
-footer .in2 { display: flex; justify-content: space-between; padding-block: 18px 40px; font-size: 12.5px; flex-wrap: wrap; gap: 8px }
-
-@media (max-width: 760px) {
-  .in2 { padding-inline: 16px }
-  .blocks .in2 { grid-template-columns: 1fr 1fr }
-  .blk { min-height: 150px; padding: 14px 16px }
-  .blk:nth-child(2n) { border-right: 0 }
-  .blk:nth-child(-n+2) { border-bottom: 1.5px solid var(--ink) }
-  .stats .in2 > div { padding: 12px 16px } .stats b { font-size: 24px }
-  .two .in2, .month .in2 { grid-template-columns: 1fr; padding-block: 36px }
-  .bars { height: 180px }
+@media (max-width: 600px) {
+  main.wybor { padding-top: 32px }
+  .karta { gap: 14px; padding: 14px }
+  .ic { width: 50px; height: 50px; font-size: 19px }
+  .t b { font-size: 16px }
+  footer .in2 { padding-inline: 16px }
 }
-@media (prefers-reduced-motion: reduce) { .blk, .big { transition: none } a.blk:hover, .big:hover { transform: none } }
+@media (prefers-reduced-motion: reduce) { .karta { transition: none } a.karta:hover { transform: none } }
 
 /* Motyw «Wołoszko/Math» (обрала Ірина 2026-10-31): широкий гротеск Unbounded, чорні рамки, кольорові блоки, жорсткі тіні.
    build.py дописує цей файл у кінець стилів кожної сторінки, тож він перекриває старі значення. */
@@ -161,103 +130,28 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
 </style>
 </head>
 <body>
-<header class="site"><div class="in"><a class="logo" href="./">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href="./" aria-current="page">Start</a><a href="e8/">Egzamin ósmoklasisty</a><a href="matura/">Matura</a><a href="arkusze/">Arkusze</a><a href="materialy/">Materiały</a><a href="konto/">Mój gabinet</a></nav><a class="join" href="konto/">Załóż konto</a></div></header>
+<header class="site"><div class="in"><a class="logo" href="./">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href="./" aria-current="page">Start</a><a href="e8/">Egzamin ósmoklasisty</a><a href="matura/">Matura</a><a href="arkusze/">Arkusze</a><a href="materialy/">Materiały</a><a href="konto/">Mój gabinet</a><a href="o-mnie/">O mnie</a></nav><a class="join" href="konto/">Załóż konto</a></div></header>
 
-<section class="hero line"><div class="in2">
-  <h1>Matematyka<br>bez paniki<span class="dot">.</span></h1>
-  <div class="hero-row">
-    <p>Zadania, arkusze i materiały według polskiego programu: od egzaminu ósmoklasisty po maturę. Ćwicz, sprawdzaj wynik i patrz, jak rośnie z miesiąca na miesiąc.</p>
-    <a class="big blue" href="e8/">Zacznij ćwiczyć →</a>
+<main class="wybor">
+  <span class="kicker">Matematyka bez paniki</span>
+  <h1>Od czego<br>zaczynamy<span>?</span></h1>
+  <p class="lead">Wybierz, do czego się przygotowujesz. Każdy dział ma swoją stronę z zadaniami i wynikiem.</p>
+
+  <nav class="lista" aria-label="Działy">
+    <a class="karta" href="e8/"><span class="ic i-blue" aria-hidden="true">8</span><span class="t"><b>Egzamin ósmo&shy;klasisty</b><small>31 tematów · 596 zadań · 22 arkuszy CKE</small></span><span class="ar" aria-hidden="true">→</span></a>
+    <a class="karta" href="matura/"><span class="ic i-coral" aria-hidden="true">√</span><span class="t"><b>Matura podstawowa</b><small>5 tematów · 148 zadań maturalnych</small></span><span class="ar" aria-hidden="true">→</span></a>
+    <div class="karta"><span class="ic i-ink" aria-hidden="true">∫</span><span class="t"><b>Matura rozszerzona</b><small>Zadania maturalne według tematów</small></span><span class="badge">wkrótce</span></div>
+    <a class="karta" href="materialy/"><span class="ic i-lime" aria-hidden="true">π</span><span class="t"><b>Materiały do lekcji</b><small>Liceum i technikum · 3 materiałów</small></span><span class="ar" aria-hidden="true">→</span></a>
+  </nav>
+
+  <div class="sep">Wkrótce</div>
+  <div class="lista wkrotce">
+    <div class="karta"><span class="ic" aria-hidden="true">▶</span><span class="t"><b>Webinary</b><small>Dla uczniów i nauczycieli</small></span><span class="badge">wkrótce</span></div>
   </div>
-</div></section>
-<div class="stats line"><div class="in2">
-  <div><b>596</b><span>zadań CKE</span></div>
-  <div><b>22</b><span>pełnych arkuszy</span></div>
-  <div><b>31</b><span>tematów</span></div>
-</div></div>
 
-<nav class="blocks line" aria-label="Działy"><div class="in2">
-  <a class="blk b-blue" href="e8/"><small>01 · 8 klasa</small><div><h3>Egzamin ósmo&shy;klasisty</h3><p>Zadania według tematów</p></div></a>
-  <a class="blk" href="arkusze/"><small>02 · arkusze</small><div><h3>Arkusze</h3><p>Pełne arkusze CKE, wynik w punktach i %</p></div></a>
-  <a class="blk b-lime" href="materialy/"><small>03 · liceum i technikum</small><div><h3>Materiały</h3><p>3 materiałów do lekcji</p></div></a>
-  <a class="blk b-coral" href="matura/"><small>04 · liceum i technikum</small><div><h3>Matura</h3><p>Podstawowa według tematów: 5 tematów, 148 zadań. Rozszerzona wkrótce.</p></div></a>
-</div></nav>
+  <div class="cta"><b>Chcesz przerobić wszystko ze mną?</b><span class="cta-b"><a class="jasny" href="o-mnie/">O mnie</a><a href="https://t.me/voloshko_tutor_math" target="_blank" rel="noopener">Zapisz się na zajęcia</a></span></div>
+</main>
 
-<section class="two line"><div class="in2">
-  <div><h2 class="big2">Zadanie<br>dnia</h2><p class="lead2">Codziennie jedno zadanie z egzaminu ósmoklasisty. Rozwiąż je w minutę i sprawdź się.</p></div>
-  <div class="dzien" id="dzien" hidden>
-    <span class="tag" id="dz-temat"></span><span class="src" id="dz-src"></span>
-    <img id="dz-img" alt="Treść zadania">
-    <div class="opts" id="dz-opts" role="group" aria-label="Odpowiedzi"></div>
-    <p class="fb" id="dz-fb" aria-live="polite"></p>
-    <a class="next" href="e8/" id="dz-more">Więcej zadań z tego tematu →</a>
-  </div>
-</div></section>
-
-<section class="month line"><div class="in2">
-  <div><span class="tag" id="m-nazwa"></span><h2 class="big2" style="margin-top:14px">Arkusz<br>miesiąca</h2>
-    <p class="lead2">Co miesiąc wszyscy piszą ten sam arkusz: <b id="m-ark"></b>. W gabinecie widzisz swój wynik obok poprzednich.</p>
-    <a class="big ink" href="arkusze/" id="m-go" style="margin-top:18px">Rozwiąż arkusz →</a></div>
-  <div><div class="bars" id="bars"></div><p class="bars-note" id="bars-note"></p></div>
-</div></section>
-
-<nav class="blocks line" aria-label="Więcej"><div class="in2">
-  <a class="blk b-ink" href="konto/"><small>05 · konto</small><div><h3>Mój gabinet</h3><p>Postęp po tematach i arkuszach</p></div></a>
-  <div class="blk"><small>06 · szkoła podstawowa</small><div><h3>Klasy 4–8</h3><p>Materiały do lekcji</p><span class="soon">wkrótce</span></div></div>
-  <div class="blk b-lime"><small>07 · online</small><div><h3>Webinary</h3><p>Dla uczniów i nauczycieli</p><span class="soon">wkrótce</span></div></div>
-  <div class="blk"><small>08 · opinie</small><div><h3>Opinie i case'y</h3><p>Uczniowie, rodzice i ich wyniki</p><span class="soon">wkrótce</span></div></div>
-</div></nav>
-
-<section class="cta"><div class="in2"><h2 class="big2">Chcesz przerobić<br>wszystko razem ze mną?</h2><a class="big light" href="https://www.instagram.com/iryna.voloshko/" target="_blank" rel="noopener">Zapisz się na zajęcia</a></div></section>
-<footer><div class="in2"><span>© Voloshko Iryna</span><a href="dla-nauczycieli/">Dla nauczycieli: gabinet z subskrypcją</a><a href="https://www.instagram.com/iryna.voloshko/" target="_blank" rel="noopener">Instagram · iryna.voloshko</a></div></footer>
-
-<script>
-// Дані підставляє build.py: відкриті завдання A–D і список аркушів у порядку ARKUSZE з wspolne.js.
-const DZIEN = [{"temat": "Cyfry, podzielność i zaokrąglanie liczb", "zrodlo": "czerwiec 2026 - zad. 5", "img": "img/cyfry-podzielnosc-i-zaokraglanie-liczb-01.png", "w": 1181, "h": 155, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Cyfry, podzielność i zaokrąglanie liczb", "zrodlo": "czerwiec 2026 - zad. 7", "img": "img/cyfry-podzielnosc-i-zaokraglanie-liczb-02.png", "w": 1181, "h": 177, "options": ["A", "B", "C", "D"], "answer": "B"}, {"temat": "Cyfry, podzielność i zaokrąglanie liczb", "zrodlo": "maj 2026 - zad. 2", "img": "img/cyfry-podzielnosc-i-zaokraglanie-liczb-03.png", "w": 1181, "h": 156, "options": ["A", "B", "C", "D"], "answer": "B"}, {"temat": "Sprzedaż, ceny, rabaty, zniżki", "zrodlo": "maj 2022 - zad. 12", "img": "img/sprzedaz-ceny-rabaty-znizki-01.png", "w": 1181, "h": 183, "options": ["A", "B", "C", "D"], "answer": "B"}, {"temat": "Sprzedaż, ceny, rabaty, zniżki", "zrodlo": "czerwiec 2020 - zad. 1", "img": "img/sprzedaz-ceny-rabaty-znizki-02.png", "w": 1181, "h": 446, "options": ["A", "B", "C", "D", "E"], "answer": "C"}, {"temat": "Sprzedaż, ceny, rabaty, zniżki", "zrodlo": "kwiecień 2013 - zad. 3", "img": "img/sprzedaz-ceny-rabaty-znizki-03.png", "w": 1181, "h": 144, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Procenty", "zrodlo": "maj 2026 - zad. 5", "img": "img/procenty-01.png", "w": 1181, "h": 187, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Procenty", "zrodlo": "maj 2023 - zad. 6", "img": "img/procenty-03.png", "w": 1181, "h": 146, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Podział proporcjonalny", "zrodlo": "czerwiec 2023 - zad. 14", "img": "img/podzial-proporcjonalny-02.png", "w": 1181, "h": 177, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Podział proporcjonalny", "zrodlo": "marzec 2021 - zad. 12", "img": "img/podzial-proporcjonalny-03.png", "w": 1181, "h": 181, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Odczytywanie danych z tabel, wykresów, diagramów", "zrodlo": "maj 2026 - zad. 1", "img": "img/odczytywanie-danych-z-tabel-wykresow-diagramow-01.png", "w": 1191, "h": 574, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Średnia arytmetyczna", "zrodlo": "czerwiec 2026 - zad. 1", "img": "img/srednia-arytmetyczna-01.png", "w": 1181, "h": 560, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Średnia arytmetyczna", "zrodlo": "maj 2026 - zad. 9", "img": "img/srednia-arytmetyczna-02.png", "w": 1181, "h": 107, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Średnia arytmetyczna", "zrodlo": "styczeń 2026 - zad. 10", "img": "img/srednia-arytmetyczna-03.png", "w": 1181, "h": 180, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Działania na ułamkach", "zrodlo": "czerwiec 2026 - zad. 9", "img": "img/dzialania-na-ulamkach-01.png", "w": 1181, "h": 285, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Działania na ułamkach", "zrodlo": "styczeń 2026 - zad. 3", "img": "img/dzialania-na-ulamkach-02.png", "w": 1181, "h": 231, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Działania na ułamkach", "zrodlo": "czerwiec 2025 - zad. 7", "img": "img/dzialania-na-ulamkach-03.png", "w": 1181, "h": 187, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Potęgi", "zrodlo": "czerwiec 2026 - zad. 4", "img": "img/potegi-01.png", "w": 1181, "h": 350, "options": ["A", "B", "C", "D"], "answer": "B"}, {"temat": "Potęgi", "zrodlo": "maj 2026 - zad. 4", "img": "img/potegi-02.png", "w": 1181, "h": 78, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Potęgi", "zrodlo": "styczeń 2026 - zad. 2", "img": "img/potegi-03.png", "w": 1181, "h": 126, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Pierwiastki", "zrodlo": "czerwiec 2026 - zad. 6", "img": "img/pierwiastki-01.png", "w": 1181, "h": 260, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Pierwiastki", "zrodlo": "maj 2026 - zad. 3", "img": "img/pierwiastki-02.png", "w": 1181, "h": 298, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Wyrażenia algebraiczne", "zrodlo": "styczeń 2026 - zad. 6", "img": "img/wyrazenia-algebraiczne-02.png", "w": 1197, "h": 238, "options": ["A", "B", "C", "D"], "answer": "B"}, {"temat": "Wyrażenia algebraiczne", "zrodlo": "maj 2025 - zad. 6", "img": "img/wyrazenia-algebraiczne-03.png", "w": 1197, "h": 207, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Wyrażenia algebraiczne na rysunkach", "zrodlo": "czerwiec 2022 - zad. 14", "img": "img/wyrazenia-algebraiczne-na-rysunkach-01.png", "w": 1181, "h": 409, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Wyrażenia algebraiczne na rysunkach", "zrodlo": "czerwiec 2021 - zad. 10", "img": "img/wyrazenia-algebraiczne-na-rysunkach-02.png", "w": 1181, "h": 383, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Obliczanie wartości, przekształcanie i interpretowanie wzorów", "zrodlo": "maj 2024 - zad. 6", "img": "img/obliczanie-wartosci-przeksztalcanie-i-interpretowanie-wzorow-02.png", "w": 1181, "h": 398, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Obliczanie wartości, przekształcanie i interpretowanie wzorów", "zrodlo": "czerwiec 2022 - zad. 11", "img": "img/obliczanie-wartosci-przeksztalcanie-i-interpretowanie-wzorow-03.png", "w": 1181, "h": 315, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Równania liniowe", "zrodlo": "czerwiec 2026 - zad. 3", "img": "img/rownania-liniowe-01.png", "w": 1033, "h": 158, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Równania liniowe", "zrodlo": "czerwiec 2025 - zad. 8", "img": "img/rownania-liniowe-02.png", "w": 1033, "h": 260, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Równania liniowe", "zrodlo": "czerwiec 2022 - zad. 4", "img": "img/rownania-liniowe-03.png", "w": 1033, "h": 130, "options": ["A", "B", "C", "D", "E"], "answer": "D"}, {"temat": "Zadania tekstowe", "zrodlo": "styczeń 2026 - zad. 4", "img": "img/zadania-tekstowe-01.png", "w": 1181, "h": 188, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Zadania tekstowe", "zrodlo": "czerwiec 2025 - zad. 11", "img": "img/zadania-tekstowe-02.png", "w": 1181, "h": 178, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Kąty w figurach", "zrodlo": "maj 2026 - zad. 11", "img": "img/katy-w-figurach-01.png", "w": 1181, "h": 105, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Kąty w figurach", "zrodlo": "czerwiec 2025 - zad. 10", "img": "img/katy-w-figurach-03.png", "w": 1181, "h": 443, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Długości w figurach", "zrodlo": "czerwiec 2024 - zad. 13", "img": "img/dlugosci-w-figurach-01.png", "w": 1181, "h": 433, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Długości w figurach", "zrodlo": "maj 2024 - zad. 13", "img": "img/dlugosci-w-figurach-02.png", "w": 1181, "h": 467, "options": ["A", "B", "C", "D"], "answer": "B"}, {"temat": "Obwody figur", "zrodlo": "czerwiec 2026 - zad. 12", "img": "img/obwody-figur-01.png", "w": 1181, "h": 427, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Obwody figur", "zrodlo": "maj 2025 - zad. 13", "img": "img/obwody-figur-02.png", "w": 1181, "h": 439, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Obwody figur", "zrodlo": "maj 2025 - zad. 5", "img": "img/obwody-figur-03.png", "w": 1181, "h": 431, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Pola figur", "zrodlo": "maj 2026 - zad. 13", "img": "img/pola-figur-02.png", "w": 1181, "h": 502, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Oś liczbowa", "zrodlo": "styczeń 2026 - zad. 8", "img": "img/os-liczbowa-01.png", "w": 1181, "h": 400, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Oś liczbowa", "zrodlo": "grudzień 2024 - zad. 6", "img": "img/os-liczbowa-03.png", "w": 1181, "h": 325, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Układ współrzędnych", "zrodlo": "maj 2025 - zad. 14", "img": "img/uklad-wspolrzednych-03.png", "w": 1181, "h": 649, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Sześcian, prostopadłościan", "zrodlo": "czerwiec 2026 - zad. 14", "img": "img/szescian-prostopadloscian-01.png", "w": 1181, "h": 379, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Sześcian, prostopadłościan", "zrodlo": "maj 2026 - zad. 14", "img": "img/szescian-prostopadloscian-02.png", "w": 1181, "h": 548, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Graniastosłup, ostrosłup", "zrodlo": "maj 2025 - zad. 15", "img": "img/graniastoslup-ostroslup-01.png", "w": 1181, "h": 552, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Graniastosłup, ostrosłup", "zrodlo": "grudzień 2024 - zad. 13", "img": "img/graniastoslup-ostroslup-02.png", "w": 1181, "h": 237, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Graniastosłup, ostrosłup", "zrodlo": "czerwiec 2024 - zad. 15", "img": "img/graniastoslup-ostroslup-03.png", "w": 1181, "h": 184, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Godziny, minuty i sekundy", "zrodlo": "czerwiec 2025 - zad. 3", "img": "img/godziny-minuty-i-sekundy-01.png", "w": 1181, "h": 184, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Godziny, minuty i sekundy", "zrodlo": "maj 2024 - zad. 10", "img": "img/godziny-minuty-i-sekundy-02.png", "w": 1181, "h": 235, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Dni, tygodnie, miesiące", "zrodlo": "listopad 2012 - zad. 7", "img": "img/dni-tygodnie-miesiace-03.png", "w": 1181, "h": 174, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Długości przedmiotów i odległości w terenie", "zrodlo": "czerwiec 2024 - zad. 12", "img": "img/dlugosci-przedmiotow-i-odleglosci-w-terenie-02.png", "w": 1181, "h": 208, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Długości przedmiotów i odległości w terenie", "zrodlo": "maj 2023 - zad. 10", "img": "img/dlugosci-przedmiotow-i-odleglosci-w-terenie-03.png", "w": 1181, "h": 606, "options": ["A", "B", "C", "D"], "answer": "A"}, {"temat": "Prędkość, droga, czas", "zrodlo": "czerwiec 2026 - zad. 10", "img": "img/predkosc-droga-czas-01.png", "w": 1181, "h": 225, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Prędkość, droga, czas", "zrodlo": "maj 2025 - zad. 9", "img": "img/predkosc-droga-czas-02.png", "w": 1181, "h": 179, "options": ["A", "B", "C", "D"], "answer": "B"}, {"temat": "Prędkość, droga, czas", "zrodlo": "grudzień 2024 - zad. 14", "img": "img/predkosc-droga-czas-03.png", "w": 1181, "h": 343, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Odkrywanie reguł i związków liczbowych", "zrodlo": "styczeń 2026 - zad. 12", "img": "img/odkrywanie-regul-i-zwiazkow-liczbowych-01.png", "w": 1181, "h": 279, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Odkrywanie reguł i związków liczbowych", "zrodlo": "czerwiec 2025 - zad. 2", "img": "img/odkrywanie-regul-i-zwiazkow-liczbowych-02.png", "w": 1181, "h": 276, "options": ["A", "B", "C", "D"], "answer": "C"}, {"temat": "Liczenie obiektów lub sytuacji o danych właściwościach", "zrodlo": "maj 2026 - zad. 7", "img": "img/liczenie-obiektow-lub-sytuacji-o-danych-wlasciwosciach-02.png", "w": 1181, "h": 154, "options": ["A", "B", "C", "D"], "answer": "B"}, {"temat": "Prawdopodobieństwo", "zrodlo": "maj 2025 - zad. 10", "img": "img/prawdopodobienstwo-03.png", "w": 1181, "h": 237, "options": ["A", "B", "C", "D"], "answer": "D"}, {"temat": "Różne", "zrodlo": "styczeń 2026 - zad. 7", "img": "img/rozne-02.png", "w": 1181, "h": 191, "options": ["A", "B", "C", "D"], "answer": "B"}], ARK = [{"nazwa": "czerwiec 2026", "slug": "czerwiec-2026"}, {"nazwa": "maj 2026", "slug": "maj-2026"}, {"nazwa": "styczeń 2026", "slug": "styczen-2026"}, {"nazwa": "czerwiec 2025", "slug": "czerwiec-2025"}, {"nazwa": "maj 2025", "slug": "maj-2025"}, {"nazwa": "grudzień 2024", "slug": "grudzien-2024"}, {"nazwa": "czerwiec 2024", "slug": "czerwiec-2024"}, {"nazwa": "maj 2024", "slug": "maj-2024"}, {"nazwa": "czerwiec 2023", "slug": "czerwiec-2023"}, {"nazwa": "maj 2023", "slug": "maj-2023"}, {"nazwa": "czerwiec 2022", "slug": "czerwiec-2022"}, {"nazwa": "maj 2022", "slug": "maj-2022"}, {"nazwa": "czerwiec 2021", "slug": "czerwiec-2021"}, {"nazwa": "maj 2021", "slug": "maj-2021"}, {"nazwa": "marzec 2021", "slug": "marzec-2021"}, {"nazwa": "czerwiec 2020", "slug": "czerwiec-2020"}, {"nazwa": "kwiecień 2020", "slug": "kwiecien-2020"}, {"nazwa": "marzec 2020", "slug": "marzec-2020"}, {"nazwa": "czerwiec 2019", "slug": "czerwiec-2019"}, {"nazwa": "kwiecień 2019", "slug": "kwiecien-2019"}, {"nazwa": "grudzień 2018", "slug": "grudzien-2018"}, {"nazwa": "grudzień 2017", "slug": "grudzien-2017"}];
-const MIESIACE = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"];
-const $ = s => document.querySelector(s), cap = s => s[0].toUpperCase() + s.slice(1);
-const now = new Date(), y = now.getFullYear(), mm = now.getMonth() + 1;
-
-// Zadanie dnia: те саме для всіх протягом дня
-if (DZIEN.length) {
-  const day = Math.floor((Date.UTC(y, mm - 1, now.getDate())) / 864e5), t = DZIEN[(day * 7) % DZIEN.length];
-  $("#dz-temat").textContent = "E8 · " + t.temat;
-  $("#dz-src").textContent = t.zrodlo || "";
-  Object.assign($("#dz-img"), { src: "e8/" + t.img, width: t.w, height: t.h });
-  $("#dz-more").href = "e8/#temat=" + encodeURIComponent(t.temat);
-  $("#dz-opts").innerHTML = t.options.map(o => `<button type="button" data-v="${o}">${o}</button>`).join("");
-  $("#dz-opts").addEventListener("click", e => {
-    const b = e.target.closest("button"); if (!b) return;
-    const ok = b.dataset.v === t.answer;
-    for (const x of $("#dz-opts").children) { x.disabled = true; if (x.dataset.v === t.answer) x.classList.add("ok"); }
-    if (!ok) b.classList.add("bad");
-    $("#dz-fb").textContent = ok ? "Brawo, dobrze! Wróć jutro po nowe zadanie." : `Niestety nie. Poprawna odpowiedź: ${t.answer}.`;
-  });
-  $("#dzien").hidden = false;
-}
-
-// Arkusz miesiąca: та сама формула, що arkuszMiesiaca() у wspolne.js
-if (ARK.length) {
-  const l = ARK.slice().reverse(), a = l[(y * 12 + mm - 1) % l.length];
-  $("#m-nazwa").textContent = cap(MIESIACE[mm - 1]) + " " + y;
-  $("#m-ark").textContent = cap(a.nazwa);
-  $("#m-go").href = "arkusze/#" + a.slug;
-}
-// стовпчики — власні результати учня з цього браузера (кабінет зберігає їх тут після входу)
-let res = {}; try { res = JSON.parse(localStorage.getItem("e8-wyniki") || "{}"); } catch (e) {}
-const mies = Object.keys(res).filter(k => k.startsWith("miesiac:")).sort().slice(-3);
-const rz = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
-if (mies.length) {
-  $("#bars").innerHTML = mies.map((k, i) => {
-    const r = res[k], p = Math.round(100 * r.pkt / r.max), m = +k.slice(-2);
-    return `<div><i class="${i === mies.length - 1 ? "now" : ""}" style="height:${Math.max(p, 3)}%"></i>${rz[m - 1]} · ${p}%</div>`;
-  }).join("");
-  $("#bars-note").textContent = "Twoje wyniki z ostatnich miesięcy.";
-} else {
-  $("#bars").classList.add("pusty");
-  $("#bars").innerHTML = [45, 60, 75].map((h, i) => `<div><i style="height:${h}%"></i>${rz[(mm - 3 + i + 12) % 12]}</div>`).join("");
-  $("#bars-note").textContent = "Tu pojawią się Twoje wyniki z kolejnych miesięcy.";
-}
-</script>
+<footer><div class="in2"><span>© Voloshko Iryna</span><a href="dla-nauczycieli/">Dla nauczycieli: gabinet z subskrypcją</a><a href="https://t.me/voloshko_tutor_math" target="_blank" rel="noopener">Telegram · voloshko_tutor_math</a><a href="https://www.instagram.com/iryna.voloshko/" target="_blank" rel="noopener">Instagram · iryna.voloshko</a></div></footer>
 </body>
 </html>
