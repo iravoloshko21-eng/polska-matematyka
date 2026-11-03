@@ -601,7 +601,7 @@ function start() {
     <div class="big"><b style="font-size:clamp(28px,5vw,40px)">Sprawdź się przed egzaminem</b></div>
     <ul class="test-fakty">
       <li><b>Zadania 1–15</b>: zamknięte, wybierasz odpowiedź (po 1 pkt)</li>
-      <li><b>Zadania 16–21</b>: otwarte, wpisujesz wynik liczbowy. Liczy się tylko poprawna liczba, wtedy dostajesz wszystkie punkty za zadanie</li>
+      <li><b>Zadania 16–21</b>: otwarte, wpisujesz tylko liczbę (bez jednostek). Liczy się tylko poprawna liczba, wtedy dostajesz wszystkie punkty za zadanie</li>
       <li><b>125 minut</b>, kartka, długopis i linijka obok (bez kalkulatora)</li>
       <li><b>bez rejestracji</b>, wynik w punktach i procentach od razu</li>
     </ul>
@@ -621,8 +621,8 @@ function zegar() {
 function pytanie() {
   const t = zad[st.i], o = st.odp[t.id] || {}, n = zad.length;
   let ans;
-  if (otwarte(t)) ans = `<span class="q">Rozwiąż w zeszycie i wpisz sam wynik${t.jedn ? ` (w ${esc(t.jedn)})` : ""}.</span>
-    <div class="opts"><input class="open-in" id="t-in" inputmode="decimal" autocomplete="off" value="${esc(o[0] || "")}" placeholder="np. 12 albo 3,5" aria-label="Wynik zadania ${st.i + 1}"></div>`;
+  if (otwarte(t)) ans = `<span class="q">Rozwiąż w zeszycie i wpisz tylko liczbę, bez jednostek.</span>
+    <div class="opts"><input class="open-in" id="t-in" inputmode="decimal" autocomplete="off" value="${esc(o[0] || "")}" placeholder="tylko liczba, np. 12 albo 3,5" aria-label="Wynik zadania ${st.i + 1}"></div>`;
   else { const lab = etykiety(t); ans = grupy(t).map((opts, g) => `<div class="opts" role="group" aria-label="${esc(lab[g] || "Odpowiedź")}">${lab[g] ? `<span class="q">${esc(lab[g])}</span>` : ""}${opts.map(v =>
     `<button type="button" class="opt" data-g="${g}" data-v="${esc(v)}" aria-pressed="${o[g] === v}">${esc(v)}</button>`).join("")}</div>`).join(""); }
   $("#list").innerHTML = `<div class="test-pasek"><span>Zadanie <b>${st.i + 1}</b> z ${n}</span><span id="t-clock"></span><span id="t-cnt">Odpowiedzi: ${ileOdp()}/${n}</span>
@@ -693,7 +693,7 @@ function przeglad(t, k, pk) {
   const o = st.odp[t.id] || {}, ok = pk === t.pkt;
   const twoja = !pelna(t, o) ? "brak odpowiedzi" : otwarte(t) ? o[0] : grupy(t).map((_, g) => nazwaOdp(o[g])).join(", ");
   const lab = etykiety(t), c = Array.isArray(t.answer) ? t.answer : [t.answer];
-  const dobra = otwarte(t) ? odpLiczba(t) : c.map((v, g) => (lab[g] ? lab[g] + ": " : "") + nazwaOdp(v)).join(", ");
+  const dobra = otwarte(t) ? (t.ulamek || String(t.liczba).replace(".", ",")) : c.map((v, g) => (lab[g] ? lab[g] + ": " : "") + nazwaOdp(v)).join(", ");
   return `<details class="task test-rev" id="r${k + 1}"><summary class="task-h"><span class="t">Zadanie ${k + 1}</span><span>· ${esc(t.temat)}</span>
       <span class="pts ${ok ? "ok" : "bad"}">${pk}/${t.pkt} pkt</span></summary>
     <div class="sheet"><img src="${esc(t.img)}" width="${Math.round(t.w * 0.6)}" height="${Math.round(t.h * 0.6)}" alt="Treść zadania ${k + 1}" loading="lazy"></div>
