@@ -280,6 +280,7 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
   <label>Hasło<input id="f-pass" type="password" autocomplete="current-password" minlength="6" required></label>
   <div class="err" id="f-err" aria-live="polite"></div>
   <button class="btn-s primary" id="f-submit" type="submit">Zaloguj się</button>
+  <div class="alt" id="link-row"><span>Nie pamiętasz hasła albo dostałeś zaproszenie?</span><button type="button" id="f-link">Wyślij link do logowania</button></div>
   <div class="alt"><span id="alt-text">Nie masz konta?</span><button type="button" id="alt-btn">Zarejestruj się</button></div>
   <div class="alt"><button type="button" id="f-close">Zamknij</button></div>
 </form></dialog>
@@ -427,6 +428,26 @@ async function initFirebase() {
   const fauth = a.getAuth(fbApp), db = fs.getFirestore(fbApp);
   auth.fb = { auth: fauth, signOut: a.signOut };
 
+  // вхід посиланням на e-mail (Firebase сам надсилає лист): для учнів, яких запросив вчитель, і якщо забули пароль
+  const LINK_URL = location.origin + "/konto/";
+  $("#f-link").onclick = async () => {
+    const email = $("#f-email").value.trim();
+    if (!email) { $("#f-err").textContent = "Wpisz swój e-mail powyżej."; return; }
+    try {
+      await a.sendSignInLinkToEmail(fauth, email, { url: LINK_URL, handleCodeInApp: true });
+      try { localStorage.setItem("email-link", email); } catch (e) {}
+      $("#f-err").textContent = ""; alert(`Wysłaliśmy link do logowania na ${email}. Otwórz e-mail i kliknij link (sprawdź też spam).`); $("#dlg").close();
+    } catch (err) { showErr(err); }
+  };
+  auth.wyslijZaproszenie = email => a.sendSignInLinkToEmail(fauth, email, { url: LINK_URL, handleCodeInApp: true });
+  if (a.isSignInWithEmailLink(fauth, location.href)) {
+    let email = null; try { email = localStorage.getItem("email-link"); } catch (e) {}
+    email ||= prompt("Podaj e-mail, na który przyszedł link:");
+    if (email) await a.signInWithEmailLink(fauth, email.trim(), location.href).then(() => { try { localStorage.removeItem("email-link"); } catch (e) {} },
+      e => alert(e.code === "auth/invalid-action-code" ? "Ten link już wygasł albo został użyty. Wyślij nowy w oknie logowania." : "Nie udało się zalogować linkiem. Sprawdź e-mail i spróbuj ponownie."));
+    history.replaceState(null, "", location.pathname + location.hash);
+  }
+
   $("#g-login").onclick = () => a.signInWithPopup(fauth, new a.GoogleAuthProvider()).then(() => $("#dlg").close(), showErr);
   $("#auth-form").addEventListener("submit", async e => {
     e.preventDefault();
@@ -451,6 +472,16 @@ async function initFirebase() {
       snap = await fs.getDoc(ref).catch(() => null);
     }
     const isAdmin = await fs.getDocs(fs.query(fs.collection(db, "users"), fs.limit(1))).then(() => true, () => false);
+    // запрошення від вчителя (zaproszenia/{email}): учень сам отримує доступ і прив'язується до картки вчителя (powiazania/{uid})
+    if (!isAdmin && user.emailVerified && user.email) {
+      const em = user.email.toLowerCase(), z = await fs.getDoc(fs.doc(db, "zaproszenia", em)).then(d => d.exists() ? d.data() : null, () => null);
+      if (z) {
+        if (!snap?.data()?.approved) await fs.updateDoc(ref, { approved: true }).catch(e => console.warn(e));
+        const pref = fs.doc(db, "powiazania", user.uid), p = await fs.getDoc(pref).then(d => d.exists() ? d.data() : null, () => null);
+        if (!p || p.karta !== z.karta || p.owner !== z.owner) await fs.setDoc(pref, { owner: z.owner, karta: z.karta, email: em }).catch(e => console.warn(e));
+        snap = await fs.getDoc(ref).catch(() => snap);
+      }
+    }
     // підписка вчителя: дата «оплачено до» в його профілі (ставить Ірина в Panel)
     const doK = snap?.data()?.nauczycielDo;
     auth.nauczycielDo = doK?.toDate ? doK.toDate() : doK ? new Date(doK) : null;
@@ -601,7 +632,7 @@ function start() {
     <div class="big"><b style="font-size:clamp(28px,5vw,40px)">Sprawdź się przed egzaminem</b></div>
     <ul class="test-fakty">
       <li><b>Zadania 1–15</b>: zamknięte, wybierasz odpowiedź (po 1 pkt)</li>
-      <li><b>Zadania 16–21</b>: otwarte, wpisujesz wynik liczbowy. Liczy się tylko poprawna liczba, wtedy dostajesz wszystkie punkty za zadanie</li>
+      <li><b>Zadania 16–21</b>: otwarte, wpisujesz tylko liczbę (bez jednostek). Liczy się tylko poprawna liczba, wtedy dostajesz wszystkie punkty za zadanie</li>
       <li><b>125 minut</b>, kartka, długopis i linijka obok (bez kalkulatora)</li>
       <li><b>bez rejestracji</b>, wynik w punktach i procentach od razu</li>
     </ul>
@@ -621,8 +652,8 @@ function zegar() {
 function pytanie() {
   const t = zad[st.i], o = st.odp[t.id] || {}, n = zad.length;
   let ans;
-  if (otwarte(t)) ans = `<span class="q">Rozwiąż w zeszycie i wpisz sam wynik${t.jedn ? ` (w ${esc(t.jedn)})` : ""}.</span>
-    <div class="opts"><input class="open-in" id="t-in" inputmode="decimal" autocomplete="off" value="${esc(o[0] || "")}" placeholder="np. 12 albo 3,5" aria-label="Wynik zadania ${st.i + 1}"></div>`;
+  if (otwarte(t)) ans = `<span class="q">Rozwiąż w zeszycie i wpisz tylko liczbę, bez jednostek.</span>
+    <div class="opts"><input class="open-in" id="t-in" inputmode="decimal" autocomplete="off" value="${esc(o[0] || "")}" placeholder="tylko liczba, np. 12 albo 3,5" aria-label="Wynik zadania ${st.i + 1}"></div>`;
   else { const lab = etykiety(t); ans = grupy(t).map((opts, g) => `<div class="opts" role="group" aria-label="${esc(lab[g] || "Odpowiedź")}">${lab[g] ? `<span class="q">${esc(lab[g])}</span>` : ""}${opts.map(v =>
     `<button type="button" class="opt" data-g="${g}" data-v="${esc(v)}" aria-pressed="${o[g] === v}">${esc(v)}</button>`).join("")}</div>`).join(""); }
   $("#list").innerHTML = `<div class="test-pasek"><span>Zadanie <b>${st.i + 1}</b> z ${n}</span><span id="t-clock"></span><span id="t-cnt">Odpowiedzi: ${ileOdp()}/${n}</span>
@@ -693,7 +724,7 @@ function przeglad(t, k, pk) {
   const o = st.odp[t.id] || {}, ok = pk === t.pkt;
   const twoja = !pelna(t, o) ? "brak odpowiedzi" : otwarte(t) ? o[0] : grupy(t).map((_, g) => nazwaOdp(o[g])).join(", ");
   const lab = etykiety(t), c = Array.isArray(t.answer) ? t.answer : [t.answer];
-  const dobra = otwarte(t) ? odpLiczba(t) : c.map((v, g) => (lab[g] ? lab[g] + ": " : "") + nazwaOdp(v)).join(", ");
+  const dobra = otwarte(t) ? (t.ulamek || String(t.liczba).replace(".", ",")) : c.map((v, g) => (lab[g] ? lab[g] + ": " : "") + nazwaOdp(v)).join(", ");
   return `<details class="task test-rev" id="r${k + 1}"><summary class="task-h"><span class="t">Zadanie ${k + 1}</span><span>· ${esc(t.temat)}</span>
       <span class="pts ${ok ? "ok" : "bad"}">${pk}/${t.pkt} pkt</span></summary>
     <div class="sheet"><img src="${esc(t.img)}" width="${Math.round(t.w * 0.6)}" height="${Math.round(t.h * 0.6)}" alt="Treść zadania ${k + 1}" loading="lazy"></div>
@@ -703,7 +734,7 @@ function przeglad(t, k, pk) {
 // результат іде і в загальний прогрес учня (якщо він увійшов — у його кабінет)
 function zapisz() {
   const pts = zad.map(punkty);
-  res["test-e8"] = { pkt: pts.reduce((a, b) => a + b, 0), max: MAX, data: st.koniec };
+  res["test:e8"] = { pkt: pts.reduce((a, b) => a + b, 0), max: MAX, data: st.koniec };
   zad.forEach((t, k) => { if (pelna(t, st.odp[t.id])) res[t.id] = pts[k] === t.pkt ? "ok" : "bad"; });
   save();
 }

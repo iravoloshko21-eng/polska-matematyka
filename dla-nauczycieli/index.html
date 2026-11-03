@@ -263,6 +263,7 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
   <label>Hasło<input id="f-pass" type="password" autocomplete="current-password" minlength="6" required></label>
   <div class="err" id="f-err" aria-live="polite"></div>
   <button class="btn-s primary" id="f-submit" type="submit">Zaloguj się</button>
+  <div class="alt" id="link-row"><span>Nie pamiętasz hasła albo dostałeś zaproszenie?</span><button type="button" id="f-link">Wyślij link do logowania</button></div>
   <div class="alt"><span id="alt-text">Nie masz konta?</span><button type="button" id="alt-btn">Zarejestruj się</button></div>
   <div class="alt"><button type="button" id="f-close">Zamknij</button></div>
 </form></dialog>
@@ -410,6 +411,26 @@ async function initFirebase() {
   const fauth = a.getAuth(fbApp), db = fs.getFirestore(fbApp);
   auth.fb = { auth: fauth, signOut: a.signOut };
 
+  // вхід посиланням на e-mail (Firebase сам надсилає лист): для учнів, яких запросив вчитель, і якщо забули пароль
+  const LINK_URL = location.origin + "/konto/";
+  $("#f-link").onclick = async () => {
+    const email = $("#f-email").value.trim();
+    if (!email) { $("#f-err").textContent = "Wpisz swój e-mail powyżej."; return; }
+    try {
+      await a.sendSignInLinkToEmail(fauth, email, { url: LINK_URL, handleCodeInApp: true });
+      try { localStorage.setItem("email-link", email); } catch (e) {}
+      $("#f-err").textContent = ""; alert(`Wysłaliśmy link do logowania na ${email}. Otwórz e-mail i kliknij link (sprawdź też spam).`); $("#dlg").close();
+    } catch (err) { showErr(err); }
+  };
+  auth.wyslijZaproszenie = email => a.sendSignInLinkToEmail(fauth, email, { url: LINK_URL, handleCodeInApp: true });
+  if (a.isSignInWithEmailLink(fauth, location.href)) {
+    let email = null; try { email = localStorage.getItem("email-link"); } catch (e) {}
+    email ||= prompt("Podaj e-mail, na który przyszedł link:");
+    if (email) await a.signInWithEmailLink(fauth, email.trim(), location.href).then(() => { try { localStorage.removeItem("email-link"); } catch (e) {} },
+      e => alert(e.code === "auth/invalid-action-code" ? "Ten link już wygasł albo został użyty. Wyślij nowy w oknie logowania." : "Nie udało się zalogować linkiem. Sprawdź e-mail i spróbuj ponownie."));
+    history.replaceState(null, "", location.pathname + location.hash);
+  }
+
   $("#g-login").onclick = () => a.signInWithPopup(fauth, new a.GoogleAuthProvider()).then(() => $("#dlg").close(), showErr);
   $("#auth-form").addEventListener("submit", async e => {
     e.preventDefault();
@@ -434,6 +455,16 @@ async function initFirebase() {
       snap = await fs.getDoc(ref).catch(() => null);
     }
     const isAdmin = await fs.getDocs(fs.query(fs.collection(db, "users"), fs.limit(1))).then(() => true, () => false);
+    // запрошення від вчителя (zaproszenia/{email}): учень сам отримує доступ і прив'язується до картки вчителя (powiazania/{uid})
+    if (!isAdmin && user.emailVerified && user.email) {
+      const em = user.email.toLowerCase(), z = await fs.getDoc(fs.doc(db, "zaproszenia", em)).then(d => d.exists() ? d.data() : null, () => null);
+      if (z) {
+        if (!snap?.data()?.approved) await fs.updateDoc(ref, { approved: true }).catch(e => console.warn(e));
+        const pref = fs.doc(db, "powiazania", user.uid), p = await fs.getDoc(pref).then(d => d.exists() ? d.data() : null, () => null);
+        if (!p || p.karta !== z.karta || p.owner !== z.owner) await fs.setDoc(pref, { owner: z.owner, karta: z.karta, email: em }).catch(e => console.warn(e));
+        snap = await fs.getDoc(ref).catch(() => snap);
+      }
+    }
     // підписка вчителя: дата «оплачено до» в його профілі (ставить Ірина в Panel)
     const doK = snap?.data()?.nauczycielDo;
     auth.nauczycielDo = doK?.toDate ? doK.toDate() : doK ? new Date(doK) : null;

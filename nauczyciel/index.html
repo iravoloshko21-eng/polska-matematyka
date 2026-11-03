@@ -254,6 +254,7 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
   <label>Hasło<input id="f-pass" type="password" autocomplete="current-password" minlength="6" required></label>
   <div class="err" id="f-err" aria-live="polite"></div>
   <button class="btn-s primary" id="f-submit" type="submit">Zaloguj się</button>
+  <div class="alt" id="link-row"><span>Nie pamiętasz hasła albo dostałeś zaproszenie?</span><button type="button" id="f-link">Wyślij link do logowania</button></div>
   <div class="alt"><span id="alt-text">Nie masz konta?</span><button type="button" id="alt-btn">Zarejestruj się</button></div>
   <div class="alt"><button type="button" id="f-close">Zamknij</button></div>
 </form></dialog>
@@ -401,6 +402,26 @@ async function initFirebase() {
   const fauth = a.getAuth(fbApp), db = fs.getFirestore(fbApp);
   auth.fb = { auth: fauth, signOut: a.signOut };
 
+  // вхід посиланням на e-mail (Firebase сам надсилає лист): для учнів, яких запросив вчитель, і якщо забули пароль
+  const LINK_URL = location.origin + "/konto/";
+  $("#f-link").onclick = async () => {
+    const email = $("#f-email").value.trim();
+    if (!email) { $("#f-err").textContent = "Wpisz swój e-mail powyżej."; return; }
+    try {
+      await a.sendSignInLinkToEmail(fauth, email, { url: LINK_URL, handleCodeInApp: true });
+      try { localStorage.setItem("email-link", email); } catch (e) {}
+      $("#f-err").textContent = ""; alert(`Wysłaliśmy link do logowania na ${email}. Otwórz e-mail i kliknij link (sprawdź też spam).`); $("#dlg").close();
+    } catch (err) { showErr(err); }
+  };
+  auth.wyslijZaproszenie = email => a.sendSignInLinkToEmail(fauth, email, { url: LINK_URL, handleCodeInApp: true });
+  if (a.isSignInWithEmailLink(fauth, location.href)) {
+    let email = null; try { email = localStorage.getItem("email-link"); } catch (e) {}
+    email ||= prompt("Podaj e-mail, na który przyszedł link:");
+    if (email) await a.signInWithEmailLink(fauth, email.trim(), location.href).then(() => { try { localStorage.removeItem("email-link"); } catch (e) {} },
+      e => alert(e.code === "auth/invalid-action-code" ? "Ten link już wygasł albo został użyty. Wyślij nowy w oknie logowania." : "Nie udało się zalogować linkiem. Sprawdź e-mail i spróbuj ponownie."));
+    history.replaceState(null, "", location.pathname + location.hash);
+  }
+
   $("#g-login").onclick = () => a.signInWithPopup(fauth, new a.GoogleAuthProvider()).then(() => $("#dlg").close(), showErr);
   $("#auth-form").addEventListener("submit", async e => {
     e.preventDefault();
@@ -425,6 +446,16 @@ async function initFirebase() {
       snap = await fs.getDoc(ref).catch(() => null);
     }
     const isAdmin = await fs.getDocs(fs.query(fs.collection(db, "users"), fs.limit(1))).then(() => true, () => false);
+    // запрошення від вчителя (zaproszenia/{email}): учень сам отримує доступ і прив'язується до картки вчителя (powiazania/{uid})
+    if (!isAdmin && user.emailVerified && user.email) {
+      const em = user.email.toLowerCase(), z = await fs.getDoc(fs.doc(db, "zaproszenia", em)).then(d => d.exists() ? d.data() : null, () => null);
+      if (z) {
+        if (!snap?.data()?.approved) await fs.updateDoc(ref, { approved: true }).catch(e => console.warn(e));
+        const pref = fs.doc(db, "powiazania", user.uid), p = await fs.getDoc(pref).then(d => d.exists() ? d.data() : null, () => null);
+        if (!p || p.karta !== z.karta || p.owner !== z.owner) await fs.setDoc(pref, { owner: z.owner, karta: z.karta, email: em }).catch(e => console.warn(e));
+        snap = await fs.getDoc(ref).catch(() => snap);
+      }
+    }
     // підписка вчителя: дата «оплачено до» в його профілі (ставить Ірина в Panel)
     const doK = snap?.data()?.nauczycielDo;
     auth.nauczycielDo = doK?.toDate ? doK.toDate() : doK ? new Date(doK) : null;
@@ -539,7 +570,9 @@ let UCZNIOWIE = null;            // [{id, ...dane}] з бази, лише для
 const CELE = { e8: "Egzamin ósmoklasisty", mp: "Matura podstawowa", inne: "Inne" };
 const dzis = () => new Date().toISOString().slice(0, 10);
 const pc = (a, b) => b ? Math.round(100 * a / b) : 0;
-const statsU = u => { const w = Object.entries(u.wyniki || {}).filter(([k]) => !k.includes(":")).map(([, v]) => v); return { done: w.length, ok: w.filter(v => v === "ok").length }; };
+// усі результати учня: з уроків (картка) і власні з його акаунта (postepy/{uid}), якщо учень прийняв запрошення
+const wszystkie = u => ({ ...(u.wlasne || {}), ...(u.wyniki || {}) });
+const statsU = u => { const w = Object.entries(wszystkie(u)).filter(([k]) => !k.includes(":")).map(([, v]) => v); return { done: w.length, ok: w.filter(v => v === "ok").length }; };
 
 async function wczytaj() {
   const { fs, db } = auth;
@@ -548,6 +581,13 @@ async function wczytaj() {
   const snap = auth.status === "admin" ? await fs.getDocs(fs.collection(db, "uczniowie"))
                                        : await fs.getDocs(fs.query(fs.collection(db, "uczniowie"), fs.where("owner", "==", uid)));
   UCZNIOWIE = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(u => !u.owner || u.owner === uid).sort((a, b) => (a.imie || "").localeCompare(b.imie || "", "pl"));
+  // учні, які прийняли запрошення: їхні власні результати з акаунта
+  const pow = await fs.getDocs(fs.query(fs.collection(db, "powiazania"), fs.where("owner", "==", uid))).then(s => s.docs, () => []);
+  await Promise.all(pow.map(async d => {
+    const u = UCZNIOWIE.find(x => x.id === d.data().karta); if (!u) return;
+    u.konto = d.id;
+    u.wlasne = await fs.getDoc(fs.doc(db, "postepy", d.id)).then(p => p.exists() ? p.data().wyniki || {} : {}, () => ({}));
+  }));
   render();
 }
 const zapisz = (id, dane) => auth.fs.setDoc(auth.fs.doc(auth.db, "uczniowie", id), { ...dane, ...(auth.status === "teacher" ? { owner: auth.user.uid } : {}), updated: auth.fs.serverTimestamp() }, { merge: true });
@@ -577,19 +617,42 @@ function lista() {
   $("#tiles").innerHTML = `<div class="tile"><b>${UCZNIOWIE.length}</b><span>uczniów</span></div><div class="tile"><b>${s.done}</b><span>zadań na lekcjach</span></div><div class="tile"><b>${s.done ? pc(s.ok, s.done) + "%" : "—"}</b><span>poprawnie</span></div>`;
   $("#list").innerHTML = `<section class="summary"><b style="font-family:var(--display);font-size:20px">Dodaj ucznia</b>
       <form class="form-row" id="nowy"><label>Imię i nazwisko<input name="imie" required maxlength="60" placeholder="np. Ania Kowalska"></label>
+      <label>E-mail ucznia (nieobowiązkowo)<input name="email" type="email" maxlength="100" placeholder="uczeń dostanie zaproszenie"></label>
       <label>Przygotowanie do<select name="cel">${Object.entries(CELE).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label>
       <button class="btn-s primary">Dodaj</button></form></section>
     <div class="uczniowie">${UCZNIOWIE.map(u => { const x = statsU(u), p = (u.proby || []).at(-1);
       return `<a class="uczen" href="#${encodeURIComponent(u.id)}"><h3>${esc(u.imie)}</h3><span class="muted-s">${esc(CELE[u.cel] || "")}</span>
         <span>${x.done} zadań · ${x.done ? pc(x.ok, x.done) + "% poprawnie" : "jeszcze bez lekcji"}</span>
+        ${u.email ? `<span class="muted-s">${u.konto ? "✓ konto ucznia połączone" : "✉ zaproszenie wysłane"}</span>` : ""}
         ${p ? `<span class="muted-s">Ostatni próbny: ${esc(p.nazwa || "")} ${p.pkt}/${p.max} pkt (${pc(p.pkt, p.max)}%)</span>` : ""}</a>`; }).join("") || `<p class="muted-s">Nie masz jeszcze uczniów. Dodaj pierwszego powyżej.</p>`}</div>`;
   $("#nowy").onsubmit = async e => {
     e.preventDefault();
     const f = new FormData(e.target), imie = f.get("imie").trim(); if (!imie) return;
     const id = slugify(imie).replace(/^-|-$/g, "").slice(0, 30) + "-" + Math.random().toString(36).slice(2, 6);
     const dane = { imie, cel: f.get("cel"), proby: [], notatki: "", wyniki: {}, created: auth.fs.serverTimestamp() };
-    await zapisz(id, dane); UCZNIOWIE.push({ id, ...dane }); location.hash = encodeURIComponent(id);
+    await zapisz(id, dane); UCZNIOWIE.push({ id, ...dane });
+    const email = (f.get("email") || "").trim();
+    if (email) await zapros(UCZNIOWIE.at(-1), email);
+    location.hash = encodeURIComponent(id);
   };
+}
+
+// запрошення: zaproszenia/{email} (хто запросив і яка картка) + лист із посиланням для входу (надсилає Firebase)
+async function zapros(u, email) {
+  email = String(email || "").trim().toLowerCase();
+  if (!/^[^@\s/]+@[^@\s/]+\.[^@\s/]+$/.test(email)) { alert("Sprawdź adres e-mail ucznia."); return false; }
+  const { fs, db } = auth;
+  try {
+    await fs.setDoc(fs.doc(db, "zaproszenia", email), { owner: auth.user.uid, karta: u.id, created: fs.serverTimestamp() });
+  } catch (e) { alert("Ten e-mail jest już zaproszony przez innego nauczyciela albo nie masz dostępu. " + (e.code || "")); return false; }
+  await zapisz(u.id, { email }); u.email = email;
+  try { await auth.wyslijZaproszenie(email); alert(`Zaproszenie wysłane na ${email}. Uczeń dostanie e-mail z linkiem do logowania (niech sprawdzi też spam).`); }
+  catch (e) { alert("Uczeń jest zapisany, ale e-maila nie udało się wysłać: " + (e.code || e.message) + ". Spróbuj ponownie za chwilę."); }
+  return true;
+}
+function wlasneInfo(u) {
+  const w = u.wlasne || {}, z = all.map(t => w[t.id]).filter(Boolean), ark = Object.entries(w).filter(([k]) => k.startsWith("arkusz:")).length, t = w["test:e8"];
+  return `<span class="muted-s">Samodzielnie na swoim koncie: ${z.length} zadań${z.length ? ` (${pc(z.filter(v => v === "ok").length, z.length)}% poprawnie)` : ""} · arkuszy: ${ark}${t ? ` · bezpłatny test E8: ${t.pkt}/${t.max} pkt` : ""}</span>`;
 }
 
 function karta(u) {
@@ -598,13 +661,17 @@ function karta(u) {
   $("#tiles").innerHTML = `<div class="tile"><b>${x.done}</b><span>rozwiązanych zadań</span></div><div class="tile"><b>${x.done ? pc(x.ok, x.done) + "%" : "—"}</b><span>poprawnie</span></div>
     <div class="tile"><b>${proby.length}</b><span>egzaminów próbnych</span></div>`;
   // слабкі теми: найнижчий відсоток серед тем, де розв'язано хоча б 3 завдання
-  const tem = D.tematy.map(({ temat }) => { const r = all.filter(t => t.temat === temat).map(t => u.wyniki?.[t.id]).filter(Boolean); return { temat, n: r.length, p: pc(r.filter(v => v === "ok").length, r.length) }; })
+  const tem = D.tematy.map(({ temat }) => { const r = all.filter(t => t.temat === temat).map(t => wszystkie(u)[t.id]).filter(Boolean); return { temat, n: r.length, p: pc(r.filter(v => v === "ok").length, r.length) }; })
     .filter(t => t.n >= 3).sort((a, b) => a.p - b.p).slice(0, 5);
   $("#list").innerHTML = `<p><a href="#">← Wszyscy uczniowie</a></p>
     <section class="summary"><b style="font-family:var(--display);font-size:20px">Lekcja z uczniem</b>
       <span class="muted-s">Otwórz zadania w trybie lekcji: odpowiedzi zapiszą się w karcie ucznia.${auth.status === "admin" ? " «Ukryj rozwiązane» + «Pobierz PDF» da Ci zadania, których jeszcze nie zrobiliście, na pracę domową." : " «Ukryj rozwiązane» pokaże zadania, których jeszcze nie zrobiliście."}</span>
       <div class="akcje"><a class="btn-s primary" href="../e8/${q}">Zadania E8</a><a class="btn-s" href="../matura/${q}">Matura podstawowa</a><a class="btn-s" href="../arkusze/${q}">Arkusz</a><a class="btn-s" href="../konto/${q}">Postęp po tematach</a></div>
       ${tem.length ? `<span><b>Do powtórki:</b> ${tem.map(t => `<a href="../e8/${q}#temat=${encodeURIComponent(t.temat)}">${esc(t.temat)}</a> (${t.p}%)`).join(" · ")}</span>` : ""}</section>
+    <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Konto ucznia</b>
+      ${u.email ? `<span>E-mail: <b>${esc(u.email)}</b> · ${u.konto ? "✓ uczeń zalogował się, jego samodzielne wyniki są wliczone w kartę" : "zaproszenie wysłane, uczeń jeszcze się nie zalogował"}</span>` : `<span class="muted-s">Wpisz e-mail ucznia: dostanie link do logowania i od razu pełny dostęp do zadań. Jego samodzielne wyniki zobaczysz w tej karcie.</span>`}
+      ${u.konto ? wlasneInfo(u) : `<form class="form-row" id="zapros"><label>E-mail ucznia<input name="email" type="email" required maxlength="100" value="${esc(u.email || "")}"></label>
+        <button class="btn-s primary">${u.email ? "Wyślij zaproszenie ponownie" : "Wyślij zaproszenie"}</button></form>`}</section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Egzaminy próbne</b>
       ${proby.length ? `<table class="proby"><thead><tr><th>Data</th><th>Egzamin</th><th>Wynik</th><th>Zmiana</th><th></th></tr></thead><tbody>${proby.map((p, i) => { const d = i ? pc(p.pkt, p.max) - pc(proby[i - 1].pkt, proby[i - 1].max) : null;
         return `<tr><td class="num">${esc(p.data)}</td><td>${esc(p.nazwa)}</td><td class="num"><b>${p.pkt}/${p.max} pkt</b> · ${pc(p.pkt, p.max)}%</td><td class="num">${d === null ? "" : `<span class="${d >= 0 ? "ok" : "bad"}">${d >= 0 ? "▲ +" : "▼ "}${d} pp</span>`}</td><td><button type="button" class="link-del" data-del="${i}">usuń</button></td></tr>`; }).join("")}</tbody></table>`
@@ -617,6 +684,11 @@ function karta(u) {
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Notatki</b>
       <textarea class="notatki" id="notatki" placeholder="Co omówiliśmy, co zadać, na co uważać…">${esc(u.notatki || "")}</textarea><span class="muted-s" id="n-stan"></span></section>
     <p style="margin-top:22px"><button type="button" class="link-del" id="usun">Usuń ucznia</button></p>`;
+  $("#zapros")?.addEventListener("submit", async e => {
+    e.preventDefault();
+    const b = e.target.querySelector("button"); b.disabled = true;
+    if (await zapros(u, new FormData(e.target).get("email"))) render(); else b.disabled = false;
+  });
   $("#proba").onsubmit = async e => {
     e.preventDefault();
     const f = new FormData(e.target), p = { data: f.get("data"), nazwa: f.get("nazwa").trim(), pkt: +f.get("pkt"), max: +f.get("max") };
