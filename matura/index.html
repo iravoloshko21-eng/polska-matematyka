@@ -775,7 +775,7 @@ function answerUI(t) {
   if (t.format === "tn") return group("0", t.tak || ["T", "N"], "Odpowiedź") + group("1", t.options, "Uzasadnienie") + `<button type="button" class="go" data-check disabled>Sprawdź</button><div class="fb" aria-live="polite"></div>`;
   if (t.liczba !== undefined) return `${LICZBA_INFO}<div class="opts"><input class="open-in" inputmode="decimal" id="in-${esc(t.id)}" autocomplete="off" placeholder="${LICZBA_PH}" aria-label="Twoja odpowiedź">
     <button type="button" class="go" data-num>Sprawdź</button></div><div class="fb" aria-live="polite"></div>`;
-  return `<div class="opts"><input class="open-in" id="in-${esc(t.id)}" placeholder="Twoja odpowiedź (np. 57 albo 3,60 zł)" aria-label="Twoja odpowiedź"></div>
+  return `<div class="opts"><input class="open-in" id="in-${esc(t.id)}" placeholder="Twoja odpowiedź" aria-label="Twoja odpowiedź"></div>
     <button type="button" class="go" data-reveal>Pokaż odpowiedź</button><div class="fb" aria-live="polite"></div>`;
 }
 
