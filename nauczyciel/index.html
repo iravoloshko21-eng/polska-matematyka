@@ -237,6 +237,20 @@ table.proby th, table.proby td { text-align: left; padding: 8px 6px; border-bott
 table.proby td.num { font-variant-numeric: tabular-nums; white-space: nowrap }
 .akcje { display: flex; flex-wrap: wrap; gap: 8px }
 .akcje a.btn-s { text-decoration: none }
+/* praca domowa (кабінет учня й вчителя) і слабкі теми */
+.prace { display: grid }
+.pd { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 1.5px dashed var(--line, #e4ded3) }
+.pd:first-child { border-top: 0 }
+.pd .pd-t { display: grid; gap: 2px }
+.pd .pd-r { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.pd .pd-r a.btn-s { text-decoration: none }
+.pd-st { font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: #f6ecd9; color: #8a5a12; white-space: nowrap }
+.pd-st.ok { background: var(--ok-soft); color: var(--ok) } .pd-st.bad { background: var(--bad-soft); color: var(--bad) }
+.slabe { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 12px }
+.slabe .sl { border: 1.5px solid var(--ink); border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; background: var(--card) }
+.slabe .sl a.t { font-weight: 700; color: var(--ink) }
+.slabe .sl b.p { font-family: var(--display); font-size: 26px; color: var(--bad) }
+.uczen .u-pd { font-size: 12.5px; font-weight: 700 } .uczen .u-pd.bad { color: var(--bad) }
 button.link-del { background: none; border: 0; color: #b3261e; font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline }
 header.site .authbar { flex-wrap: nowrap; gap: 6px }
 header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; padding: 5px 11px; white-space: nowrap }
@@ -367,6 +381,24 @@ const ARKUSZE = (() => {
 const bySlug = Object.fromEntries(ARKUSZE.map(a => [a.slug, a]));
 const label = a => a.nazwa[0].toUpperCase() + a.nazwa.slice(1);
 const dostepny = a => a.zadania.every(z => unlocked(z.t));
+
+// Praca domowa (prace/{id karty ucznia}.lista, Ірина 2026-11-04): вчитель задає тему (конкретні завдання ids) або аркуш (slug) з терміном.
+// Зроблено = усі завдання мають результат / аркуш розв'язано після призначення (od, мс). w — результати учня.
+const dzienLok = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const terminTxt = s => new Date(s + "T12:00").toLocaleDateString("pl-PL", { day: "numeric", month: "long" });
+function stanPracy(p, w) {
+  let n = 1, done = 0;
+  if (p.typ === "arkusz") { const r = w["arkusz:" + p.slug]; done = r && (r.data || 0) >= (p.od || 0) ? 1 : 0; }
+  else { n = (p.ids || []).length; done = (p.ids || []).filter(id => w[id]).length; }
+  const zrobione = n > 0 && done >= n;
+  return { n, done, zrobione, spoznione: !zrobione && p.termin < dzienLok() };
+}
+const tytulPracy = p => p.typ === "arkusz" ? `Arkusz ${bySlug[p.slug] ? label(bySlug[p.slug]) : p.slug}` : `${p.temat} · ${(p.ids || []).length} zad.`;
+const linkPracy = p => p.typ === "arkusz" ? `../arkusze/#${encodeURIComponent(p.slug)}` : `../e8/#zadania=${(p.ids || []).map(encodeURIComponent).join(",")}`;
+const etykietaPracy = s => s.zrobione ? `<span class="pd-st ok">✓ zrobione</span>` : s.spoznione ? `<span class="pd-st bad">⚠ po terminie${s.n > 1 ? ` · ${s.done}/${s.n}` : ""}</span>`
+  : `<span class="pd-st">${s.done ? `w trakcie · ${s.done}/${s.n}` : "do zrobienia"}</span>`;
+// спершу незроблені за терміном, потім зроблені
+const sortPrac = (l, w) => l.slice().sort((a, b) => stanPracy(a, w).zrobione - stanPracy(b, w).zrobione || a.termin.localeCompare(b.termin));
 
 // Arkusz miesiąca: щомісяця всі учні пишуть той самий аркуш (по колу, від найстарішого).
 // Перша спроба, завершена в цьому місяці, зберігається в res["miesiac:РРРР-ММ"] — для порівняння місяців.
@@ -641,6 +673,9 @@ async function wczytaj() {
     u.konto = d.id;
     u.wlasne = await fs.getDoc(fs.doc(db, "postepy", d.id)).then(p => p.exists() ? p.data().wyniki || {} : {}, () => ({}));
   }));
+  // praca domowa (prace/{id картки}): усі мої, щоб у плитках було видно, хто не зробив
+  const prace = await fs.getDocs(auth.status === "admin" ? fs.collection(db, "prace") : fs.query(fs.collection(db, "prace"), fs.where("owner", "==", uid))).then(s => s.docs, () => []);
+  prace.forEach(d => { const u = UCZNIOWIE.find(x => x.id === d.id); if (u) u.prace = d.data().lista || []; });
   render();
 }
 const zapisz = (id, dane) => auth.fs.setDoc(auth.fs.doc(auth.db, "uczniowie", id), { ...dane, ...(auth.status === "teacher" ? { owner: auth.user.uid } : {}), updated: auth.fs.serverTimestamp() }, { merge: true });
@@ -679,6 +714,7 @@ function lista() {
         <span class="muted-s">${esc(CELE[u.cel] || "")}</span>
         <span class="u-wynik"><b>${x.done ? p + "%" : "—"}</b><span>${x.done} zadań · ${ark} ${ark === 1 ? "arkusz" : ark > 1 && ark < 5 ? "arkusze" : "arkuszy"}</span></span>
         <span class="bar">${x.done ? `<i class="ok" style="width:${p}%"></i><i class="bad" style="width:${100 - p}%"></i>` : ""}</span>
+        ${pdInfo(u)}
         ${u.email ? `<span class="muted-s">${u.konto ? "✓ konto ucznia połączone" : "✉ zaproszenie wysłane"}</span>` : ""}</a>`; }).join("") || `<p class="muted-s">Nie masz jeszcze uczniów. Dodaj pierwszego poniżej.</p>`}</div>
     <section class="summary"><b style="font-family:var(--display);font-size:20px">Dodaj ucznia</b>
       <form class="form-row" id="nowy">${pola({})}
@@ -695,6 +731,12 @@ function lista() {
     if (email) await zapros(UCZNIOWIE.find(x => x.id === id), email);
     location.hash = encodeURIComponent(id);
   };
+}
+// плитка учня: скільки домашніх не зроблено і чи є прострочені
+function pdInfo(u) {
+  const st = (u.prace || []).map(p => stanPracy(p, wszystkie(u))), nie = st.filter(s => !s.zrobione), po = nie.filter(s => s.spoznione).length;
+  if (!st.length) return "";
+  return `<span class="u-pd${po ? " bad" : ""}">📚 ${nie.length ? `praca domowa: ${nie.length} do zrobienia${po ? `, ${po} po terminie` : ""}` : "praca domowa zrobiona ✓"}</span>`;
 }
 // поля форми «Dodaj ucznia» / «Dane ucznia»
 const pola = u => `<label>Klasa<input name="klasa" maxlength="10" placeholder="np. 8b" style="width:80px" value="${esc(u.klasa || "")}"></label>
@@ -759,13 +801,19 @@ function karta(u) {
     <div class="tile"><b>${ark}</b><span>arkuszy</span></div><div class="tile"><b>${proby.length}</b><span>egzaminów próbnych</span></div>`;
   // слабкі теми: найнижчий відсоток серед тем, де розв'язано хоча б 3 завдання
   const tem = D.tematy.map(({ temat }) => { const r = all.filter(t => t.temat === temat).map(t => wszystkie(u)[t.id]).filter(Boolean); return { temat, n: r.length, p: pc(r.filter(v => v === "ok").length, r.length) }; })
-    .filter(t => t.n >= 3).sort((a, b) => a.p - b.p).slice(0, 5);
+    .filter(t => t.n >= 3).sort((a, b) => a.p - b.p || b.n - a.n).slice(0, 3);
   const arkHtml = arkuszeHtml([u.wyniki, "na lekcji"], [u.konto ? u.wlasne : null, "samodzielnie"]);
   $("#list").innerHTML = `<p><a href="#">← Wszyscy uczniowie</a></p>
     <section class="summary"><b style="font-family:var(--display);font-size:20px">Lekcja z uczniem</b>
       <span class="muted-s">Otwórz zadania w trybie lekcji: odpowiedzi zapiszą się w gabinecie ucznia.${auth.status === "admin" ? " «Ukryj rozwiązane» + «Pobierz PDF» da Ci zadania, których jeszcze nie zrobiliście, na pracę domową." : " «Ukryj rozwiązane» pokaże zadania, których jeszcze nie zrobiliście."}</span>
-      <div class="akcje"><a class="btn-s primary" href="../e8/${q}">Zadania E8</a><a class="btn-s" href="../matura/${q}">Matura podstawowa</a><a class="btn-s" href="../arkusze/${q}">Arkusz</a></div>
-      ${tem.length ? `<span><b>Do powtórki:</b> ${tem.map(t => `<a href="../e8/${q}#temat=${encodeURIComponent(t.temat)}">${esc(t.temat)}</a> (${t.p}%)`).join(" · ")}</span>` : ""}</section>
+      <div class="akcje"><a class="btn-s primary" href="../e8/${q}">Zadania E8</a><a class="btn-s" href="../matura/${q}">Matura podstawowa</a><a class="btn-s" href="../arkusze/${q}">Arkusz</a></div></section>
+    <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Słabe tematy</b>
+      ${tem.length ? `<span class="muted-s">Tematy E8 z najniższym wynikiem (liczone, gdy uczeń rozwiązał co najmniej 3 zadania z tematu).</span>
+      <div class="slabe">${tem.map(t => `<div class="sl"><a class="t" href="../e8/${q}#temat=${encodeURIComponent(t.temat)}">${esc(t.temat)}</a>
+        <span><b class="p">${t.p}%</b> <span class="muted-s">poprawnie z ${t.n} zadań</span></span>
+        <div class="akcje"><button type="button" class="btn-s primary" data-zadaj="${esc(t.temat)}">Zadaj z tego tematu</button><a class="btn-s" href="../e8/${q}#temat=${encodeURIComponent(t.temat)}">Ćwicz na lekcji</a></div></div>`).join("")}</div>`
+        : `<span class="muted-s">Słabe tematy pojawią się, gdy uczeń rozwiąże co najmniej 3 zadania z jednego tematu.</span>`}</section>
+    ${pracaHtml(u)}
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Postęp po tematach</b>
       ${tematyHtml(u, q)}</section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Arkusze</b>
@@ -789,6 +837,7 @@ function karta(u) {
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Notatki</b>
       <textarea class="notatki" id="notatki" placeholder="Co omówiliśmy, co zadać, na co uważać…">${esc(u.notatki || "")}</textarea><span class="muted-s" id="n-stan"></span></section>
     <p style="margin-top:22px"><button type="button" class="link-del" id="usun">Usuń ucznia</button></p>`;
+  pracaZdarzenia(u);
   $("#dane").onsubmit = async e => {
     e.preventDefault();
     const dane = daneZ(new FormData(e.target)); if (!dane.imie || !dane.nazwisko) return;
@@ -812,8 +861,56 @@ function karta(u) {
   let t; $("#notatki").oninput = e => { clearTimeout(t); $("#n-stan").textContent = "…"; t = setTimeout(async () => { u.notatki = e.target.value; await zapisz(u.id, { notatki: u.notatki }); $("#n-stan").textContent = "Zapisano"; }, 800); };
   $("#usun").onclick = async () => {
     if (!confirm(`Usunąć ucznia ${nazwa(u)} razem z wynikami? Tego nie da się cofnąć.`)) return;
-    await auth.fs.deleteDoc(auth.fs.doc(auth.db, "uczniowie", u.id)); UCZNIOWIE = UCZNIOWIE.filter(x => x !== u); location.hash = "";
+    await auth.fs.deleteDoc(auth.fs.doc(auth.db, "uczniowie", u.id));
+    if (u.prace) await auth.fs.deleteDoc(auth.fs.doc(auth.db, "prace", u.id)).catch(e => console.warn(e));
+    UCZNIOWIE = UCZNIOWIE.filter(x => x !== u); location.hash = "";
   };
+}
+
+// Praca domowa: тема (N нерозв'язаних завдань цієї теми) або аркуш, з терміном; статус рахується з результатів учня
+function pracaHtml(u) {
+  const w = wszystkie(u), l = sortPrac(u.prace || [], w), za7 = dzienLok(new Date(Date.now() + 7 * 864e5));
+  return `<section class="summary" style="margin-top:22px" id="pd"><b style="font-family:var(--display);font-size:20px">Praca domowa</b>
+    ${u.konto ? "" : `<span class="muted-s">Uczeń zobaczy pracę domową w swoim gabinecie po zalogowaniu z zaproszenia (sekcja «Konto ucznia» niżej). Zadania zrobione na lekcji też się liczą.</span>`}
+    ${l.length ? `<div class="prace">${l.map(p => { const st = stanPracy(p, w);
+      return `<div class="pd"><span class="pd-t"><b>${esc(tytulPracy(p))}</b><span class="muted-s">zadano ${esc(new Date(p.od).toLocaleDateString("pl-PL"))} · termin: ${esc(terminTxt(p.termin))}</span></span>
+        <span class="pd-r">${etykietaPracy(st)}<button type="button" class="link-del" data-pd-del="${esc(p.id)}">usuń</button></span></div>`; }).join("")}</div>`
+      : `<span class="muted-s">Brak zadanej pracy. Wybierz temat albo arkusz i termin.</span>`}
+    <form class="form-row" id="pd-form"><label>Co zadać<select name="co" required>
+        <optgroup label="Temat (zadania, których uczeń jeszcze nie rozwiązał)">${D.tematy.map(({ temat }) => `<option value="t:${esc(temat)}">${esc(temat)}</option>`).join("")}</optgroup>
+        <optgroup label="Cały arkusz">${ARKUSZE.map(a => `<option value="a:${esc(a.slug)}">Arkusz ${esc(label(a))}</option>`).join("")}</optgroup></select></label>
+      <label>Ile zadań<input type="number" name="ile" min="1" max="20" value="5" style="width:80px"></label>
+      <label>Termin<input type="date" name="termin" value="${za7}" min="${dzienLok()}" required></label>
+      <button class="btn-s primary">Zadaj</button></form></section>`;
+}
+function pracaZdarzenia(u) {
+  const f = $("#pd-form"), ile = f.querySelector("[name=ile]").closest("label");
+  const typ = () => { ile.hidden = f.co.value.startsWith("a:"); }; f.co.onchange = typ; typ();
+  const zapiszPrace = lista => auth.fs.setDoc(auth.fs.doc(auth.db, "prace", u.id), { owner: auth.user.uid, lista, updated: auth.fs.serverTimestamp() });
+  $("#list").querySelectorAll("[data-zadaj]").forEach(b => b.onclick = () => {
+    f.co.value = "t:" + b.dataset.zadaj; typ(); $("#pd").scrollIntoView({ behavior: "smooth", block: "start" }); f.ile.focus({ preventScroll: true });
+  });
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const co = f.co.value, w = wszystkie(u), p = { id: Date.now().toString(36), termin: f.termin.value, od: Date.now() };
+    if (co.startsWith("a:")) Object.assign(p, { typ: "arkusz", slug: co.slice(2) });
+    else {
+      const temat = co.slice(2), ids = all.filter(t => t.temat === temat && !w[t.id]).slice(0, Math.max(1, Math.min(20, +f.ile.value || 5))).map(t => t.id);
+      if (!ids.length) { alert("Uczeń rozwiązał już wszystkie zadania z tego tematu."); return; }
+      Object.assign(p, { typ: "temat", temat, ids });
+    }
+    // найстаріші зроблені випадають першими, щоб список не ріс без кінця (у базі до 30)
+    let lista = [...(u.prace || []), p];
+    while (lista.length > 30) { const i = lista.findIndex(x => stanPracy(x, w).zrobione); lista.splice(i < 0 ? 0 : i, 1); }
+    const b = f.querySelector("button"); b.disabled = true;
+    try { await zapiszPrace(lista); u.prace = lista; render(); $("#pd")?.scrollIntoView({ block: "start" }); }
+    catch (err) { b.disabled = false; alert("Nie udało się zapisać pracy domowej. Sprawdź, czy w Firebase są nowe reguły (blok «prace»). " + (err.code || "")); }
+  };
+  $("#list").querySelectorAll("[data-pd-del]").forEach(b => b.onclick = async () => {
+    if (!confirm("Usunąć tę pracę domową?")) return;
+    const lista = (u.prace || []).filter(p => p.id !== b.dataset.pdDel);
+    await zapiszPrace(lista); u.prace = lista; render();
+  });
 }
 
 render();
