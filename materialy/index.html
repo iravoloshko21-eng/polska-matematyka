@@ -195,6 +195,20 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
   header.site .in { flex-wrap: wrap }
   header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
 }
+
+/* Плавні переходи (Ірина, 2026-11-04): сторінка м'яко зникає і з'являється, а не перемикається різко.
+   Між сторінками — @view-transition (Chrome/Edge/Safari 18+); всередині сторінки (наступне завдання, аркуш, учень) — plynnie() у wspolne.js.
+   Меню зверху стоїть на місці. Хто вимкнув анімації в системі — без переходів. */
+@view-transition { navigation: auto; }
+header.site { view-transition-name: menu; }
+::view-transition-old(root) { animation: znikaj .18s ease-in both; }
+::view-transition-new(root) { animation: pojaw .32s ease-out .06s both; }
+@keyframes znikaj { to { opacity: 0; } }
+@keyframes pojaw { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
 </style>
 
 <header class="site"><div class="in"><a class="logo" href="../">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../matura/">Matura</a><a href="../arkusze/">Arkusze</a><a href="../materialy/" aria-current="page">Materiały</a><a href="../konto/">Mój gabinet</a><a href="../o-mnie/">O mnie</a></nav><a class="join" href="../konto/">Załóż konto</a></div></header>

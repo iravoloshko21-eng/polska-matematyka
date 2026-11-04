@@ -263,6 +263,20 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
   header.site .in { flex-wrap: wrap }
   header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
 }
+
+/* Плавні переходи (Ірина, 2026-11-04): сторінка м'яко зникає і з'являється, а не перемикається різко.
+   Між сторінками — @view-transition (Chrome/Edge/Safari 18+); всередині сторінки (наступне завдання, аркуш, учень) — plynnie() у wspolne.js.
+   Меню зверху стоїть на місці. Хто вимкнув анімації в системі — без переходів. */
+@view-transition { navigation: auto; }
+header.site { view-transition-name: menu; }
+::view-transition-old(root) { animation: znikaj .18s ease-in both; }
+::view-transition-new(root) { animation: pojaw .32s ease-out .06s both; }
+@keyframes znikaj { to { opacity: 0; } }
+@keyframes pojaw { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -653,6 +667,9 @@ async function drukuj(lista, { sekcja, temat, podpis }) {
   pdf.save(`${temat} - zadania${zOdp ? " z odpowiedziami" : ""}.pdf`.replace(/[\\/:*?"<>|]/g, "-"));
 }
 
+// плавна зміна вмісту на сторінці (наступне завдання, аркуш, учень): старе м'яко зникає, нове з'являється; без підтримки браузера чи при вимкнених анімаціях — просто одразу
+const plynnie = fn => document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches ? document.startViewTransition(fn) : fn();
+
 // Аркуші: повні аркуші CKE, зібрані з завдань бази за джерелом («maj 2026 - zad. 8»).
 // Закриті завдання рахуються автоматично, відкриті учень оцінює сам за ключем. Результат іде в res["arkusz:<slug>"].
 const SZKIC = "arkusz-szkic";   // незавершені відповіді, лише в цьому браузері
@@ -816,7 +833,7 @@ $("#list").addEventListener("input", e => {
   const a = bySlug[location.hash.slice(1)], s = a && stan(a); if (!s || s.koniec) return;
   s.odp[e.target.closest(".task").dataset.id] = { 0: e.target.value }; saveSzkic(); tick(a);
 });
-addEventListener("hashchange", () => { render(); scrollTo(0, 0); });
+addEventListener("hashchange", () => plynnie(() => { render(); scrollTo(0, 0); }));
 
 render();
 initFirebase().catch(e => { console.warn("Firebase niedostępny", e); $("#authbar").innerHTML = `<span>Logowanie chwilowo niedostępne</span>`; });
