@@ -323,7 +323,10 @@ const zgodna = (t, v) => { const x = czytajLiczbe(v); return Number.isFinite(x) 
 const odpLiczba = t => t.ulamek || String(t.liczba).replace(".", ",") + (t.jedn ? " " + t.jedn : "");
 
 const nauczyciel = () => auth.status === "admin" || auth.status === "teacher";
-const dostep = () => auth.status === "approved" || nauczyciel();
+// розділ сторінки за закритими пакетами (m… — матура, p… — E8) і доступ користувача до нього (users.zakres: all | e8 | mp)
+const SEKCJA = (D.pakiety || [])[0]?.[0] === "m" ? "mp" : "e8";
+const wZakresie = () => auth.status === "admin" || !auth.zakres || auth.zakres === "all" || auth.zakres === SEKCJA;
+const dostep = () => (auth.status === "approved" || nauczyciel()) && wZakresie();
 
 const unlocked = t => !t.zamkniete || t.img;
 const openCount = () => all.filter(unlocked).length;
@@ -368,6 +371,7 @@ const proc = r => Math.round(100 * r.pkt / r.max);
 function lockedBody() {
   if (!FB) return `<div class="locked"><b>Zadanie dla zarejestrowanych</b><span>Dostęp wkrótce.</span></div>`;
   if (auth.status === "pending") return `<div class="locked"><b>Czekasz na akceptację</b><span>Iryna sprawdzi Twoje konto i otworzy dostęp.</span></div>`;
+  if ((auth.status === "approved" || nauczyciel()) && !wZakresie()) return `<div class="locked"><b>Poza Twoim dostępem</b><span>Twój dostęp obejmuje ${auth.zakres === "mp" ? "maturę" : "egzamin ósmoklasisty"}. Napisz do Iryny, jeśli potrzebujesz też tego działu.</span></div>`;
   if (dostep()) return `<div class="locked"><b>Ładowanie…</b></div>`;
   return `<div class="locked"><b>Zadanie dla zarejestrowanych</b><span>Zarejestruj się, a po akceptacji zobaczysz wszystkie zadania.</span><button type="button" class="btn-s primary" data-open-auth="up">Zarejestruj się</button></div>`;
 }
@@ -383,6 +387,7 @@ function notice() {
   if (!FB || !closed) { w.innerHTML = ""; return; }
   if (auth.status === "out") w.innerHTML = `<div class="notice"><p><b>${closed} zadań</b> jest dostępnych tylko dla zarejestrowanych uczniów. Załóż konto, a po akceptacji otworzą się wszystkie.</p><button type="button" class="btn-s primary" data-open-auth="up">Zarejestruj się</button></div>`;
   else if (auth.status === "pending") w.innerHTML = `<div class="notice"><p>Konto <b>${esc(auth.user.email)}</b> czeka na akceptację. Gdy Iryna je zatwierdzi, odśwież stronę.</p></div>`;
+  else if (!wZakresie()) w.innerHTML = `<div class="notice"><p>Twój dostęp obejmuje <b>${auth.zakres === "mp" ? "maturę podstawową" : "egzamin ósmoklasisty"}</b>. Tutaj widzisz tylko pierwsze zadania z każdego tematu.</p></div>`;
   else w.innerHTML = "";
   w.querySelector("[data-open-auth]")?.addEventListener("click", () => openAuth("up"));
 }
@@ -476,7 +481,8 @@ async function initFirebase() {
     if (!isAdmin && user.emailVerified && user.email) {
       const em = user.email.toLowerCase(), z = await fs.getDoc(fs.doc(db, "zaproszenia", em)).then(d => d.exists() ? d.data() : null, () => null);
       if (z) {
-        if (!snap?.data()?.approved) await fs.updateDoc(ref, { approved: true }).catch(e => console.warn(e));
+        const zk = z.zakres || "e8";
+        if (!snap?.data()?.approved || snap?.data()?.zakres !== zk) await fs.updateDoc(ref, { approved: true, zakres: zk }).catch(e => console.warn(e));
         const pref = fs.doc(db, "powiazania", user.uid), p = await fs.getDoc(pref).then(d => d.exists() ? d.data() : null, () => null);
         if (!p || p.karta !== z.karta || p.owner !== z.owner) await fs.setDoc(pref, { owner: z.owner, karta: z.karta, email: em }).catch(e => console.warn(e));
         snap = await fs.getDoc(ref).catch(() => snap);
@@ -485,6 +491,7 @@ async function initFirebase() {
     // підписка вчителя: дата «оплачено до» в його профілі (ставить Ірина в Panel)
     const doK = snap?.data()?.nauczycielDo;
     auth.nauczycielDo = doK?.toDate ? doK.toDate() : doK ? new Date(doK) : null;
+    auth.zakres = snap?.data()?.zakres || null;
     const isTeacher = !isAdmin && !!auth.nauczycielDo && auth.nauczycielDo > new Date();
     Object.assign(auth, { db, fs });
     if (UCZEN && (isAdmin || isTeacher)) {
@@ -509,7 +516,7 @@ async function initFirebase() {
     }
     auth.status = isAdmin ? "admin" : isTeacher ? "teacher" : snap?.data()?.approved ? "approved" : "pending";
     authbar(); render();
-    if (dostep() && !globalThis.BEZ_PAKIETOW) {
+    if (dostep() && !globalThis.BEZ_PAKIETOW) {   // dostep() уже враховує розділ: пакети чужого розділу не вантажимо
       try {
         // лише пакети цього розділу (D.pakiety), щоб сторінка не тягнула закриті завдання інших розділів
         const packs = D.pakiety ? await Promise.all(D.pakiety.map(id => fs.getDoc(fs.doc(db, "pakiety", id)).catch(() => null)))
@@ -731,11 +738,10 @@ function przeglad(t, k, pk) {
     <div class="ans"><span class="q">Twoja odpowiedź: ${esc(twoja)}</span>${ok ? "" : `<div class="fb bad">Poprawna odpowiedź: ${esc(dobra)}</div>`}</div></details>`;
 }
 
-// результат іде і в загальний прогрес учня (якщо він увійшов — у його кабінет)
+// у прогрес іде лише підсумок тесту; завдання за темами не зараховуються (як і в аркушах)
 function zapisz() {
   const pts = zad.map(punkty);
   res["test:e8"] = { pkt: pts.reduce((a, b) => a + b, 0), max: MAX, data: st.koniec };
-  zad.forEach((t, k) => { if (pelna(t, st.odp[t.id])) res[t.id] = pts[k] === t.pkt ? "ok" : "bad"; });
   save();
 }
 
