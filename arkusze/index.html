@@ -147,6 +147,9 @@ dialog::backdrop { background: rgba(38, 32, 28, .35) }
 .nums a.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad) }
 .nums a.part { background: #f6ecd9; border-color: #c99a45; color: #8a5a12 }
 .nums a.todo { border-style: dashed }
+.ark-wyniki { display: grid; gap: 14px }
+.ark-wynik { display: grid; gap: 8px; padding-top: 12px; border-top: 1.5px dashed var(--line) }
+.ark-wynik .nums a:not([href]) { cursor: default }
 .self { display: grid; gap: 8px; background: var(--blue-soft); border-radius: 12px; padding: 12px 14px }
 .self .q { color: var(--ink) }
 .task { scroll-margin-top: 70px }
@@ -295,6 +298,19 @@ function czytajLiczbe(v) {
   return /^-?\d+(?:[,.]\d+)?$/.test(x) ? parseFloat(x.replace(",", ".")) : NaN;
 }
 const zgodna = (t, v) => { const x = czytajLiczbe(v); return Number.isFinite(x) && Math.abs(x - t.liczba) < 1e-6 * Math.max(1, Math.abs(t.liczba)); };
+// Те саме, що liczba() у build.py: відкрите завдання з відповіддю-числом отримує поле для числа.
+// Потрібно для закритих завдань із бази, завантажених до того, як build.py почав дописувати liczba.
+function dodajLiczbe(t) {
+  if (t.format !== "otwarte" || t.liczba !== undefined || typeof t.answer !== "string") return;
+  const a = t.answer.trim().replace(/\.$/, ""); let m;
+  if ((m = /^km (\d+) h$/.exec(a))) return Object.assign(t, { liczba: +m[1], jedn: "km/h" });
+  if ((m = /^(\d+) (\d+)$/.exec(a)) && t.temat === "Prawdopodobieństwo") return Object.assign(t, { liczba: m[1] / m[2], jedn: "", ulamek: `${m[1]}/${m[2]}` });
+  m = /^(?:o )?(-?\d+(?:[,.]\d+)?)\s*(km\/h|zł|cm ?2|cm ?3|cm|dm|mm|m ?2|m ?3|m|km|kg|g|%|min|godz\.?|razy|lat|dni|osób|l)?$/.exec(a);
+  if (m) Object.assign(t, { liczba: parseFloat(m[1].replace(",", ".")), jedn: m[2] ? m[2].replace(/ (\d)$/, "$1").replace("2", "²").replace("3", "³") : "" });
+}
+// Ірина, 2026-11-04: у полі для числа — лише число без одиниць, дріб десятковий через кому, звичайний через «/», приклад одразу в полі
+const LICZBA_PH = "tylko liczba, np. 12 · 3,6 · 3/4";
+const LICZBA_INFO = `<span class="q">Wpisz tylko liczbę, bez jednostek. Ułamek dziesiętny z przecinkiem (3,6), zwykły przez ukośnik (3/4).</span>`;
 const odpLiczba = t => t.ulamek || String(t.liczba).replace(".", ",") + (t.jedn ? " " + t.jedn : "");
 
 const nauczyciel = () => auth.status === "admin" || auth.status === "teacher";
@@ -497,7 +513,7 @@ async function initFirebase() {
         // лише пакети цього розділу (D.pakiety), щоб сторінка не тягнула закриті завдання інших розділів
         const packs = D.pakiety ? await Promise.all(D.pakiety.map(id => fs.getDoc(fs.doc(db, "pakiety", id)).catch(() => null)))
                                 : (await fs.getDocs(fs.collection(db, "pakiety"))).docs;
-        packs.forEach(p => p?.exists?.() !== false && JSON.parse(p?.data()?.dane || "[]").forEach(z => { if (byId[z.id]) Object.assign(byId[z.id], z); }));
+        packs.forEach(p => p?.exists?.() !== false && JSON.parse(p?.data()?.dane || "[]").forEach(z => { if (byId[z.id]) dodajLiczbe(Object.assign(byId[z.id], z)); }));
       } catch (e) { console.warn(e); }
       render();
     }
@@ -657,7 +673,7 @@ function zadanie(t, nr, s) {
   let ans;
   if (liczbowa(t)) {
     const v = s.odp[t.id]?.[0] || "", hit = trafiona(t, s);
-    ans = `<div class="opts"><input class="open-in" data-liczba inputmode="decimal" value="${esc(v)}" ${done ? "disabled" : ""} placeholder="Wpisz wynik${t.jedn ? ` (w ${esc(t.jedn)})` : ""}, np. 3,6 albo 3/4" aria-label="Odpowiedź do zadania ${nr}"></div>`;
+    ans = `${done ? "" : LICZBA_INFO}<div class="opts"><input class="open-in" data-liczba inputmode="decimal" autocomplete="off" value="${esc(v)}" ${done ? "disabled" : ""} placeholder="${LICZBA_PH}" aria-label="Odpowiedź do zadania ${nr}"></div>`;
     if (done) ans += hit ? `<div class="fb ok">✓ Dobrze! Odpowiedź: ${esc(odpLiczba(t))}</div>`
       : `<div class="self"><div class="key">Odpowiedź z klucza: ${esc(odpLiczba(t))}</div>${t.pkt > 1 ? `<span class="q">Wynik się nie zgadza. Za poprawny tok rozwiązania możesz dostać część punktów — ile przyznajesz sobie?</span><div class="opts">${Array.from({ length: t.pkt + 1 }, (_, k) =>
            `<button type="button" class="opt" data-ocena="${k}" aria-pressed="${s.ocena[t.id] === k}">${k}</button>`).join("")}</div>` : ""}</div>`;
@@ -704,7 +720,8 @@ function podsumowanie(a) {
 function zapisz(a) {
   const s = stan(a);
   const pts = a.zadania.map(z => punkty(z.t, s));
-  res["arkusz:" + a.slug] = { pkt: pts.reduce((x, p) => x + (p || 0), 0), max: a.max, ocenione: pts.every(p => p !== undefined), data: s.koniec };
+  res["arkusz:" + a.slug] = { pkt: pts.reduce((x, p) => x + (p || 0), 0), max: a.max, ocenione: pts.every(p => p !== undefined), data: s.koniec,
+    z: pts.map(p => p ?? null) };   // бали за кожне завдання (null — ще не оцінене) — для картки учня в кабінеті вчителя
   // Ірина, 2026-11-03: аркуш — окремо від завдань за темами, тож результати аркуша не зараховуються як розв'язані завдання
   const k = "miesiac:" + MIESIAC;
   if (a === arkuszMiesiaca() && ym(new Date(s.koniec)) === MIESIAC && (!res[k] || res[k].data === s.koniec))
