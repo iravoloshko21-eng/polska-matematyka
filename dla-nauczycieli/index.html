@@ -403,7 +403,13 @@ function stanPracy(p, w) {
   return { n, done, zrobione, spoznione: !zrobione && p.termin < dzienLok() };
 }
 const tytulPracy = p => p.typ === "arkusz" ? `Arkusz ${bySlug[p.slug] ? label(bySlug[p.slug]) : p.slug}` : `${p.temat} · ${(p.ids || []).length} zad.`;
-const linkPracy = p => p.typ === "arkusz" ? `../arkusze/#${encodeURIComponent(p.slug)}` : `../e8/#zadania=${(p.ids || []).map(encodeURIComponent).join(",")}`;
+// завдання матури мають id «mp-…» — посилання веде на /matura/
+const linkPracy = p => p.typ === "arkusz" ? `../arkusze/#${encodeURIComponent(p.slug)}` : `../${(p.ids || [])[0]?.startsWith("mp-") ? "matura" : "e8"}/#zadania=${(p.ids || []).map(encodeURIComponent).join(",")}`;
+// Розділи для кабінетів (konto, nauczyciel): на цих сторінках D — завдання E8, а D.mp — список завдань матури (id, temat) з build.py
+const DZIALY = { e8: { nazwa: "Egzamin ósmoklasisty", krotko: "E8", url: "../e8/", tematy: D.tematy, zadania: all },
+                 mp: { nazwa: "Matura podstawowa", krotko: "matura", url: "../matura/", tematy: D.mp?.tematy || [], zadania: D.mp?.zadania || [] } };
+// cel картки учня (e8 | mp | inne) або users.zakres (e8 | mp | all) → розділи, які учень проходить
+const dzialyDla = c => c === "e8" || c === "mp" ? [c] : ["e8", "mp"];
 const etykietaPracy = s => s.zrobione ? `<span class="pd-st ok">✓ zrobione</span>` : s.spoznione ? `<span class="pd-st bad">⚠ po terminie${s.n > 1 ? ` · ${s.done}/${s.n}` : ""}</span>`
   : `<span class="pd-st">${s.done ? `w trakcie · ${s.done}/${s.n}` : "do zrobienia"}</span>`;
 // спершу незроблені за терміном, потім зроблені
