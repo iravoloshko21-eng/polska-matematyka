@@ -235,7 +235,7 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
 <header class="site"><div class="in"><a class="logo" href="../">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../matura/">Matura</a><a href="../arkusze/">Arkusze</a><a href="../materialy/">Materiały</a><a href="../konto/">Mój gabinet</a><a href="../o-mnie/">O mnie</a></nav><div class="authbar" id="authbar"></div></div></header>
 
 <header class="top"><div class="wrap">
-  <span class="pill">Tylko dla nauczyciela</span>
+  <span class="pill">Gabinet nauczyciela</span>
   <h1 id="n-title">Moi uczniowie</h1>
   <p style="margin:0;max-width:62ch" id="n-lead">Karta każdego ucznia: lekcje z zadaniami, postęp po tematach, wyniki egzaminów próbnych i notatki.</p>
   <div class="tiles" id="tiles"></div>
@@ -370,7 +370,8 @@ function authbar() {
   const b = $("#authbar");
   if (!FB) { b.innerHTML = ""; return; }
   if (!auth.user) b.innerHTML = `<button type="button" id="ab-in">Zaloguj się</button><button type="button" class="primary" id="ab-up">Zarejestruj się</button>`;
-  else b.innerHTML = `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>${nauczyciel() ? `<a class="btn-s" href="../nauczyciel/">Uczniowie</a>` : ""}${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
+  // вчитель / адмін: без кнопки з ім'ям (вона вела на «учнівський» кабінет), лише «Moi uczniowie»
+  else b.innerHTML = `${nauczyciel() ? `<a class="btn-s" href="../nauczyciel/">Moi uczniowie</a>` : `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>`}${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
   $("#ab-in")?.addEventListener("click", () => openAuth("in"));
   $("#ab-up")?.addEventListener("click", () => openAuth("up"));
   $("#ab-out")?.addEventListener("click", () => auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));

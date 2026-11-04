@@ -388,7 +388,8 @@ function authbar() {
   const b = $("#authbar");
   if (!FB) { b.innerHTML = ""; return; }
   if (!auth.user) b.innerHTML = `<button type="button" id="ab-in">Zaloguj się</button><button type="button" class="primary" id="ab-up">Zarejestruj się</button>`;
-  else b.innerHTML = `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>${nauczyciel() ? `<a class="btn-s" href="../nauczyciel/">Uczniowie</a>` : ""}${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
+  // вчитель / адмін: без кнопки з ім'ям (вона вела на «учнівський» кабінет), лише «Moi uczniowie»
+  else b.innerHTML = `${nauczyciel() ? `<a class="btn-s" href="../nauczyciel/">Moi uczniowie</a>` : `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>`}${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
   $("#ab-in")?.addEventListener("click", () => openAuth("in"));
   $("#ab-up")?.addEventListener("click", () => openAuth("up"));
   $("#ab-out")?.addEventListener("click", () => auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));
