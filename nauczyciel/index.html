@@ -244,6 +244,8 @@ table.proby td.num { font-variant-numeric: tabular-nums; white-space: nowrap }
 .pd .pd-t { display: grid; gap: 2px }
 .pd .pd-r { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
 .pd .pd-r a.btn-s { text-decoration: none }
+.pd .pd-w { flex-basis: 100%; display: grid; gap: 6px; font-size: 13.5px } .pd .pd-w .ok { color: var(--ok); font-weight: 700 } .pd .pd-w .bad { color: var(--bad); font-weight: 700 }
+.pd .pd-w .nums a.ok, .pd .pd-w .nums a.bad { font-weight: 700 } .pd .pd-w .nums a { cursor: default }
 .pd-st { font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: #f6ecd9; color: #8a5a12; white-space: nowrap }
 .pd-st.ok { background: var(--ok-soft); color: var(--ok) } .pd-st.bad { background: var(--bad-soft); color: var(--bad) }
 .slabe { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 12px }
@@ -887,6 +889,23 @@ function karta(u) {
   };
 }
 
+// результат домашнього для вчителя (Ірина, 2026-11-04): кожне завдання ✓/✗ квадратиком, разом правильно і %
+function wynikPracy(p, w) {
+  if (p.typ === "arkusz") {
+    const a = bySlug[p.slug], r = w["arkusz:" + p.slug];
+    if (!a || !r || (r.data || 0) < (p.od || 0) || !r.max) return "";
+    const z = Array.isArray(r.z) && r.z.length === a.zadania.length ? r.z : null;
+    return `<div class="pd-w"><span><b>${Number(r.pkt)}/${Number(r.max)} pkt · ${pc(r.pkt, r.max)}%</b>${r.ocenione ? "" : ` <span class="muted-s">(otwarte jeszcze nieocenione)</span>`}</span>
+      ${z ? `<div class="nums">${a.zadania.map(({ nr, t }, i) => { const x = z[i], c = x === null || x === undefined ? "todo" : x === t.pkt ? "ok" : x === 0 ? "bad" : "part";
+        return `<a class="${c}" title="Zadanie ${nr}: ${c === "todo" ? "nieocenione" : `${Number(x)}/${t.pkt} pkt`} · ${esc(t.temat)}">${nr}</a>`; }).join("")}</div>` : ""}</div>`;
+  }
+  const ids = p.ids || [], v = ids.map(id => w[id]), done = v.filter(Boolean).length, ok = v.filter(x => x === "ok").length;
+  if (!done) return "";
+  return `<div class="pd-w"><span><span class="ok">✓ ${ok} poprawnie</span> · <span class="bad">✗ ${done - ok} błędnie</span>${done < ids.length ? ` · ${ids.length - done} nierozwiązane` : ""} · <b>${pc(ok, done)}%</b></span>
+    <div class="nums">${ids.map((id, i) => { const x = w[id], c = x === "ok" ? "ok" : x ? "bad" : "todo", zr = byId[id]?.zrodlo;
+      return `<a class="${c}" title="Zadanie ${i + 1}: ${c === "ok" ? "poprawnie" : c === "bad" ? "błędnie" : "nierozwiązane"}${zr ? ` · ${esc(zr)}` : ""}">${i + 1}</a>`; }).join("")}</div></div>`;
+}
+
 // Praca domowa: тема (N нерозв'язаних завдань цієї теми) або аркуш, з терміном; статус рахується з результатів учня
 function pracaHtml(u) {
   const w = wszystkie(u), l = sortPrac(u.prace || [], w), za7 = dzienLok(new Date(Date.now() + 7 * 864e5));
@@ -894,7 +913,7 @@ function pracaHtml(u) {
     ${u.konto ? "" : `<span class="muted-s">Uczeń zobaczy pracę domową w swoim gabinecie po zalogowaniu z zaproszenia (sekcja «Konto ucznia» niżej). Zadania zrobione na lekcji też się liczą.</span>`}
     ${l.length ? `<div class="prace">${l.map(p => { const st = stanPracy(p, w);
       return `<div class="pd"><span class="pd-t"><b>${esc(tytulPracy(p))}</b><span class="muted-s">zadano ${esc(new Date(p.od).toLocaleDateString("pl-PL"))} · termin: ${esc(terminTxt(p.termin))}</span></span>
-        <span class="pd-r">${etykietaPracy(st)}<button type="button" class="link-del" data-pd-del="${esc(p.id)}">usuń</button></span></div>`; }).join("")}</div>`
+        <span class="pd-r">${etykietaPracy(st)}<button type="button" class="link-del" data-pd-del="${esc(p.id)}">usuń</button></span>${wynikPracy(p, w)}</div>`; }).join("")}</div>`
       : `<span class="muted-s">Brak zadanej pracy. Wybierz temat albo arkusz i termin.</span>`}
     <form class="form-row" id="pd-form"><label>Co zadać<select name="co" required>
         ${dzialyDla(u.cel).filter(k => DZIALY[k].tematy.length).map(k => `<optgroup label="${k === "mp" ? "Matura" : "E8"} · temat (zadania, których uczeń jeszcze nie rozwiązał)">${DZIALY[k].tematy.map(t => `<option value="t:${k}:${esc(t.temat)}">${esc(zNr(t))}</option>`).join("")}</optgroup>`).join("")}
