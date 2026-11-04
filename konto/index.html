@@ -583,6 +583,8 @@ function tiles() {
 }
 
 function render() {
+  // вчитель / адмін: свій прогрес не потрібен — «Mój gabinet» = кабінет вчителя (учні та їхні результати)
+  if (nauczyciel() && !UCZEN) { location.replace("../nauczyciel/"); return; }
   notice(); tiles();
   if (FB && !auth.user) {
     $("#list").innerHTML = `<section class="summary"><b style="font-family:var(--display);font-size:24px">Zaloguj się, aby zobaczyć swój gabinet</b>
