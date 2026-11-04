@@ -309,6 +309,8 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
 // Спільне для сторінок E8 і аркушів: дані, результати учня, вхід через Firebase і закриті завдання.
 const D = {"tematy": [], "zadania": []};
 const FB = {"apiKey":"AIzaSyB3805-WbIEjbE6R62Di6irvn9-iUzpdxM","authDomain":"polska-matematyka.firebaseapp.com","projectId":"polska-matematyka","storageBucket":"polska-matematyka.firebasestorage.app","messagingSenderId":"325870615029","appId":"1:325870615029:web:aa5237f6d943b9649a88bc"};   // налаштування Firebase (не секретні); null — вхід вимкнено
+// номер теми в порядку навчання (build.py: KOLEJNOSC) — «3. Działania na ułamkach»
+const zNr = t => (t.nr ? t.nr + ". " : "") + t.temat;
 const TYPY = { abcd: "Wybór A–D", pf: "Prawda / fałsz", dwa: "Uzupełnij zdania", tn: "Tak / nie + uzasadnienie", otwarte: "Otwarte" };
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
