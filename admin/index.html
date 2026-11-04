@@ -177,14 +177,15 @@ else {
       <td><select data-zakres="${u.id}" style="font:inherit;padding:4px 6px">${[["all", "усе"], ["e8", "лише E8"], ["mp", "лише матура"]].map(([k, n]) => `<option value="${k}"${(u.zakres || "all") === k ? " selected" : ""}>${n}</option>`).join("")}</select></td>
       <td>${stat(prog[u.id])}</td>
       <td style="white-space:nowrap"><input type="date" data-do="${u.id}" value="${u.nauczycielDo ? new Date(u.nauczycielDo.seconds * 1000).toISOString().slice(0, 10) : ""}" style="font:inherit;padding:4px 6px">
-        <button data-zapisz-do="${u.id}">Зберегти</button>${u.nauczycielDo ? (u.nauczycielDo.seconds * 1000 > Date.now() ? ` <span class="pill ok">активний</span>` : ` <span class="pill wait">закінчився</span>`) : ""}</td>
+        <button data-zapisz-do="${u.id}">Зберегти</button>${u.nauczycielDo ? ` <button data-usun-do="${u.id}" title="Зробити звичайним учнем">Прибрати</button>` : ""}${u.nauczycielDo ? (u.nauczycielDo.seconds * 1000 > Date.now() ? ` <span class="pill ok">активний</span>` : ` <span class="pill wait">закінчився</span>`) : ""}</td>
       <td>${u.approved ? `<button data-id="${u.id}" data-v="0">Закрити доступ</button>` : `<button class="primary" data-id="${u.id}" data-v="1">Схвалити</button>`}</td></tr>`).join("");
   }
   $("#tb").addEventListener("click", async e => {
     // підписка вчителя: дата «оплачено до» (включно до кінця дня); порожня дата — закрити доступ вчителя
-    const z = e.target.closest("button[data-zapisz-do]");
+    const z = e.target.closest("button[data-zapisz-do], button[data-usun-do]");
     if (z) {
-      const id = z.dataset.zapiszDo, v = document.querySelector(`input[data-do="${id}"]`).value;
+      // «Прибрати» — без дати (у Safari поле дати важко очистити), акаунт стає звичайним учнем
+      const id = z.dataset.zapiszDo || z.dataset.usunDo, v = z.dataset.usunDo ? "" : document.querySelector(`input[data-do="${id}"]`).value;
       z.disabled = true;
       const val = v ? fs.Timestamp.fromDate(new Date(v + "T23:59:59")) : null;
       await fs.updateDoc(fs.doc(db, "users", id), v ? { nauczycielDo: val, approved: true } : { nauczycielDo: null });
