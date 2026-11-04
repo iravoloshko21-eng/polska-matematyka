@@ -99,8 +99,11 @@ footer .wrap { padding-block: 10px 44px; display: grid; gap: 10px; justify-items
   --blue: #5157d6; --blue-soft: #e3e4fa; --sage: #cdd38a; --lime: #cdd38a; --coral: #f0a78c;
   --display: "Unbounded", system-ui, sans-serif; --body: "Inter", "Segoe UI", system-ui, sans-serif;
   --shadow: 5px 5px 0 var(--ink);
+  /* легкий фон із формулами (x², √, π…) — ледь видно, картки його перекривають */
+  --doodles: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='440' height='440' viewBox='0 0 440 440'%3E%3Cg fill='%231c1712' fill-opacity='.075' font-family='Georgia,serif' font-style='italic'%3E%3Ctext x='24' y='52' font-size='30'%3Ex%C2%B2%3C/text%3E%3Ctext x='170' y='38' font-size='22' transform='rotate(-8 170 38)'%3Ea%C2%B2%2Bb%C2%B2=c%C2%B2%3C/text%3E%3Ctext x='352' y='70' font-size='34'%3E%CF%80%3C/text%3E%3Ctext x='60' y='150' font-size='26' transform='rotate(6 60 150)'%3E%E2%88%9A2%3C/text%3E%3Ctext x='250' y='132' font-size='20'%3Ey=ax%2Bb%3C/text%3E%3Ctext x='388' y='190' font-size='28'%3E%E2%88%9E%3C/text%3E%3Ctext x='20' y='262' font-size='22' transform='rotate(-6 20 262)'%3E2%E2%81%BF%3C/text%3E%3Ctext x='150' y='236' font-size='34'%3E%E2%88%91%3C/text%3E%3Ctext x='270' y='290' font-size='20' transform='rotate(5 270 290)'%3Esin %CE%B1%3C/text%3E%3Ctext x='96' y='340' font-size='24'%3E%C2%B3%E2%88%9A8=2%3C/text%3E%3Ctext x='300' y='384' font-size='26'%3E%C2%BD%3C/text%3E%3Ctext x='30' y='420' font-size='22' transform='rotate(-4 30 420)'%3E%CE%94=b%C2%B2%E2%88%924ac%3C/text%3E%3Ctext x='236' y='428' font-size='24'%3E%25%3C/text%3E%3Ctext x='380' y='308' font-size='24'%3E%C3%B7%3C/text%3E%3C/g%3E%3Cg fill='none' stroke='%231c1712' stroke-opacity='.075' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M330 222 l40 0 l-20 -34 z'/%3E%3Cpath d='M196 174 v60 M186 224 h80'/%3E%3Cpath d='M200 228 q24 -60 50 -10'/%3E%3Ccircle cx='120' cy='206' r='14'/%3E%3Cpath d='M106 206 h28'/%3E%3Cpath d='M360 400 l22 -22 l22 22'/%3E%3C/g%3E%3C/svg%3E");
 }
-body { background: var(--cream) }
+body { background: var(--cream) var(--doodles) repeat; background-size: 440px }
+@media (max-width: 760px) { body { background-size: 330px } }
 h1 { font-family: var(--display); font-weight: 800; letter-spacing: -.03em; line-height: .95; font-size: clamp(30px, 6.4vw, 68px) }
 h2, h3 { font-family: var(--display); letter-spacing: -.02em }
 
