@@ -212,7 +212,21 @@ header.top { border-bottom: 1.5px solid var(--ink) }
 .lekcja a { color: #fff; font-weight: 700 }
 .uczniowie { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 18px; margin: 18px 0 }
 .uczen { background: var(--card); border: 1.5px solid var(--ink); box-shadow: var(--shadow); border-radius: 16px; padding: 16px 18px; display: grid; gap: 8px; text-decoration: none; color: var(--ink) }
-.uczen h3 { margin: 0; font-size: 20px }
+.uczen h3 { margin: 0; font-size: 20px; line-height: 1.2 }
+.uczen h3 span { font-family: var(--body, inherit); font-size: 15px; font-weight: 600 }
+.uczen:hover { transform: translate(-2px, -2px) }
+.uczen .u-top { display: flex; justify-content: space-between; align-items: center }
+.uczen .avatar { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: #fff; font-family: var(--display); font-weight: 700; font-size: 17px; border: 1.5px solid var(--ink) }
+.uczen .klasa { font-weight: 700; font-size: 13px; background: #cdd38a; border: 1.5px solid var(--ink); border-radius: 999px; padding: 3px 10px }
+.uczen .u-wynik { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 13.5px }
+.uczen .u-wynik b { font-family: var(--display); font-size: 26px }
+.uczen .bar, .tem .bar { display: flex; height: 8px; border-radius: 999px; background: var(--line, #e4ded3); overflow: hidden }
+.uczen .bar i, .tem .bar i { display: block; height: 100% } .bar i.ok { background: var(--ok) } .bar i.bad { background: var(--bad) }
+.tematy-u { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px 22px }
+.tem { display: grid; gap: 4px }
+.tem a { font-weight: 700; color: var(--ink) }
+.tem b.ok { color: var(--ok) } .tem b.bad { color: var(--bad) }
+.ark-wynik .tag { font-size: 12px; font-weight: 700; background: var(--blue-soft, #e9ebfd); color: var(--blue); border-radius: 999px; padding: 2px 9px }
 .uczen .muted-s, .muted-s { color: var(--muted); font-size: 13px }
 .form-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end }
 .form-row label { display: grid; gap: 3px; font-size: 12.5px; font-weight: 600 }
@@ -493,6 +507,7 @@ async function initFirebase() {
       // урок з учнем: беремо його результати і зберігаємо туди ж
       const uref = fs.doc(db, "uczniowie", UCZEN);
       const u = await fs.getDoc(uref).then(d => d.exists() ? d.data() : null, () => null);
+      if (u?.nazwisko) u.imie = [u.nazwisko, u.imie, u.ojciec].filter(Boolean).join(" ");   // повне ім'я в смужці уроку й підписах
       res = u?.wyniki || {};
       let timer;
       cloud = () => { clearTimeout(timer); timer = setTimeout(() => fs.setDoc(uref, { wyniki: res, updated: fs.serverTimestamp() }, { merge: true }).catch(e => console.warn(e)), 800); };
@@ -604,6 +619,12 @@ const dzis = () => new Date().toISOString().slice(0, 10);
 const pc = (a, b) => b ? Math.round(100 * a / b) : 0;
 // усі результати учня: з уроків (картка) і власні з його акаунта (postepy/{uid}), якщо учень прийняв запрошення
 const wszystkie = u => ({ ...(u.wlasne || {}), ...(u.wyniki || {}) });
+// дані учня (Ірина, 2026-11-04): клас, прізвище, ім'я, по батькові; старі картки мають лише imie (повне ім'я)
+const nazwa = u => [u.nazwisko, u.imie, u.ojciec].filter(Boolean).join(" ") || "—";
+const inicjaly = u => (u.nazwisko ? u.nazwisko[0] + (u.imie || "")[0] : (u.imie || "?").split(/\s+/).map(x => x[0]).slice(0, 2).join("")).toUpperCase();
+const porzadek = (a, b) => (a.klasa || "").localeCompare(b.klasa || "", "pl", { numeric: true }) || nazwa(a).localeCompare(nazwa(b), "pl");
+const arkLiczba = u => new Set(Object.keys(wszystkie(u)).filter(k => k.startsWith("arkusz:"))).size;
+let KLASA = "";                  // фільтр класу у списку
 const statsU = u => { const w = Object.entries(wszystkie(u)).filter(([k]) => !k.includes(":")).map(([, v]) => v); return { done: w.length, ok: w.filter(v => v === "ok").length }; };
 
 async function wczytaj() {
@@ -612,7 +633,7 @@ async function wczytaj() {
   const uid = auth.user.uid;
   const snap = auth.status === "admin" ? await fs.getDocs(fs.collection(db, "uczniowie"))
                                        : await fs.getDocs(fs.query(fs.collection(db, "uczniowie"), fs.where("owner", "==", uid)));
-  UCZNIOWIE = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(u => !u.owner || u.owner === uid).sort((a, b) => (a.imie || "").localeCompare(b.imie || "", "pl"));
+  UCZNIOWIE = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(u => !u.owner || u.owner === uid).sort(porzadek);
   // учні, які прийняли запрошення: їхні власні результати з акаунта
   const pow = await fs.getDocs(fs.query(fs.collection(db, "powiazania"), fs.where("owner", "==", uid))).then(s => s.docs, () => []);
   await Promise.all(pow.map(async d => {
@@ -644,30 +665,44 @@ addEventListener("hashchange", render);
 
 function lista() {
   $("#n-title").textContent = "Moi uczniowie";
-  if (auth.status === "teacher") $("#n-lead").textContent = `Dostęp nauczyciela do ${auth.nauczycielDo.toLocaleDateString("pl-PL")}. Karta każdego ucznia: lekcje z zadaniami, postęp po tematach, wyniki egzaminów próbnych i notatki.`;
+  if (auth.status === "teacher") $("#n-lead").textContent = `Dostęp nauczyciela do ${auth.nauczycielDo.toLocaleDateString("pl-PL")}. Kliknij ucznia, aby otworzyć jego gabinet: wyniki, arkusze i postęp po tematach.`;
+  else $("#n-lead").textContent = "Kliknij ucznia, aby otworzyć jego gabinet: wyniki, arkusze i postęp po tematach.";
   const s = UCZNIOWIE.reduce((a, u) => { const x = statsU(u); return { done: a.done + x.done, ok: a.ok + x.ok }; }, { done: 0, ok: 0 });
-  $("#tiles").innerHTML = `<div class="tile"><b>${UCZNIOWIE.length}</b><span>uczniów</span></div><div class="tile"><b>${s.done}</b><span>zadań na lekcjach</span></div><div class="tile"><b>${s.done ? pc(s.ok, s.done) + "%" : "—"}</b><span>poprawnie</span></div>`;
-  $("#list").innerHTML = `<section class="summary"><b style="font-family:var(--display);font-size:20px">Dodaj ucznia</b>
-      <form class="form-row" id="nowy"><label>Imię i nazwisko<input name="imie" required maxlength="60" placeholder="np. Ania Kowalska"></label>
+  $("#tiles").innerHTML = `<div class="tile"><b>${UCZNIOWIE.length}</b><span>uczniów</span></div><div class="tile"><b>${s.done}</b><span>rozwiązanych zadań</span></div><div class="tile"><b>${s.done ? pc(s.ok, s.done) + "%" : "—"}</b><span>poprawnie</span></div>`;
+  const klasy = [...new Set(UCZNIOWIE.map(u => u.klasa || ""))].sort((a, b) => a.localeCompare(b, "pl", { numeric: true }));
+  if (!klasy.includes(KLASA)) KLASA = "";
+  const widoczni = UCZNIOWIE.filter(u => !KLASA || (u.klasa || "") === KLASA);
+  $("#list").innerHTML = `${klasy.length > 1 ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 0"><button type="button" class="chip" data-klasa="" aria-pressed="${!KLASA}">Wszyscy<span class="n">${UCZNIOWIE.length}</span></button>${klasy.filter(Boolean).map(k => `<button type="button" class="chip" data-klasa="${esc(k)}" aria-pressed="${KLASA === k}">Klasa ${esc(k)}<span class="n">${UCZNIOWIE.filter(u => u.klasa === k).length}</span></button>`).join("")}</div>` : ""}
+    <div class="uczniowie">${widoczni.map(u => { const x = statsU(u), p = pc(x.ok, x.done), ark = arkLiczba(u);
+      return `<a class="uczen" href="#${encodeURIComponent(u.id)}"><span class="u-top"><span class="avatar">${esc(inicjaly(u))}</span>${u.klasa ? `<span class="klasa">kl. ${esc(u.klasa)}</span>` : ""}</span>
+        <h3>${u.nazwisko ? `${esc(u.nazwisko)}<br><span>${esc([u.imie, u.ojciec].filter(Boolean).join(" "))}</span>` : esc(u.imie)}</h3>
+        <span class="muted-s">${esc(CELE[u.cel] || "")}</span>
+        <span class="u-wynik"><b>${x.done ? p + "%" : "—"}</b><span>${x.done} zadań · ${ark} ${ark === 1 ? "arkusz" : ark > 1 && ark < 5 ? "arkusze" : "arkuszy"}</span></span>
+        <span class="bar">${x.done ? `<i class="ok" style="width:${p}%"></i><i class="bad" style="width:${100 - p}%"></i>` : ""}</span>
+        ${u.email ? `<span class="muted-s">${u.konto ? "✓ konto ucznia połączone" : "✉ zaproszenie wysłane"}</span>` : ""}</a>`; }).join("") || `<p class="muted-s">Nie masz jeszcze uczniów. Dodaj pierwszego poniżej.</p>`}</div>
+    <section class="summary"><b style="font-family:var(--display);font-size:20px">Dodaj ucznia</b>
+      <form class="form-row" id="nowy">${pola({})}
       <label>E-mail ucznia (nieobowiązkowo)<input name="email" type="email" maxlength="100" placeholder="uczeń dostanie zaproszenie"></label>
-      <label>Przygotowanie do<select name="cel">${Object.entries(mojeCele()).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label>
-      <button class="btn-s primary">Dodaj</button></form></section>
-    <div class="uczniowie">${UCZNIOWIE.map(u => { const x = statsU(u), p = (u.proby || []).at(-1);
-      return `<a class="uczen" href="#${encodeURIComponent(u.id)}"><h3>${esc(u.imie)}</h3><span class="muted-s">${esc(CELE[u.cel] || "")}</span>
-        <span>${x.done} zadań · ${x.done ? pc(x.ok, x.done) + "% poprawnie" : "jeszcze bez lekcji"}</span>
-        ${u.email ? `<span class="muted-s">${u.konto ? "✓ konto ucznia połączone" : "✉ zaproszenie wysłane"}</span>` : ""}
-        ${p ? `<span class="muted-s">Ostatni próbny: ${esc(p.nazwa || "")} ${p.pkt}/${p.max} pkt (${pc(p.pkt, p.max)}%)</span>` : ""}</a>`; }).join("") || `<p class="muted-s">Nie masz jeszcze uczniów. Dodaj pierwszego powyżej.</p>`}</div>`;
+      <button class="btn-s primary">Dodaj</button></form></section>`;
+  $("#list").querySelectorAll("[data-klasa]").forEach(b => b.onclick = () => { KLASA = b.dataset.klasa; lista(); });
   $("#nowy").onsubmit = async e => {
     e.preventDefault();
-    const f = new FormData(e.target), imie = f.get("imie").trim(); if (!imie) return;
-    const id = slugify(imie).replace(/^-|-$/g, "").slice(0, 30) + "-" + Math.random().toString(36).slice(2, 6);
-    const dane = { imie, cel: f.get("cel"), proby: [], notatki: "", wyniki: {}, created: auth.fs.serverTimestamp() };
-    await zapisz(id, dane); UCZNIOWIE.push({ id, ...dane });
+    const f = new FormData(e.target), dane = daneZ(f); if (!dane.imie || !dane.nazwisko) return;
+    const id = slugify(dane.nazwisko + " " + dane.imie).replace(/^-|-$/g, "").slice(0, 30) + "-" + Math.random().toString(36).slice(2, 6);
+    Object.assign(dane, { proby: [], notatki: "", wyniki: {}, created: auth.fs.serverTimestamp() });
+    await zapisz(id, dane); UCZNIOWIE.push({ id, ...dane }); UCZNIOWIE.sort(porzadek);
     const email = (f.get("email") || "").trim();
-    if (email) await zapros(UCZNIOWIE.at(-1), email);
+    if (email) await zapros(UCZNIOWIE.find(x => x.id === id), email);
     location.hash = encodeURIComponent(id);
   };
 }
+// поля форми «Dodaj ucznia» / «Dane ucznia»
+const pola = u => `<label>Klasa<input name="klasa" maxlength="10" placeholder="np. 8b" style="width:80px" value="${esc(u.klasa || "")}"></label>
+  <label>Nazwisko<input name="nazwisko" required maxlength="40" placeholder="np. Kowalska" value="${esc(u.nazwisko || "")}"></label>
+  <label>Imię<input name="imie" required maxlength="40" placeholder="np. Anna" value="${esc(u.imie || "")}"></label>
+  <label>Imię odojcowskie (по батькові)<input name="ojciec" maxlength="40" placeholder="np. Ołeksandriwna" value="${esc(u.ojciec || "")}"></label>
+  <label>Przygotowanie do<select name="cel">${Object.entries({ ...mojeCele(), ...(u.cel && CELE[u.cel] ? { [u.cel]: CELE[u.cel] } : {}) }).map(([k, v]) => `<option value="${k}"${u.cel === k ? " selected" : ""}>${v}</option>`).join("")}</select></label>`;
+const daneZ = f => Object.fromEntries(["klasa", "nazwisko", "imie", "ojciec", "cel"].map(k => [k, String(f.get(k) || "").trim()]));
 
 // запрошення: zaproszenia/{email} (хто запросив і яка картка) + лист із посиланням для входу (надсилає Firebase)
 async function zapros(u, email) {
@@ -688,39 +723,54 @@ function wlasneInfo(u) {
 }
 
 // розв'язані аркуші (res["arkusz:<slug>"]): назва з роком, бали й %, кожне завдання ✓/✗ (Ірина, 2026-11-04)
-function arkuszeHtml(w) {
-  const lista = Object.entries(w || {}).filter(([k]) => k.startsWith("arkusz:")).map(([k, r]) => ({ a: bySlug[k.slice(7)], r }))
+function arkuszeHtml(...zrodla) {   // zrodla: [[wyniki, "na lekcji"], [wlasne, "samodzielnie"]]
+  const lista = zrodla.flatMap(([w, tag]) => Object.entries(w || {}).filter(([k]) => k.startsWith("arkusz:")).map(([k, r]) => ({ a: bySlug[k.slice(7)], r, tag })))
     .filter(x => x.a && x.r && x.r.max).sort((x, y) => (y.r.data || 0) - (x.r.data || 0));
   if (!lista.length) return "";
-  return `<div class="ark-wyniki">${lista.map(({ a, r }) => {
+  return `<div class="ark-wyniki">${lista.map(({ a, r, tag }) => {
     const z = Array.isArray(r.z) && r.z.length === a.zadania.length ? r.z : null;
     const ok = z ? z.filter((p, i) => p === a.zadania[i].t.pkt).length : 0;
     const data = r.data ? new Date(r.data).toLocaleDateString("pl-PL") : "";
-    return `<div class="ark-wynik"><span><b>Arkusz ${esc(label(a))}</b> · <b>${Number(r.pkt)}/${Number(r.max)} pkt · ${pc(r.pkt, r.max)}%</b>${z ? ` · poprawnie ${ok} z ${z.length} zadań` : ""}${data ? ` · <span class="muted-s">${data}</span>` : ""}${r.ocenione ? "" : ` <span class="muted-s">(otwarte jeszcze nieocenione)</span>`}</span>
+    return `<div class="ark-wynik"><span><b>Arkusz ${esc(label(a))}</b>${tag ? ` <span class="tag">${tag}</span>` : ""} · <b>${Number(r.pkt)}/${Number(r.max)} pkt · ${pc(r.pkt, r.max)}%</b>${z ? ` · poprawnie ${ok} z ${z.length} zadań` : ""}${data ? ` · <span class="muted-s">${data}</span>` : ""}${r.ocenione ? "" : ` <span class="muted-s">(otwarte jeszcze nieocenione)</span>`}</span>
       ${z ? `<div class="nums">${a.zadania.map(({ nr, t }, i) => { const p = z[i], c = p === null ? "todo" : p === t.pkt ? "ok" : p === 0 ? "bad" : "part";
         return `<a class="${c}" title="Zadanie ${nr}: ${p === null ? "nieocenione" : `${Number(p)}/${t.pkt} pkt`} · ${esc(t.temat)}">${nr}</a>`; }).join("")}</div>`
         : `<span class="muted-s">Wyniki poszczególnych zadań widać dla arkuszy rozwiązanych od 4.11.2026.</span>`}</div>`;
   }).join("")}</div>`;
 }
 
+// прогрес по темах E8 (уроки + власний акаунт учня): розв'язано / усього, % правильних
+function tematyHtml(u, q) {
+  const w = wszystkie(u);
+  const rows = D.tematy.map(({ temat }) => { const z = all.filter(t => t.temat === temat), r = z.map(t => w[t.id]).filter(Boolean), ok = r.filter(v => v === "ok").length;
+    return { temat, n: z.length, done: r.length, ok }; });
+  const zrobione = rows.filter(t => t.done);
+  if (!zrobione.length) return `<span class="muted-s">Uczeń nie rozwiązał jeszcze zadań z tematów E8. Wyniki pojawią się tu po pierwszej lekcji albo pracy na swoim koncie.</span>`;
+  return `<div class="tematy-u">${zrobione.map(t => { const p = pc(t.ok, t.done);
+    return `<div class="tem"><a href="../e8/${q}#temat=${encodeURIComponent(t.temat)}">${esc(t.temat)}</a><span class="muted-s">${t.done}/${t.n} zadań · <b class="${p >= 70 ? "ok" : p < 50 ? "bad" : ""}">${p}% poprawnie</b></span>
+      <span class="bar"><i class="ok" style="width:${100 * t.ok / t.n}%"></i><i class="bad" style="width:${100 * (t.done - t.ok) / t.n}%"></i></span></div>`; }).join("")}</div>
+    ${rows.length > zrobione.length ? `<span class="muted-s">Nierozpoczęte tematy: ${rows.length - zrobione.length} z ${rows.length}.</span>` : ""}`;
+}
+
 function karta(u) {
-  $("#n-title").textContent = u.imie;
-  const x = statsU(u), q = "?uczen=" + encodeURIComponent(u.id), proby = u.proby || [];
+  $("#n-title").textContent = nazwa(u);
+  $("#n-lead").textContent = [u.klasa && "Klasa " + u.klasa, CELE[u.cel]].filter(Boolean).join(" · ") || "Gabinet ucznia";
+  const x = statsU(u), q = "?uczen=" + encodeURIComponent(u.id), proby = u.proby || [], ark = arkLiczba(u);
   $("#tiles").innerHTML = `<div class="tile"><b>${x.done}</b><span>rozwiązanych zadań</span></div><div class="tile"><b>${x.done ? pc(x.ok, x.done) + "%" : "—"}</b><span>poprawnie</span></div>
-    <div class="tile"><b>${proby.length}</b><span>egzaminów próbnych</span></div>`;
+    <div class="tile"><b>${ark}</b><span>arkuszy</span></div><div class="tile"><b>${proby.length}</b><span>egzaminów próbnych</span></div>`;
   // слабкі теми: найнижчий відсоток серед тем, де розв'язано хоча б 3 завдання
   const tem = D.tematy.map(({ temat }) => { const r = all.filter(t => t.temat === temat).map(t => wszystkie(u)[t.id]).filter(Boolean); return { temat, n: r.length, p: pc(r.filter(v => v === "ok").length, r.length) }; })
     .filter(t => t.n >= 3).sort((a, b) => a.p - b.p).slice(0, 5);
+  const arkHtml = arkuszeHtml([u.wyniki, "na lekcji"], [u.konto ? u.wlasne : null, "samodzielnie"]);
   $("#list").innerHTML = `<p><a href="#">← Wszyscy uczniowie</a></p>
     <section class="summary"><b style="font-family:var(--display);font-size:20px">Lekcja z uczniem</b>
-      <span class="muted-s">Otwórz zadania w trybie lekcji: odpowiedzi zapiszą się w karcie ucznia.${auth.status === "admin" ? " «Ukryj rozwiązane» + «Pobierz PDF» da Ci zadania, których jeszcze nie zrobiliście, na pracę domową." : " «Ukryj rozwiązane» pokaże zadania, których jeszcze nie zrobiliście."}</span>
-      <div class="akcje"><a class="btn-s primary" href="../e8/${q}">Zadania E8</a><a class="btn-s" href="../matura/${q}">Matura podstawowa</a><a class="btn-s" href="../arkusze/${q}">Arkusz</a><a class="btn-s" href="../konto/${q}">Postęp po tematach</a></div>
-      ${arkuszeHtml(u.wyniki) ? `<span><b>Arkusze na lekcji:</b></span>${arkuszeHtml(u.wyniki)}` : ""}
+      <span class="muted-s">Otwórz zadania w trybie lekcji: odpowiedzi zapiszą się w gabinecie ucznia.${auth.status === "admin" ? " «Ukryj rozwiązane» + «Pobierz PDF» da Ci zadania, których jeszcze nie zrobiliście, na pracę domową." : " «Ukryj rozwiązane» pokaże zadania, których jeszcze nie zrobiliście."}</span>
+      <div class="akcje"><a class="btn-s primary" href="../e8/${q}">Zadania E8</a><a class="btn-s" href="../matura/${q}">Matura podstawowa</a><a class="btn-s" href="../arkusze/${q}">Arkusz</a></div>
       ${tem.length ? `<span><b>Do powtórki:</b> ${tem.map(t => `<a href="../e8/${q}#temat=${encodeURIComponent(t.temat)}">${esc(t.temat)}</a> (${t.p}%)`).join(" · ")}</span>` : ""}</section>
-    <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Konto ucznia</b>
-      ${u.email ? `<span>E-mail: <b>${esc(u.email)}</b> · ${u.konto ? "✓ uczeń zalogował się, jego samodzielne wyniki są wliczone w kartę" : "zaproszenie wysłane, uczeń jeszcze się nie zalogował"}</span>` : `<span class="muted-s">Wpisz e-mail ucznia: dostanie link do logowania i od razu pełny dostęp do zadań. Jego samodzielne wyniki zobaczysz w tej karcie.</span>`}
-      ${u.konto ? wlasneInfo(u) + arkuszeHtml(u.wlasne) : `<form class="form-row" id="zapros"><label>E-mail ucznia<input name="email" type="email" required maxlength="100" value="${esc(u.email || "")}"></label>
-        <button class="btn-s primary">${u.email ? "Wyślij zaproszenie ponownie" : "Wyślij zaproszenie"}</button></form>`}</section>
+    <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Postęp po tematach</b>
+      ${tematyHtml(u, q)}</section>
+    <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Arkusze</b>
+      ${arkHtml || `<span class="muted-s">Uczeń nie rozwiązał jeszcze żadnego arkusza.</span>`}
+      ${u.konto && u.wlasne?.["test:e8"] ? `<span>Bezpłatny test E8: <b>${u.wlasne["test:e8"].pkt}/${u.wlasne["test:e8"].max} pkt</b></span>` : ""}</section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Egzaminy próbne</b>
       ${proby.length ? `<table class="proby"><thead><tr><th>Data</th><th>Egzamin</th><th>Wynik</th><th>Zmiana</th><th></th></tr></thead><tbody>${proby.map((p, i) => { const d = i ? pc(p.pkt, p.max) - pc(proby[i - 1].pkt, proby[i - 1].max) : null;
         return `<tr><td class="num">${esc(p.data)}</td><td>${esc(p.nazwa)}</td><td class="num"><b>${p.pkt}/${p.max} pkt</b> · ${pc(p.pkt, p.max)}%</td><td class="num">${d === null ? "" : `<span class="${d >= 0 ? "ok" : "bad"}">${d >= 0 ? "▲ +" : "▼ "}${d} pp</span>`}</td><td><button type="button" class="link-del" data-del="${i}">usuń</button></td></tr>`; }).join("")}</tbody></table>`
@@ -730,9 +780,20 @@ function karta(u) {
         <label>Punkty<input type="number" name="pkt" min="0" step="0.5" required style="width:90px"></label>
         <label>Maks.<input type="number" name="max" min="1" step="1" value="${u.cel === "mp" ? 50 : 25}" required style="width:90px"></label>
         <button class="btn-s primary">Dodaj wynik</button></form></section>
+    <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Konto ucznia</b>
+      ${u.email ? `<span>E-mail: <b>${esc(u.email)}</b> · ${u.konto ? "✓ uczeń zalogował się, jego samodzielne wyniki są wliczone w gabinet" : "zaproszenie wysłane, uczeń jeszcze się nie zalogował"}</span>` : `<span class="muted-s">Wpisz e-mail ucznia: dostanie link do logowania i od razu pełny dostęp do zadań. Jego samodzielne wyniki zobaczysz tutaj.</span>`}
+      ${u.konto ? wlasneInfo(u) : `<form class="form-row" id="zapros"><label>E-mail ucznia<input name="email" type="email" required maxlength="100" value="${esc(u.email || "")}"></label>
+        <button class="btn-s primary">${u.email ? "Wyślij zaproszenie ponownie" : "Wyślij zaproszenie"}</button></form>`}</section>
+    <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Dane ucznia</b>
+      <form class="form-row" id="dane">${pola(u)}<button class="btn-s primary">Zapisz</button></form><span class="muted-s" id="d-stan"></span></section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Notatki</b>
       <textarea class="notatki" id="notatki" placeholder="Co omówiliśmy, co zadać, na co uważać…">${esc(u.notatki || "")}</textarea><span class="muted-s" id="n-stan"></span></section>
     <p style="margin-top:22px"><button type="button" class="link-del" id="usun">Usuń ucznia</button></p>`;
+  $("#dane").onsubmit = async e => {
+    e.preventDefault();
+    const dane = daneZ(new FormData(e.target)); if (!dane.imie || !dane.nazwisko) return;
+    await zapisz(u.id, dane); Object.assign(u, dane); UCZNIOWIE.sort(porzadek); render();
+  };
   $("#zapros")?.addEventListener("submit", async e => {
     e.preventDefault();
     const b = e.target.querySelector("button"); b.disabled = true;
@@ -750,7 +811,7 @@ function karta(u) {
   });
   let t; $("#notatki").oninput = e => { clearTimeout(t); $("#n-stan").textContent = "…"; t = setTimeout(async () => { u.notatki = e.target.value; await zapisz(u.id, { notatki: u.notatki }); $("#n-stan").textContent = "Zapisano"; }, 800); };
   $("#usun").onclick = async () => {
-    if (!confirm(`Usunąć ucznia ${u.imie} razem z wynikami? Tego nie da się cofnąć.`)) return;
+    if (!confirm(`Usunąć ucznia ${nazwa(u)} razem z wynikami? Tego nie da się cofnąć.`)) return;
     await auth.fs.deleteDoc(auth.fs.doc(auth.db, "uczniowie", u.id)); UCZNIOWIE = UCZNIOWIE.filter(x => x !== u); location.hash = "";
   };
 }
