@@ -661,7 +661,8 @@ const poprawna = (t, o) => { const c = Array.isArray(t.answer) ? t.answer : [t.a
 // числова відповідь у відкритому: правильне число — повні бали автоматично, інакше самооцінка (бали за хід розв'язання)
 const liczbowa = t => t.format === "otwarte" && t.liczba !== undefined;
 const trafiona = (t, s) => liczbowa(t) && zgodna(t, s.odp[t.id]?.[0]);
-const punkty = (t, s) => trafiona(t, s) ? t.pkt : liczbowa(t) && t.pkt === 1 ? 0 : t.format === "otwarte" ? s.ocena[t.id] : poprawna(t, s.odp[t.id]) ? t.pkt : 0;
+// Ірина, 2026-11-04: число правильне — максимум балів, неправильне — 0, без самооцінки
+const punkty = (t, s) => trafiona(t, s) ? t.pkt : liczbowa(t) ? 0 : t.format === "otwarte" ? s.ocena[t.id] : poprawna(t, s.odp[t.id]) ? t.pkt : 0;
 const doOdp = t => t.format !== "otwarte" || liczbowa(t);
 const odpowiedziano = (t, s) => liczbowa(t) ? !!(s.odp[t.id]?.[0] || "").trim() : pelna(t, s.odp[t.id]);
 
@@ -675,8 +676,7 @@ function zadanie(t, nr, s) {
     const v = s.odp[t.id]?.[0] || "", hit = trafiona(t, s);
     ans = `${done ? "" : LICZBA_INFO}<div class="opts"><input class="open-in" data-liczba inputmode="decimal" autocomplete="off" value="${esc(v)}" ${done ? "disabled" : ""} placeholder="${LICZBA_PH}" aria-label="Odpowiedź do zadania ${nr}"></div>`;
     if (done) ans += hit ? `<div class="fb ok">✓ Dobrze! Odpowiedź: ${esc(odpLiczba(t))}</div>`
-      : `<div class="self"><div class="key">Odpowiedź z klucza: ${esc(odpLiczba(t))}</div>${t.pkt > 1 ? `<span class="q">Wynik się nie zgadza. Za poprawny tok rozwiązania możesz dostać część punktów — ile przyznajesz sobie?</span><div class="opts">${Array.from({ length: t.pkt + 1 }, (_, k) =>
-           `<button type="button" class="opt" data-ocena="${k}" aria-pressed="${s.ocena[t.id] === k}">${k}</button>`).join("")}</div>` : ""}</div>`;
+      : `<div class="fb bad">✗ Poprawna odpowiedź: ${esc(odpLiczba(t))}</div>`;
   } else if (t.format === "otwarte") {
     ans = !done ? `<p class="q" style="margin:0">Rozwiąż w zeszycie. Po zakończeniu arkusza porównasz rozwiązanie z kluczem i przyznasz sobie punkty.</p>`
       : `<div class="self"><div class="key">${t.answer ? `Odpowiedź z klucza: ${esc(t.answer)}` : "Porównaj rozwiązanie z kluczem CKE albo pokaż je nauczycielowi."}</div>
