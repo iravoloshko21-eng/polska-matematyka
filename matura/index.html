@@ -320,6 +320,10 @@ const zgodna = (t, v) => { const x = czytajLiczbe(v); return Number.isFinite(x) 
 function dodajLiczbe(t) {
   if (t.format !== "otwarte" || t.liczba !== undefined || typeof t.answer !== "string") return;
   const a = t.answer.trim().replace(/\.$/, ""); let m;
+  if ((m = /^(A|B|Tak|Nie)\s*,?\s*([1-3])$/.exec(a))) {   // «Tak/Nie (A/B), ponieważ 1/2/3» → кнопки з автоперевіркою
+    const ab = m[1].length === 1;
+    return Object.assign(t, { format: "tn", tak: ab ? ["A", "B"] : ["T", "N"], options: ["1", "2", "3"], answer: [ab ? m[1] : m[1][0], m[2]] });
+  }
   if ((m = /^km (\d+) h$/.exec(a))) return Object.assign(t, { liczba: +m[1], jedn: "km/h" });
   if ((m = /^(\d+) (\d+)$/.exec(a)) && t.temat === "Prawdopodobieństwo") return Object.assign(t, { liczba: m[1] / m[2], jedn: "", ulamek: `${m[1]}/${m[2]}` });
   m = /^(?:o )?(-?\d+(?:[,.]\d+)?)\s*(km\/h|zł|cm ?2|cm ?3|cm|dm|mm|m ?2|m ?3|m|km|kg|g|%|min|godz\.?|razy|lat|dni|osób|l)?$/.exec(a);
@@ -708,7 +712,7 @@ function answerUI(t) {
   if (t.format === "abcd") return group("0", t.options, "") + `<div class="fb" aria-live="polite"></div>`;
   if (t.format === "pf") return t.answer.map((_, i) => group(String(i), ["P", "F"], `Zdanie ${i + 1}`)).join("") + `<button type="button" class="go" data-check disabled>Sprawdź</button><div class="fb" aria-live="polite"></div>`;
   if (t.format === "dwa") return t.options.map((o, i) => group(String(i), o, `Zdanie ${i + 1}`)).join("") + `<button type="button" class="go" data-check disabled>Sprawdź</button><div class="fb" aria-live="polite"></div>`;
-  if (t.format === "tn") return group("0", ["T", "N"], "Odpowiedź") + group("1", t.options, "Uzasadnienie") + `<button type="button" class="go" data-check disabled>Sprawdź</button><div class="fb" aria-live="polite"></div>`;
+  if (t.format === "tn") return group("0", t.tak || ["T", "N"], "Odpowiedź") + group("1", t.options, "Uzasadnienie") + `<button type="button" class="go" data-check disabled>Sprawdź</button><div class="fb" aria-live="polite"></div>`;
   if (t.liczba !== undefined) return `${LICZBA_INFO}<div class="opts"><input class="open-in" inputmode="decimal" id="in-${esc(t.id)}" autocomplete="off" placeholder="${LICZBA_PH}" aria-label="Twoja odpowiedź">
     <button type="button" class="go" data-num>Sprawdź</button></div><div class="fb" aria-live="polite"></div>`;
   return `<div class="opts"><input class="open-in" id="in-${esc(t.id)}" placeholder="Twoja odpowiedź (np. 57 albo 3,60 zł)" aria-label="Twoja odpowiedź"></div>
