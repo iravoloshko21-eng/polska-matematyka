@@ -147,6 +147,9 @@ dialog::backdrop { background: rgba(38, 32, 28, .35) }
 .nums a.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad) }
 .nums a.part { background: #f6ecd9; border-color: #c99a45; color: #8a5a12 }
 .nums a.todo { border-style: dashed }
+.ark-wyniki { display: grid; gap: 14px }
+.ark-wynik { display: grid; gap: 8px; padding-top: 12px; border-top: 1.5px dashed var(--line) }
+.ark-wynik .nums a:not([href]) { cursor: default }
 .self { display: grid; gap: 8px; background: var(--blue-soft); border-radius: 12px; padding: 12px 14px }
 .self .q { color: var(--ink) }
 .task { scroll-margin-top: 70px }
@@ -294,6 +297,19 @@ function czytajLiczbe(v) {
   return /^-?\d+(?:[,.]\d+)?$/.test(x) ? parseFloat(x.replace(",", ".")) : NaN;
 }
 const zgodna = (t, v) => { const x = czytajLiczbe(v); return Number.isFinite(x) && Math.abs(x - t.liczba) < 1e-6 * Math.max(1, Math.abs(t.liczba)); };
+// Те саме, що liczba() у build.py: відкрите завдання з відповіддю-числом отримує поле для числа.
+// Потрібно для закритих завдань із бази, завантажених до того, як build.py почав дописувати liczba.
+function dodajLiczbe(t) {
+  if (t.format !== "otwarte" || t.liczba !== undefined || typeof t.answer !== "string") return;
+  const a = t.answer.trim().replace(/\.$/, ""); let m;
+  if ((m = /^km (\d+) h$/.exec(a))) return Object.assign(t, { liczba: +m[1], jedn: "km/h" });
+  if ((m = /^(\d+) (\d+)$/.exec(a)) && t.temat === "Prawdopodobieństwo") return Object.assign(t, { liczba: m[1] / m[2], jedn: "", ulamek: `${m[1]}/${m[2]}` });
+  m = /^(?:o )?(-?\d+(?:[,.]\d+)?)\s*(km\/h|zł|cm ?2|cm ?3|cm|dm|mm|m ?2|m ?3|m|km|kg|g|%|min|godz\.?|razy|lat|dni|osób|l)?$/.exec(a);
+  if (m) Object.assign(t, { liczba: parseFloat(m[1].replace(",", ".")), jedn: m[2] ? m[2].replace(/ (\d)$/, "$1").replace("2", "²").replace("3", "³") : "" });
+}
+// Ірина, 2026-11-04: у полі для числа — лише число без одиниць, дріб десятковий через кому, звичайний через «/», приклад одразу в полі
+const LICZBA_PH = "tylko liczba, np. 12 · 3,6 · 3/4";
+const LICZBA_INFO = `<span class="q">Wpisz tylko liczbę, bez jednostek. Ułamek dziesiętny z przecinkiem (3,6), zwykły przez ukośnik (3/4).</span>`;
 const odpLiczba = t => t.ulamek || String(t.liczba).replace(".", ",") + (t.jedn ? " " + t.jedn : "");
 
 const nauczyciel = () => auth.status === "admin" || auth.status === "teacher";
@@ -496,7 +512,7 @@ async function initFirebase() {
         // лише пакети цього розділу (D.pakiety), щоб сторінка не тягнула закриті завдання інших розділів
         const packs = D.pakiety ? await Promise.all(D.pakiety.map(id => fs.getDoc(fs.doc(db, "pakiety", id)).catch(() => null)))
                                 : (await fs.getDocs(fs.collection(db, "pakiety"))).docs;
-        packs.forEach(p => p?.exists?.() !== false && JSON.parse(p?.data()?.dane || "[]").forEach(z => { if (byId[z.id]) Object.assign(byId[z.id], z); }));
+        packs.forEach(p => p?.exists?.() !== false && JSON.parse(p?.data()?.dane || "[]").forEach(z => { if (byId[z.id]) dodajLiczbe(Object.assign(byId[z.id], z)); }));
       } catch (e) { console.warn(e); }
       render();
     }
@@ -667,6 +683,22 @@ function wlasneInfo(u) {
   return `<span class="muted-s">Samodzielnie na swoim koncie: ${z.length} zadań${z.length ? ` (${pc(z.filter(v => v === "ok").length, z.length)}% poprawnie)` : ""} · arkuszy: ${ark}${t ? ` · bezpłatny test E8: ${t.pkt}/${t.max} pkt` : ""}</span>`;
 }
 
+// розв'язані аркуші (res["arkusz:<slug>"]): назва з роком, бали й %, кожне завдання ✓/✗ (Ірина, 2026-11-04)
+function arkuszeHtml(w) {
+  const lista = Object.entries(w || {}).filter(([k]) => k.startsWith("arkusz:")).map(([k, r]) => ({ a: bySlug[k.slice(7)], r }))
+    .filter(x => x.a && x.r && x.r.max).sort((x, y) => (y.r.data || 0) - (x.r.data || 0));
+  if (!lista.length) return "";
+  return `<div class="ark-wyniki">${lista.map(({ a, r }) => {
+    const z = Array.isArray(r.z) && r.z.length === a.zadania.length ? r.z : null;
+    const ok = z ? z.filter((p, i) => p === a.zadania[i].t.pkt).length : 0;
+    const data = r.data ? new Date(r.data).toLocaleDateString("pl-PL") : "";
+    return `<div class="ark-wynik"><span><b>Arkusz ${esc(label(a))}</b> · <b>${Number(r.pkt)}/${Number(r.max)} pkt · ${pc(r.pkt, r.max)}%</b>${z ? ` · poprawnie ${ok} z ${z.length} zadań` : ""}${data ? ` · <span class="muted-s">${data}</span>` : ""}${r.ocenione ? "" : ` <span class="muted-s">(otwarte jeszcze nieocenione)</span>`}</span>
+      ${z ? `<div class="nums">${a.zadania.map(({ nr, t }, i) => { const p = z[i], c = p === null ? "todo" : p === t.pkt ? "ok" : p === 0 ? "bad" : "part";
+        return `<a class="${c}" title="Zadanie ${nr}: ${p === null ? "nieocenione" : `${Number(p)}/${t.pkt} pkt`} · ${esc(t.temat)}">${nr}</a>`; }).join("")}</div>`
+        : `<span class="muted-s">Wyniki poszczególnych zadań widać dla arkuszy rozwiązanych od 4.11.2026.</span>`}</div>`;
+  }).join("")}</div>`;
+}
+
 function karta(u) {
   $("#n-title").textContent = u.imie;
   const x = statsU(u), q = "?uczen=" + encodeURIComponent(u.id), proby = u.proby || [];
@@ -679,10 +711,11 @@ function karta(u) {
     <section class="summary"><b style="font-family:var(--display);font-size:20px">Lekcja z uczniem</b>
       <span class="muted-s">Otwórz zadania w trybie lekcji: odpowiedzi zapiszą się w karcie ucznia.${auth.status === "admin" ? " «Ukryj rozwiązane» + «Pobierz PDF» da Ci zadania, których jeszcze nie zrobiliście, na pracę domową." : " «Ukryj rozwiązane» pokaże zadania, których jeszcze nie zrobiliście."}</span>
       <div class="akcje"><a class="btn-s primary" href="../e8/${q}">Zadania E8</a><a class="btn-s" href="../matura/${q}">Matura podstawowa</a><a class="btn-s" href="../arkusze/${q}">Arkusz</a><a class="btn-s" href="../konto/${q}">Postęp po tematach</a></div>
+      ${arkuszeHtml(u.wyniki) ? `<span><b>Arkusze na lekcji:</b></span>${arkuszeHtml(u.wyniki)}` : ""}
       ${tem.length ? `<span><b>Do powtórki:</b> ${tem.map(t => `<a href="../e8/${q}#temat=${encodeURIComponent(t.temat)}">${esc(t.temat)}</a> (${t.p}%)`).join(" · ")}</span>` : ""}</section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Konto ucznia</b>
       ${u.email ? `<span>E-mail: <b>${esc(u.email)}</b> · ${u.konto ? "✓ uczeń zalogował się, jego samodzielne wyniki są wliczone w kartę" : "zaproszenie wysłane, uczeń jeszcze się nie zalogował"}</span>` : `<span class="muted-s">Wpisz e-mail ucznia: dostanie link do logowania i od razu pełny dostęp do zadań. Jego samodzielne wyniki zobaczysz w tej karcie.</span>`}
-      ${u.konto ? wlasneInfo(u) : `<form class="form-row" id="zapros"><label>E-mail ucznia<input name="email" type="email" required maxlength="100" value="${esc(u.email || "")}"></label>
+      ${u.konto ? wlasneInfo(u) + arkuszeHtml(u.wlasne) : `<form class="form-row" id="zapros"><label>E-mail ucznia<input name="email" type="email" required maxlength="100" value="${esc(u.email || "")}"></label>
         <button class="btn-s primary">${u.email ? "Wyślij zaproszenie ponownie" : "Wyślij zaproszenie"}</button></form>`}</section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Egzaminy próbne</b>
       ${proby.length ? `<table class="proby"><thead><tr><th>Data</th><th>Egzamin</th><th>Wynik</th><th>Zmiana</th><th></th></tr></thead><tbody>${proby.map((p, i) => { const d = i ? pc(p.pkt, p.max) - pc(proby[i - 1].pkt, proby[i - 1].max) : null;
