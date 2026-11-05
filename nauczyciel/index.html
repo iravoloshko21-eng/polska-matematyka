@@ -870,10 +870,10 @@ function tgNick(v) {
   if (/^\+?[\d\s()-]{7,20}$/.test(v)) return "+" + v.replace(/\D/g, "");
   return /^[A-Za-z0-9_]{4,32}$/.test(v) ? v : "";
 }
-// ДЗ у Telegram: відкриваємо чат з учнем з готовим текстом (вчитель тисне «Надіслати»); текст ще й копіюємо, якщо Telegram його не підставить
+// ДЗ у Telegram (коротке посилання на кабінет: довге з # і комами Telegram не робить клікабельним): відкриваємо чат з учнем з готовим текстом (вчитель тисне «Надіслати»); текст ще й копіюємо, якщо Telegram його не підставить
 function tekstPracy(u, p) {
   const n = p.typ === "arkusz" ? "" : ` (${(p.ids || []).length} завд.)`, co = p.typ === "arkusz" ? tytulPracy(p) : p.temat + n;
-  return `Привіт, ${u.imie}! 📚 Домашнє завдання: ${co}.\nТермін: ${new Date(p.termin + "T12:00").toLocaleDateString("uk-UA", { day: "numeric", month: "long" })}.\nРозв'язуй тут: ${new URL(linkPracy(p), location.href).href}`;
+  return `Привіт, ${u.imie}! 📚 Домашнє завдання: ${co}.\nТермін: ${new Date(p.termin + "T12:00").toLocaleDateString("uk-UA", { day: "numeric", month: "long" })}.\nЗавдання чекають у твоєму кабінеті:\n${location.origin}/konto/`;
 }
 function wyslijTg(u, p) {
   const t = tekstPracy(u, p);
