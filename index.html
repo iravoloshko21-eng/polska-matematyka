@@ -6,10 +6,10 @@
 <title>Voloshko Iryna · Matematyka</title>
 <meta name="description" content="Matematyka w polskiej szkole: egzamin ósmoklasisty, matura i materiały do lekcji — zadania według tematów i arkusze z wynikiem. Voloshko Iryna.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <style>
 /* Компактна головна (Ірина, 2026-11-02): лише вибір розділу великими картками, решта — на окремих сторінках.
-   Стиль B «яскраве bento» (2026-11-05) (motyw.css дописує build.py): кремовий фон, чорні рамки, жорсткі тіні, синій/лайм/корал.
+   спокійний стиль (2026-11-05) (motyw.css дописує build.py): кремовий фон, чорні рамки, жорсткі тіні, синій/лайм/корал.
    Zadanie dnia прибрано, Arkusz miesiąca — на сторінці arkusze/. */
 :root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px) }
 * { box-sizing: border-box }
@@ -18,57 +18,62 @@ a { color: inherit }
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px }
 header.site .logo span { color: var(--blue) }
 
-main.wybor { max-width: 1080px; margin: 0 auto; padding: 48px 20px 64px }
-.hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px 40px; align-items: end; margin-bottom: 36px }
-.kicker { display: inline-block; background: var(--pink); color: #fff; border: 2px solid var(--ink); font-size: 14px; font-weight: 700; border-radius: 999px; padding: 6px 16px; transform: rotate(-2deg) }
-main.wybor h1 { font-size: clamp(36px, 5.6vw, 60px); line-height: 1.1; margin: 18px 0 0 }
-main.wybor h1 em { font-style: normal; background: var(--yellow); border-radius: 12px; padding: 0 .14em; -webkit-box-decoration-break: clone; box-decoration-break: clone }
+main.wybor { max-width: 1080px; margin: 0 auto; padding: 44px 20px 64px }
+.hero { position: relative; display: grid; grid-template-columns: 1.25fr 1fr; gap: 24px 40px; align-items: end; margin-bottom: 34px }
+.kicker { display: inline-block; background: var(--blue-soft); color: var(--blue); font-size: 14px; font-weight: 700; border-radius: 999px; padding: 6px 14px }
+main.wybor h1 { font-size: clamp(38px, 5.6vw, 62px); line-height: 1.15; margin: 16px 0 0 }
+main.wybor h1 em { font-style: normal; background: linear-gradient(transparent 58%, var(--yellow) 58%, var(--yellow) 92%, transparent 92%); padding: 0 .06em }
 .lead { margin: 0 0 18px; color: var(--muted); font-size: 18px; line-height: 1.55 }
 .hero-b { display: flex; gap: 10px; flex-wrap: wrap }
-.hero-b a { display: inline-flex; align-items: center; min-height: 50px; padding: 12px 22px; border: 2px solid var(--ink); border-radius: 999px; font-weight: 700; font-size: 16px; text-decoration: none; box-shadow: 4px 4px 0 var(--ink); transition: transform .15s, box-shadow .15s }
-.hero-b a:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink) }
-.hero-b .p { background: var(--blue); color: #fff } .hero-b .s { background: #fff; color: var(--ink) }
+.hero-b a { display: inline-flex; align-items: center; min-height: 50px; padding: 12px 22px; border-radius: 999px; font-weight: 700; font-size: 16px; text-decoration: none; transition: transform .15s, box-shadow .15s }
+.hero-b a:hover { transform: translateY(-2px) }
+.hero-b .p { background: var(--blue); color: #fff; box-shadow: 0 10px 24px rgba(59,59,255,.28) } .hero-b .s { background: #fff; color: var(--ink); box-shadow: var(--shadow) }
+/* формули, що плавають (Ірина, 2026-11-05) */
+.fl { position: absolute; z-index: -1; font-family: Georgia, serif; font-style: italic; font-weight: 700; pointer-events: none; opacity: .5; animation: plyw 7s ease-in-out infinite }
+@keyframes plyw { 50% { transform: translateY(-14px) rotate(6deg) } }
+.f1 { right: 4%; top: -18px; font-size: 40px; color: var(--blue) } .f2 { left: 46%; top: 4px; font-size: 32px; color: #e9b400; animation-delay: -2s }
+.f3 { right: 40%; bottom: -26px; font-size: 30px; color: #ff6f91; animation-delay: -4s } .f4 { left: -6px; bottom: -40px; font-size: 28px; color: #1fae74; animation-delay: -3s }
 
-.bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px }
-.k { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; min-height: 190px; padding: 22px; border: 2px solid var(--ink); border-radius: 22px; box-shadow: 5px 5px 0 var(--ink); text-decoration: none; color: var(--ink); background: #fff; transition: transform .15s, box-shadow .15s }
-a.k:hover { transform: translate(-3px, -3px); box-shadow: 8px 8px 0 var(--ink) }
-a.k:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink) }
+.bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px }
+.k { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; min-height: 186px; padding: 22px; border-radius: 24px; box-shadow: var(--shadow); text-decoration: none; color: var(--ink); background: #fff; transition: transform .18s, box-shadow .18s }
+a.k:hover { transform: translateY(-4px); box-shadow: var(--shadow-h) }
+a.k:active { transform: translateY(0) }
 .k.w3 { grid-column: span 3 } .k.w2 { grid-column: span 2 } .k.w4 { grid-column: span 4 }
-.k .ic { width: 54px; height: 54px; border-radius: 15px; border: 2px solid var(--ink); background: #fff; color: var(--ink); display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 22px; margin-bottom: auto }
-.k b { font-family: var(--display); font-weight: 700; font-size: 21px; line-height: 1.2; margin-top: 14px }
-.k small { font-size: 15px; line-height: 1.45; color: inherit; opacity: .88 }
-.k .go { position: absolute; right: 20px; bottom: 18px; font-family: var(--display); font-weight: 800; font-size: 22px }
-.k .num { position: absolute; right: 18px; top: 8px; font-family: var(--display); font-weight: 800; font-size: 72px; line-height: 1; opacity: .16; pointer-events: none }
-.k .badge { position: absolute; right: 16px; top: 16px; font-size: 13px; font-weight: 700; background: #fff; color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; padding: 4px 12px }
-.c-blue { background: var(--blue) !important; color: #fff !important } .c-coral { background: var(--coral) !important }
-.c-ink { background: var(--ink) !important; color: #fff !important } .c-mint { background: var(--mint) !important }
-.c-lav { background: var(--lav) !important } .c-yellow { background: var(--yellow) !important }
-.k.wk { box-shadow: none; border-style: dashed; background: rgba(255,255,255,.7) } .k.wk .ic { border-style: dashed }
+.k .ic { width: 52px; height: 52px; border-radius: 15px; display: grid; place-items: center; font-weight: 800; font-size: 22px; margin-bottom: auto }
+.k b { font-weight: 800; font-size: 21px; line-height: 1.2; margin-top: 14px; letter-spacing: -.01em }
+.k small { font-size: 15px; line-height: 1.45; color: var(--muted) }
+.k .num { position: absolute; right: 18px; top: 6px; font-weight: 800; font-size: 76px; line-height: 1; opacity: .12; pointer-events: none }
+.k .badge { position: absolute; right: 16px; top: 16px; font-size: 13px; font-weight: 700; background: var(--line); color: var(--muted); border-radius: 999px; padding: 4px 12px }
+.k.glowna { background: linear-gradient(135deg, #3b3bff, #6a4cff); color: #fff } .k.glowna small { color: rgba(255,255,255,.88) } .k.glowna .ic { background: rgba(255,255,255,.2); color: #fff }
+.i-blue { background: var(--blue-soft); color: var(--blue) } .i-coral { background: #ffece6; color: #e0552f } .i-mint { background: #e2f8ee; color: #119160 }
+.i-lav { background: #efe8ff; color: #7b4ce0 } .i-yel { background: #fff4cc; color: #a77b00 } .i-grey { background: var(--line); color: var(--muted) }
+.k.wk { box-shadow: none; background: rgba(255,255,255,.6); outline: 2px dashed #dcdce8; outline-offset: -2px }
 
-.cta { margin-top: 34px; background: var(--pink); border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); border-radius: 22px; padding: 24px 26px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap }
-.cta b { font-family: var(--display); font-size: 22px; line-height: 1.25 }
+.cta { margin-top: 30px; background: var(--ink); color: #fff; border-radius: 24px; padding: 26px 28px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap }
+.cta b { font-size: 22px; line-height: 1.25; font-weight: 800 }
 .cta-b { display: flex; gap: 10px; flex-wrap: wrap }
-.cta a { display: inline-flex; align-items: center; min-height: 48px; background: var(--ink); color: #fff; font-weight: 700; font-size: 15.5px; text-decoration: none; border: 2px solid var(--ink); border-radius: 999px; padding: 10px 22px }
-.cta a.jasny { background: #fff; color: var(--ink) }
-footer { border-top: 2px solid var(--ink); margin-top: 20px }
-footer .in2 { max-width: 1080px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px 18px; padding: 18px max(20px, env(safe-area-inset-left, 0px)) 36px; font-size: 14.5px }
+.cta a { display: inline-flex; align-items: center; min-height: 48px; background: var(--yellow); color: var(--ink); font-weight: 700; font-size: 15.5px; text-decoration: none; border-radius: 999px; padding: 10px 22px }
+.cta a.jasny { background: transparent; color: #fff; box-shadow: inset 0 0 0 2px rgba(255,255,255,.5) }
+footer { margin-top: 20px }
+footer .in2 { max-width: 1080px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px 18px; padding: 18px 20px 36px; font-size: 14.5px; color: var(--muted) }
 footer a { text-underline-offset: 3px }
 
 @media (max-width: 760px) {
-  main.wybor { padding-top: 28px }
-  .hero { grid-template-columns: 1fr; gap: 14px; margin-bottom: 26px }
+  main.wybor { padding-top: 26px }
+  .hero { grid-template-columns: 1fr; gap: 12px; margin-bottom: 24px }
   .lead { font-size: 17px }
   .hero-b a { flex: 1 1 auto; justify-content: center }
+  .f2, .f3 { display: none } .f1 { top: -6px; font-size: 32px } .f4 { left: auto; right: 6%; bottom: auto; top: 70px }
   .bento { grid-template-columns: 1fr 1fr; gap: 12px }
   .k.w3, .k.w4, .k.w2 { grid-column: span 2 } .k.half { grid-column: span 1 }
   .k { min-height: 0; padding: 18px; gap: 4px }
   .k .ic { width: 46px; height: 46px; font-size: 19px }
   .k b { font-size: 18px; margin-top: 12px } .k small { font-size: 14.5px }
-  .k .num { font-size: 56px }
+  .k .num { font-size: 58px }
   .cta b { font-size: 19px } .cta-b, .cta a { flex: 1 1 auto; justify-content: center }
-  footer .in2 { flex-direction: column; padding-inline: 20px }
+  footer .in2 { flex-direction: column }
 }
-@media (prefers-reduced-motion: reduce) { .k, .hero-b a { transition: none } a.k:hover, .hero-b a:hover { transform: none } }
+@media (prefers-reduced-motion: reduce) { .fl { animation: none } .k, .hero-b a { transition: none } a.k:hover, .hero-b a:hover { transform: none } }
 
 /* Motyw «Wołoszko/Math» (обрала Ірина 2026-10-31): широкий гротеск Unbounded, чорні рамки, кольорові блоки, жорсткі тіні.
    build.py дописує цей файл у кінець стилів кожної сторінки, тож він перекриває старі значення. */
@@ -175,63 +180,90 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
 }
 
 
-/* ===== Стиль B «Яскраве bento» (обрала Ірина 2026-11-05): білий фон, насичені кольори, рамки 2px.
-   Пріоритет — читабельність і зручність: більший текст, сильніший контраст, великі кнопки (≥44px), чіткий фокус. ===== */
+/* ===== Стиль «спокійний» (Ірина, 2026-11-05; варіант 3 після B): шрифт Plus Jakarta Sans, без чорних рамок,
+   білі картки з м'якою тінню, один головний колір (синій) + жовтий для виділення. Читабельність і зручність:
+   текст 16.5px, кнопки й поля ≥44px, чіткий фокус. Комп'ютер: меню в лівій колонці. Телефон: нижня панель як у застосунку. ===== */
 :root {
-  --cream: #fffdf7; --card: #ffffff; --ink: #111111; --muted: #3d3d3d; --line: #e2e0da;
-  --blue: #3b3bff; --blue-soft: #e8e8ff; --lime: #ffd23f; --sage: #ffd23f; --coral: #ff7a59;
-  --mint: #b9f3d9; --lav: #e4d4ff; --pink: #ff5c8a; --yellow: #ffd23f;
-  --shadow: 4px 4px 0 var(--ink);
+  --cream: #fbfaf7; --card: #ffffff; --ink: #14142b; --muted: #55556d; --line: #ececf3;
+  --blue: #3b3bff; --blue-soft: #ececff; --lime: #fff1b8; --sage: #fff1b8; --coral: #ff7a59; --yellow: #ffd23f;
+  --mint: #e2f8ee; --lav: #efe8ff; --pink: #ffe3ea;
+  --display: "Plus Jakarta Sans", system-ui, sans-serif; --body: "Plus Jakarta Sans", system-ui, sans-serif;
+  --shadow: 0 8px 28px rgba(20, 20, 60, .08); --shadow-h: 0 16px 40px rgba(20, 20, 60, .14);
 }
 html { -webkit-text-size-adjust: 100% }
 body { font-size: 16.5px; line-height: 1.6; color: var(--ink); -webkit-font-smoothing: antialiased }
 p, li { max-width: 72ch }
-h1 { line-height: 1.08; letter-spacing: -.02em }
-h2 { line-height: 1.15; letter-spacing: -.01em }
-h3 { line-height: 1.25; letter-spacing: 0 }
+h1 { font-weight: 800; line-height: 1.1; letter-spacing: -.025em }
+h2, h3 { font-weight: 800; letter-spacing: -.015em; line-height: 1.2 }
 small, .muted, .muted-s, .lead { color: var(--muted) }
 :focus-visible { outline: 3px solid var(--blue) !important; outline-offset: 3px }
 ::selection { background: var(--yellow) }
 
-/* меню: більші пігулки, чіткий активний розділ */
-header.site { border-bottom: 2px solid var(--ink); background: rgba(255,253,247,.94); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 40 }
-header.site .logo { font-size: 16px }
+/* меню */
+header.site { border-bottom: 1px solid var(--line); background: rgba(251, 250, 247, .92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 40 }
+header.site .logo { font-weight: 800; font-size: 17px; letter-spacing: 0 }
 header.site .logo span { color: var(--blue) }
-header.site .pills { gap: 8px }
-header.site .pills a { font-size: 14px; border-width: 2px; padding: 7px 14px; min-height: 40px; display: inline-flex; align-items: center; transition: background .15s }
+header.site .pills { gap: 4px }
+header.site .pills a { border: 0; font-size: 15px; font-weight: 600; padding: 9px 14px; border-radius: 12px; min-height: 42px; display: flex; align-items: center; transition: background .15s }
 header.site .pills a:hover { background: var(--blue-soft) }
-header.site .pills a[aria-current] { background: var(--yellow); color: var(--ink) }
-header.site .join, header.site .authbar .btn-s, header.site .authbar button { font-size: 14px; padding: 8px 16px; min-height: 40px; border: 2px solid var(--ink); background: var(--blue); color: #fff }
-@media (max-width: 1420px) {
-  header.site .in { flex-wrap: wrap }
-  header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
+header.site .pills a[aria-current] { background: var(--blue-soft); color: var(--blue) }
+header.site .join, header.site .authbar .btn-s, header.site .authbar button { border: 0; font-size: 14.5px; padding: 9px 16px; min-height: 42px; border-radius: 999px }
+header.site .join, header.site .authbar .primary { background: var(--blue); color: #fff }
+header.site .authbar .btn-s:not(.primary), header.site .authbar button:not(.primary) { background: var(--card); color: var(--ink); box-shadow: var(--shadow) }
+.tabbar { display: none }
+
+/* комп'ютер: меню — ліва колонка */
+@media (min-width: 1100px) {
+  body { padding-left: 248px }
+  header.site { position: fixed; left: 0; top: 0; bottom: 0; width: 248px; border-bottom: 0; border-right: 1px solid var(--line); background: var(--card); overflow-y: auto }
+  header.site .in { height: 100%; max-width: none; flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 4px; padding: 24px 14px }
+  header.site .logo { margin: 0 0 22px 12px }
+  header.site .pills { order: 0; width: auto; flex-direction: column; overflow: visible; padding: 0 }
+  header.site .pills a { white-space: normal }
+  header.site .join, header.site .authbar { margin: auto 0 0; }
+  header.site .join { text-align: center; justify-content: center; display: flex; align-items: center }
+  header.site .authbar { display: flex; flex-direction: column; gap: 8px !important; align-items: stretch }
+  header.site .authbar > * { justify-content: center }
 }
-@media (max-width: 760px) {
-  header.site .pills { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); padding-right: 24px }
+/* телефон і планшет: зверху лише логотип і вхід, розділи — у нижній панелі */
+@media (max-width: 1099px) {
+  header.site .in { flex-wrap: nowrap }
+  header.site .pills { display: none }
+  body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)) }
+  .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; z-index: 50; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); max-width: 560px; margin: 0 auto;
+    background: rgba(255, 255, 255, .96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 22px; box-shadow: 0 10px 36px rgba(20, 20, 60, .18); padding: 6px; view-transition-name: tabbar }
+  .tabbar a { display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 54px; border-radius: 16px; text-decoration: none; color: var(--muted); font-size: 11.5px; font-weight: 700 }
+  .tabbar a b { font-size: 19px; line-height: 22px; font-weight: 800 }
+  .tabbar svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round }
+  .tabbar a[href$="trenazery/"] svg { fill: currentColor }
+  .tabbar a[aria-current] { background: var(--blue-soft); color: var(--blue) }
 }
 
-/* картки, кнопки, поля: рамки 2px, великі зони натискання */
-.tile, .task, .prog, .notice, .ark, .summary, .card, .box, dialog, .uczen, .slabe .sl { border-width: 2px; border-radius: 20px }
+/* картки, кнопки, поля: без чорних рамок, м'які тіні, великі зони натискання */
+.tile, .task, .prog, .notice, .ark, .summary, .card, .box, dialog, .uczen, .slabe .sl { border: 0 !important; border-radius: 22px; box-shadow: var(--shadow); background: var(--card) }
 .tile, .ark, .card, .uczen { transition: transform .15s, box-shadow .15s }
-a.tile:hover, a.ark:hover, a.card:hover, .uczen:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink) }
-.btn, .btn-s, button.primary, .authbar button { min-height: 44px; border-width: 2px; border-radius: 999px; font-weight: 700; font-size: 15px; padding: 10px 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: transform .15s, box-shadow .15s }
-.btn.primary, .btn-s.primary, button.primary { box-shadow: 3px 3px 0 var(--ink); border-color: var(--ink) }
-.btn.primary:hover, .btn-s.primary:hover, button.primary:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink) }
-.btn:active, .btn-s:active, button.primary:active { transform: translate(2px, 2px); box-shadow: none }
-.chip { border-width: 2px; min-height: 40px; font-size: 14.5px; font-weight: 600; padding: 7px 14px }
-.chip[aria-pressed="true"] { background: var(--ink); color: #fff }
-.opt { border-width: 2px; min-height: 48px; font-size: 16px }
-.opt[aria-pressed="true"] { background: var(--blue); border-color: var(--ink); color: #fff }
-.pill { background: var(--yellow); border-width: 2px }
-input, select, textarea, .form-row input, .form-row select { font-size: 16px; min-height: 44px; border: 2px solid var(--ink); border-radius: 12px }
+a.tile:hover, a.ark:hover, a.card:hover, .uczen:hover { transform: translateY(-3px); box-shadow: var(--shadow-h) }
+.btn, .btn-s, button.primary, .authbar button { min-height: 44px; border: 0; border-radius: 999px; font-weight: 700; font-size: 15px; padding: 10px 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: transform .15s, box-shadow .15s }
+.btn:not(.primary), .btn-s:not(.primary) { background: var(--card); color: var(--ink); box-shadow: 0 2px 10px rgba(20, 20, 60, .08), inset 0 0 0 1.5px var(--line) }
+.btn.primary, .btn-s.primary, button.primary { background: var(--blue); color: #fff; box-shadow: 0 8px 20px rgba(59, 59, 255, .25) }
+.btn:active, .btn-s:active, button.primary:active { transform: translateY(1px) }
+.chip { border: 0; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); min-height: 40px; font-size: 14.5px; font-weight: 600; padding: 7px 14px }
+.chip[aria-pressed="true"] { background: var(--blue); color: #fff; box-shadow: none }
+.opt { border: 0 !important; box-shadow: inset 0 0 0 2px var(--line); min-height: 48px; font-size: 16px; border-radius: 14px }
+.opt:hover { box-shadow: inset 0 0 0 2px var(--blue) }
+.opt[aria-pressed="true"] { background: var(--blue); color: #fff; box-shadow: none }
+.pill { background: var(--blue-soft); color: var(--blue); border: 0 }
+input, select, textarea, .form-row input, .form-row select { font-size: 16px; min-height: 44px; border: 1.5px solid #dcdce8; border-radius: 12px; background: #fff }
 input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); outline: none }
-.task-h .t { background: var(--blue); color: #fff }
-.uczen .klasa { background: var(--yellow); border-width: 2px }
-.uczen .avatar { border-width: 2px }
-.sheetbar, header.top { border-bottom-width: 2px }
+.task-h .t { background: var(--blue-soft); color: var(--blue) }
+.uczen .klasa { background: var(--lime); border: 0 }
+.uczen .avatar { border: 0 }
+.sheet { border: 1px solid var(--line) }
+.sheetbar, header.top { border-bottom: 1px solid var(--line) }
 .lekcja { font-size: 15px; padding-block: 11px }
 table.proby { font-size: 15px }
 table.proby th, table.proby td { padding: 10px 8px }
+footer { border-top: 1px solid var(--line) !important }
 
 /* Плавні переходи (Ірина, 2026-11-04): сторінка м'яко зникає і з'являється, а не перемикається різко.
    Між сторінками — @view-transition (Chrome/Edge/Safari 18+); всередині сторінки (наступне завдання, аркуш, учень) — plynnie() у wspolne.js.
@@ -251,10 +283,11 @@ header.site { view-transition-name: menu; }
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
 <body>
-<header class="site"><div class="in"><a class="logo" href="./">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href="./" aria-current="page">Start</a><a href="e8/">Egzamin ósmoklasisty</a><a href="matura/">Matura</a><a href="arkusze/">Arkusze</a><a href="materialy/">Materiały</a><a href="konto/">Mój gabinet</a><a href="o-mnie/">O mnie</a></nav><a class="join" href="konto/">Załóż konto</a></div></header>
+<header class="site"><div class="in"><a class="logo" href="./">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href="./" aria-current="page">Start</a><a href="e8/">Egzamin ósmoklasisty</a><a href="matura/">Matura</a><a href="arkusze/">Arkusze</a><a href="trenazery/">Trenażery</a><a href="materialy/">Materiały</a><a href="konto/">Mój gabinet</a><a href="o-mnie/">O mnie</a></nav><a class="join" href="konto/">Załóż konto</a></div></header><nav class="tabbar" aria-label="Menu"><a href="./" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Start</span></a><a href="e8/"><b>8</b><span>E8</span></a><a href="matura/"><b>√</b><span>Matura</span></a><a href="trenazery/"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg><span>Trenażery</span></a><a href="konto/"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Gabinet</span></a></nav>
 
 <main class="wybor">
   <section class="hero">
+    <span class="fl f1" aria-hidden="true">x²</span><span class="fl f2" aria-hidden="true">π</span><span class="fl f3" aria-hidden="true">√2</span><span class="fl f4" aria-hidden="true">∑</span>
     <div>
       <span class="kicker">Matematyka bez paniki</span>
       <h1>Od czego <em>zaczynamy?</em></h1>
@@ -266,13 +299,13 @@ header.site { view-transition-name: menu; }
   </section>
 
   <nav class="bento" aria-label="Działy">
-    <a class="k w3 c-blue" href="e8/"><span class="num" aria-hidden="true">8</span><span class="ic" aria-hidden="true">8</span><b>Egzamin ósmo&shy;klasisty</b><small>31 tematów · 596 zadań · 22 arkuszy CKE</small></a>
-    <a class="k w3 c-coral" href="matura/"><span class="num" aria-hidden="true">√</span><span class="ic" aria-hidden="true">√</span><b>Matura podstawowa</b><small>5 tematów · 148 zadań maturalnych</small></a>
-    <a class="k w2 half c-ink" href="test-e8/"><span class="ic" aria-hidden="true">✓</span><b>Test E8</b><small>21 zadań · 125 min · za darmo</small></a>
-    <a class="k w2 half c-mint" href="trenazery/"><span class="ic" aria-hidden="true">▶</span><b>Trenażery</b><small>Gry, sprinty i testy</small></a>
-    <a class="k w2 c-lav" href="materialy/"><span class="ic" aria-hidden="true">π</span><b>Materiały do lekcji</b><small>Liceum i technikum · 3 materiałów</small></a>
-    <div class="k w2 half wk"><span class="badge">wkrótce</span><span class="ic" aria-hidden="true">∫</span><b>Matura rozszerzona</b><small>Zadania według tematów</small></div>
-    <div class="k w4 half wk"><span class="badge">wkrótce</span><span class="ic" aria-hidden="true">◉</span><b>Webinary</b><small>Dla uczniów i nauczycieli</small></div>
+    <a class="k w3 glowna" href="e8/"><span class="num" aria-hidden="true">8</span><span class="ic" aria-hidden="true">8</span><b>Egzamin ósmo&shy;klasisty</b><small>31 tematów · 596 zadań · 22 arkuszy CKE</small></a>
+    <a class="k w3" href="matura/"><span class="ic i-coral" aria-hidden="true">√</span><b>Matura podstawowa</b><small>5 tematów · 148 zadań maturalnych</small></a>
+    <a class="k w2 half" href="test-e8/"><span class="ic i-blue" aria-hidden="true">✓</span><b>Test E8</b><small>21 zadań · 125 min · za darmo</small></a>
+    <a class="k w2 half" href="trenazery/"><span class="ic i-mint" aria-hidden="true">▶</span><b>Trenażery</b><small>Gry, sprinty i testy</small></a>
+    <a class="k w2" href="materialy/"><span class="ic i-lav" aria-hidden="true">π</span><b>Materiały do lekcji</b><small>Liceum i technikum · 3 materiałów</small></a>
+    <div class="k w2 half wk"><span class="badge">wkrótce</span><span class="ic i-grey" aria-hidden="true">∫</span><b>Matura rozszerzona</b><small>Zadania według tematów</small></div>
+    <div class="k w4 half wk"><span class="badge">wkrótce</span><span class="ic i-grey" aria-hidden="true">◉</span><b>Webinary</b><small>Dla uczniów i nauczycieli</small></div>
   </nav>
 
   <div class="cta"><b>Chcesz przerobić wszystko ze mną?</b><span class="cta-b"><a class="jasny" href="o-mnie/">O mnie</a><a href="https://t.me/voloshko_tutor_math" target="_blank" rel="noopener">Napisz na Telegramie →</a></span></div>
