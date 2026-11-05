@@ -1,0 +1,502 @@
+<!doctype html><html lang="pl"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"></head><body>
+<a href="../" style="position:fixed;z-index:9999;left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));background:#151515;color:#fbf6ea;font:700 13px/1 Inter,system-ui,sans-serif;text-decoration:none;border-radius:999px;padding:10px 14px;box-shadow:3px 3px 0 #5157d6">← Trenażery</a>
+<title>Rajd Miarki</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: one column "dashboard of a rally car" — measuring-tape track on top, question card, on-screen keypad below */
+:root {
+  --bg: #EEF2F4; --surface: #FFFFFF; --ink: #1D2430; --muted: #5C6878; --line: #CBD3DB;
+  --tape: #F4C430; --tape-ink: #2B2410; --accent: #0E8576; --accent-ink: #FFFFFF;
+  --good: #1F9D55; --bad: #D0453A; --good-bg: #E3F5EA; --bad-bg: #FBE6E4;
+  --display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11161D; --surface: #1A212B; --ink: #E7ECF2; --muted: #9AA7B6; --line: #2E3946;
+  --tape: #E9B825; --tape-ink: #241D08; --accent: #2BB3A2; --accent-ink: #08201D;
+  --good: #44C47A; --bad: #F06A5E; --good-bg: #173726; --bad-bg: #3D1E1C; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11161D; --surface: #1A212B; --ink: #E7ECF2; --muted: #9AA7B6; --line: #2E3946;
+  --tape: #E9B825; --tape-ink: #241D08; --accent: #2BB3A2; --accent-ink: #08201D;
+  --good: #44C47A; --bad: #F06A5E; --good-bg: #173726; --bad-bg: #3D1E1C; color-scheme: dark }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 18px; line-height: 1.45; }
+.wrap { max-width: 860px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 18px 32px; display: flex; flex-direction: column; gap: 16px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(30px, 6vw, 46px); font-weight: 700; letter-spacing: 0.01em; }
+h2 { font-size: 26px; font-weight: 600; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, .field:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand svg { width: 54px; height: 54px; flex: none; }
+.sub { color: var(--muted); font-size: 16px; }
+.pillbtn { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-size: 15px; }
+.odo { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; background: var(--tape); color: var(--tape-ink); border-radius: 10px; padding: 8px 14px; font-family: var(--display); font-weight: 600; font-variant-numeric: tabular-nums; }
+.odo small { font-family: var(--body); font-weight: 400; opacity: .8; }
+
+/* tape track */
+.track { position: relative; height: 92px; background: var(--tape); border-radius: 10px; overflow: hidden; box-shadow: inset 0 -6px 0 rgba(0,0,0,.08); }
+.track canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.rover { position: absolute; bottom: 30px; left: 0; width: 64px; transition: left .7s cubic-bezier(.3,1.4,.5,1); }
+.rover svg { width: 64px; height: 40px; display: block; }
+.flag { position: absolute; right: 8px; bottom: 30px; font-family: var(--display); color: var(--tape-ink); font-size: 26px; }
+.bump .rover svg { animation: bump .45s; }
+@keyframes bump { 30% { transform: translateY(-10px) rotate(-6deg); } 60% { transform: translateY(0) rotate(3deg); } }
+.shake { animation: shake .4s; }
+@keyframes shake { 20%,60% { transform: translateX(-8px); } 40%,80% { transform: translateX(8px); } }
+
+/* map */
+.stations { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.st { text-align: left; background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; transition: transform .15s, border-color .15s; }
+.st:hover { transform: translateY(-2px); border-color: var(--accent); }
+.st .km { font-family: var(--display); font-size: 14px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.st h3 { font-size: 21px; font-weight: 600; }
+.st p { margin: 0; color: var(--muted); font-size: 15.5px; }
+.st .ex { font-family: var(--display); font-size: 17px; color: var(--ink); background: var(--bg); border-radius: 8px; padding: 3px 8px; align-self: flex-start; }
+.stars { color: var(--tape); font-size: 22px; letter-spacing: 2px; -webkit-text-stroke: 1px #b38a10; }
+.stars .off { color: transparent; }
+.st.race { border-color: var(--tape); border-style: dashed; }
+.cheat { background: var(--surface); border-radius: 14px; border: 2px solid var(--line); padding: 12px 16px; }
+.cheat summary { font-family: var(--display); font-weight: 600; font-size: 19px; cursor: pointer; }
+.ladder { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; font-family: var(--display); font-size: 18px; }
+.ladder .u { background: var(--tape); color: var(--tape-ink); border-radius: 8px; padding: 2px 12px; font-weight: 600; }
+.ladder .x { color: var(--muted); font-size: 15px; }
+
+/* play */
+.hud { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.hud .left { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.chip { background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 15px; font-variant-numeric: tabular-nums; }
+.chip.combo { background: var(--tape); color: var(--tape-ink); border-color: transparent; font-weight: 700; }
+.chip.time { font-family: var(--display); font-size: 18px; font-weight: 600; }
+.card { background: var(--surface); border: 2px solid var(--line); border-radius: 16px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.card.ok { border-color: var(--good); }
+.card.no { border-color: var(--bad); }
+.q-title { color: var(--muted); font-size: 16px; }
+.q { font-family: var(--display); font-size: clamp(26px, 5.4vw, 40px); font-weight: 500; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }
+.field { min-width: 2.6em; padding: 2px 10px; border: 2.5px solid var(--line); border-radius: 10px; background: var(--bg); text-align: center; cursor: text; min-height: 1.3em; }
+.field.active { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.field.active:empty::after { content: "▏"; color: var(--accent); animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.unit { color: var(--muted); }
+.cmp { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; font-family: var(--display); font-size: clamp(24px, 5vw, 38px); text-align: center; }
+.cmp .side { background: var(--bg); border-radius: 12px; padding: 12px 6px; font-variant-numeric: tabular-nums; }
+.cmp .mid { width: 1.6em; height: 1.6em; border: 2.5px dashed var(--line); border-radius: 10px; display: grid; place-items: center; }
+.cmpbtns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.cmpbtns button, .key { border: 2px solid var(--line); background: var(--bg); border-radius: 12px; font-family: var(--display); font-size: 30px; font-weight: 600; padding: 8px 0; }
+.cmpbtns button:hover, .key:hover { border-color: var(--accent); }
+.tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.tile { border: 2px solid var(--line); background: var(--bg); border-radius: 12px; padding: 12px 8px; font-family: var(--display); font-size: clamp(22px, 4.6vw, 32px); position: relative; font-variant-numeric: tabular-nums; }
+.tile .n { position: absolute; top: 4px; left: 8px; font-size: 15px; background: var(--accent); color: var(--accent-ink); border-radius: 999px; width: 24px; height: 24px; display: grid; place-items: center; }
+.tile.picked { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--bg)); }
+.keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.key.go { grid-column: 4; grid-row: 1 / span 4; background: var(--accent); color: var(--accent-ink); border-color: transparent; font-size: 22px; }
+.key.small { font-size: 20px; }
+.fb { border-radius: 12px; padding: 10px 14px; font-size: 17px; }
+.fb.ok { background: var(--good-bg); color: var(--ink); border-left: 6px solid var(--good); }
+.fb.no { background: var(--bad-bg); color: var(--ink); border-left: 6px solid var(--bad); }
+.fb b { font-family: var(--display); font-weight: 600; font-size: 19px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+.btn { border: none; background: var(--accent); color: var(--accent-ink); border-radius: 12px; padding: 10px 22px; font-family: var(--display); font-weight: 600; font-size: 20px; }
+.btn.ghost { background: transparent; color: var(--ink); border: 2px solid var(--line); }
+.result { text-align: center; align-items: center; }
+.result .stars { font-size: 56px; }
+.big { font-family: var(--display); font-size: 44px; font-weight: 700; }
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 20; }
+@media (max-width: 520px) { .tiles { grid-template-columns: 1fr; } .key { font-size: 24px; } body { font-size: 17px; } }
+@media (prefers-reduced-motion: reduce) { .rover { transition: none; } .bump .rover svg, .shake { animation: none; } }
+</style>
+
+<div class="wrap" id="app"></div>
+<canvas class="confetti" id="confetti"></canvas>
+
+<script>
+// ---------- units & number helpers (all lengths kept as whole millimetres) ----------
+const U = { mm: 1, cm: 10, dm: 100, m: 1000, km: 1000000 };
+const DIG = { mm: 0, cm: 1, dm: 2, m: 3, km: 6 };
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = rnd(0, i); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+// mm -> "6,07" in unit u, showing `show` decimals (or minimal if undefined)
+function dec(mm, u, show) {
+  const whole = Math.floor(mm / U[u]), rem = mm % U[u];
+  let frac = DIG[u] ? String(rem).padStart(DIG[u], '0') : '';
+  if (show === undefined) frac = frac.replace(/0+$/, '');
+  else frac = frac.slice(0, show);
+  return frac ? `${whole},${frac}` : String(whole);
+}
+// "0,74" in unit u -> mm (or NaN if not an exact number of mm)
+function parseLen(s, u) {
+  s = String(s).trim().replace('.', ',');
+  if (!/^\d+(,\d+)?$/.test(s)) return NaN;
+  const [w, f = ''] = s.split(',');
+  const fracVal = f ? Number(f) * U[u] / Math.pow(10, f.length) : 0;
+  const mm = Number(w) * U[u] + fracVal;
+  return Number.isInteger(Math.round(mm * 1e6) / 1e6) ? Math.round(mm) : NaN;
+}
+const ratio = (b, s) => U[b] / U[s];
+const rel = (b, s) => `1 ${b} = ${ratio(b, s)} ${s}`;
+const mixed = (a, b, bu, su) => `${a} ${bu} ${b} ${su}`;
+function kmM(m) { const k = Math.floor(m / 1000), r = m % 1000; return k ? (r ? `${k} km ${r} m` : `${k} km`) : `${r} m`; }
+
+// all ways to write a length (used by compare and order)
+function reps(mm) {
+  const out = [];
+  for (const u of ['mm', 'cm', 'dm', 'm', 'km']) if (mm % U[u] === 0 && mm / U[u] <= 5000) out.push(`${mm / U[u]} ${u}`);
+  for (const [u, d] of [['cm', 1], ['dm', 1], ['m', 2], ['km', 3]]) {
+    const step = U[u] / Math.pow(10, d);
+    if (mm % U[u] !== 0 && mm % step === 0 && !(u === 'dm' && mm >= 1000)) out.push(`${dec(mm, u)} ${u}`);
+  }
+  for (const [b, s] of [['km', 'm'], ['m', 'cm'], ['dm', 'cm'], ['cm', 'mm']]) {
+    const a = Math.floor(mm / U[b]), r = mm % U[b];
+    if (a >= 1 && r > 0 && r % U[s] === 0 && !(b === 'dm' && a >= 10)) out.push(mixed(a, r / U[s], b, s));
+  }
+  return out;
+}
+
+// ---------- question generators ----------
+function smallPart(big, small) {
+  const max = ratio(big, small) - 1;
+  if (max === 9) return rnd(1, 9);
+  const r = Math.random();
+  if (r < .3) return rnd(1, 9);
+  if (r < .55) return rnd(1, Math.floor(max / 10)) * 10;
+  if (max > 99 && r < .75) return rnd(10, 99);
+  return rnd(1, max);
+}
+
+// Station 1: decimal -> two-part (wyrażenie dwumianowane)
+function qSplit() {
+  const [b, s] = pick([['cm', 'mm'], ['dm', 'cm'], ['m', 'cm'], ['m', 'cm'], ['km', 'm'], ['km', 'm']]);
+  const a = b === 'km' ? rnd(1, 9) : rnd(1, 15), x = smallPart(b, s);
+  const mm = a * U[b] + x * U[s];
+  const show = { cm: 1, dm: 1, m: 2, km: 3 }[b];
+  const shown = dec(mm, b, show);
+  return {
+    kind: 'fields', title: 'Zapisz w postaci wyrażenia dwumianowanego.',
+    parts: [`${shown} ${b} =`, { f: 0 }, b, { f: 1 }, s],
+    check: v => Number(v[0]) === a && Number(v[1]) === x && v[0] !== '' && v[1] !== '',
+    answer: mixed(a, x, b, s),
+    why: `${shown} ${b} = ${a} ${b} + 0,${shown.split(',')[1]} ${b}, a ${rel(b, s)}, więc 0,${shown.split(',')[1]} ${b} = ${x} ${s}.`
+  };
+}
+
+// Station 2: missing number (kwadraciki) in many directions
+function qConvert() {
+  const t = pick(['d2s', 'd2s', 'mix2b', 'mix2s', 's2b', 'b2s']);
+  let lhs, ans, u, why;
+  if (t === 'd2s') {
+    const [b, s] = pick([['cm', 'mm'], ['dm', 'cm'], ['m', 'cm'], ['km', 'm'], ['m', 'dm']]);
+    const r = ratio(b, s); const x = Math.random() < .25 ? rnd(1, 3) * r + smallPart(b, s) : smallPart(b, s);
+    const mm = x * U[s]; lhs = `${dec(mm, b)} ${b}`; ans = String(x); u = s;
+    why = `${rel(b, s)}, więc ${lhs} = ${x} ${s}.`;
+  } else if (t === 'mix2b') {
+    const [b, s] = pick([['m', 'cm'], ['cm', 'mm'], ['dm', 'cm']]);
+    const a = rnd(1, 12), x = smallPart(b, s), mm = a * U[b] + x * U[s];
+    lhs = mixed(a, x, b, s); ans = dec(mm, b); u = b;
+    why = `${x} ${s} = ${dec(x * U[s], b)} ${b}, więc ${lhs} = ${ans} ${b}.`;
+  } else if (t === 'mix2s') {
+    const [b, s] = pick([['km', 'm'], ['m', 'cm'], ['dm', 'cm'], ['cm', 'mm']]);
+    const a = b === 'km' ? rnd(1, 6) : rnd(1, 9), x = smallPart(b, s), mm = a * U[b] + x * U[s];
+    lhs = mixed(a, x, b, s); ans = String(mm / U[s]); u = s;
+    why = `${a} ${b} = ${a * ratio(b, s)} ${s}, dodaj ${x} ${s}: razem ${ans} ${s}.`;
+  } else if (t === 's2b') {
+    const [s, b, lo, hi] = pick([['cm', 'm', 5, 450], ['dm', 'm', 3, 60], ['mm', 'cm', 3, 150], ['m', 'km', 40, 4000], ['cm', 'dm', 3, 90]]);
+    const x = rnd(lo, hi), mm = x * U[s]; if (mm % U[b] === 0 && Math.random() < .6) return qConvert();
+    lhs = `${x} ${s}`; ans = dec(mm, b); u = b;
+    why = `${rel(b, s)}, więc 1 ${s} = ${dec(U[s], b)} ${b}, a ${lhs} = ${ans} ${b}.`;
+  } else {
+    const [b, s, hi] = pick([['dm', 'cm', 40], ['m', 'cm', 25], ['km', 'm', 12], ['m', 'dm', 30], ['cm', 'mm', 40]]);
+    const x = rnd(2, hi); lhs = `${x} ${b}`; ans = String(x * ratio(b, s)); u = s;
+    why = `${rel(b, s)}, więc ${lhs} = ${x} · ${ratio(b, s)} ${s} = ${ans} ${s}.`;
+  }
+  const target = parseLen(ans, u);
+  return {
+    kind: 'fields', title: 'Jaką liczbę wpisać w okienko?',
+    parts: [`${lhs} =`, { f: 0 }, u],
+    check: v => parseLen(v[0], u) === target,
+    answer: `${ans} ${u}`, why
+  };
+}
+
+function level() {
+  return pick([
+    () => rnd(11, 250),                 // centymetry i milimetry
+    () => rnd(12, 900) * 10,            // metry i centymetry
+    () => rnd(2, 99) * 100,             // metry i decymetry
+    () => rnd(40, 9500) * 1000          // kilometry i metry
+  ])();
+}
+// Station 3: compare
+function qCompare() {
+  const A = level(); let B;
+  const r = Math.random();
+  if (r < .35) B = A;
+  else if (r < .65) { B = Math.random() < .5 ? A * 10 : A / 10; if (!Number.isInteger(B) || !reps(B).length) B = A * 10; }
+  else { const st = A >= 1e6 ? 1000 : A >= 1000 ? 10 : 1; B = A + pick([-1, 1]) * st * rnd(1, 9); }
+  let ra = reps(A), rb = reps(B);
+  if (!ra.length || !rb.length) return qCompare();
+  let sa = pick(ra), sb = pick(rb), guard = 0;
+  while (sa === sb && guard++ < 20) { sa = pick(ra); sb = pick(rb); }
+  if (sa === sb) return qCompare();
+  const sign = A < B ? '<' : A > B ? '>' : '=';
+  const common = A >= 1e6 && B >= 1e6 ? 'm' : (A % 10 === 0 && B % 10 === 0 ? 'cm' : 'mm');
+  return {
+    kind: 'cmp', title: 'Wstaw znak <, = lub >.', a: sa, b: sb,
+    check: v => v === sign, answer: `${sa} ${sign} ${sb}`,
+    why: `Zamień na ${common}: ${sa} = ${A / U[common]} ${common}, ${sb} = ${B / U[common]} ${common}.`
+  };
+}
+
+// Station 4: order from shortest
+function qOrder() {
+  const base = level(); const st = base >= 1e6 ? 1000 : base >= 1000 ? 10 : 1;
+  const set = new Set([base]);
+  while (set.size < 4) { const v = base + pick([-1, 1]) * st * rnd(1, 40) * (Math.random() < .3 ? 10 : 1); if (v > 0 && reps(v).length) set.add(v); }
+  const vals = shuffle([...set]);
+  const items = vals.map(v => ({ v, s: pick(reps(v)) }));
+  const common = vals.every(v => v >= 1e6) ? 'm' : vals.every(v => v % 10 === 0) ? 'cm' : 'mm';
+  const sorted = [...items].sort((x, y) => x.v - y.v);
+  return {
+    kind: 'order', title: 'Klikaj od najkrótszej do najdłuższej.', items,
+    check: order => order.every((i, k) => items[i].v === sorted[k].v),
+    answer: sorted.map(x => x.s).join('  <  '),
+    why: 'W jednej jednostce: ' + sorted.map(x => `${x.v / U[common]} ${common}`).join(' < ') + '.'
+  };
+}
+
+const STATIONS = [
+  { id: 'split', km: 'Odcinek 1', name: 'Rozbij na dwie jednostki', desc: 'Liczba z przecinkiem zamienia się w metry i centymetry.', ex: '6,07 m = 6 m 7 cm', gen: qSplit, n: 8 },
+  { id: 'conv', km: 'Odcinek 2', name: 'Okienka', desc: 'Jaka liczba pasuje do okienka? Zamiany w obie strony.', ex: '0,807 km = ▢ m', gen: qConvert, n: 8 },
+  { id: 'cmp', km: 'Odcinek 3', name: 'Pojedynek długości', desc: 'Która długość wygrywa? Uwaga na pułapki z przecinkiem.', ex: '0,5 m ▢ 5 cm', gen: qCompare, n: 8 },
+  { id: 'order', km: 'Odcinek 4', name: 'Ustaw na starcie', desc: 'Ułóż cztery długości od najkrótszej.', ex: '1,2 m · 98 cm · 1 m 5 cm', gen: qOrder, n: 6 },
+  { id: 'race', km: 'Finał', name: 'Wyścig 60 sekund', desc: 'Wszystko naraz, na czas. Pobij swój rekord!', ex: 'rekord: —', gen: () => pick([qSplit, qConvert, qConvert, qCompare])(), n: Infinity, race: true }
+];
+
+// ---------- storage (per-browser convenience only) ----------
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('rajd-' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('rajd-' + k, JSON.stringify(v)); } catch (e) {} }
+};
+let stars = store.get('stars', {}), best = store.get('best', 0), odo = store.get('odo', 0), soundOn = store.get('sound', true);
+
+// ---------- sound ----------
+let ac;
+function tone(freqs, dur = .12, type = 'triangle') {
+  if (!soundOn) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    freqs.forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + i * dur;
+      o.type = type; o.frequency.value = f; g.gain.setValueAtTime(.18, t); g.gain.exponentialRampToValueAtTime(.001, t + dur * 1.6);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + dur * 1.7);
+    });
+  } catch (e) {}
+}
+const sfx = { ok: () => tone([660, 880]), no: () => tone([220, 165], .16, 'sawtooth'), combo: () => tone([523, 659, 784, 1046], .09), win: () => tone([523, 659, 784, 1046, 1318], .12) };
+
+// ---------- rendering ----------
+const app = document.getElementById('app');
+const roverSVG = `<svg viewBox="0 0 64 40" aria-hidden="true"><rect x="6" y="10" width="44" height="18" rx="5" fill="#0E8576"/><rect x="34" y="4" width="16" height="12" rx="3" fill="#BFE8E2" stroke="#0E8576" stroke-width="2"/><rect x="8" y="14" width="22" height="6" rx="1" fill="#F4C430"/><path d="M10 14v3M14 14v4M18 14v3M22 14v4M26 14v3" stroke="#2B2410" stroke-width="1"/><circle cx="16" cy="31" r="7" fill="#1D2430"/><circle cx="16" cy="31" r="3" fill="#CBD3DB"/><circle cx="42" cy="31" r="7" fill="#1D2430"/><circle cx="42" cy="31" r="3" fill="#CBD3DB"/><path d="M50 16h8" stroke="#D0453A" stroke-width="3" stroke-linecap="round"/></svg>`;
+
+function odoHTML() { return `<div class="odo" title="Każda dobra odpowiedź to kilka metrów trasy">Przejechane: ${kmM(odo)} <small>= ${dec(odo * 1000, 'km')} km</small></div>`; }
+function header() {
+  return `<div class="top"><div class="brand">${roverSVG.replace('viewBox', 'width="54" height="54" viewBox')}<div><h1>Rajd Miarki</h1><div class="sub">Rajd po taśmie mierniczej: mm, cm, dm, m, km</div></div></div>
+  <div class="row">${odoHTML()}<button class="pillbtn" id="snd">${soundOn ? 'Dźwięk: wł.' : 'Dźwięk: wył.'}</button></div></div>`;
+}
+function starStr(n) { return [0, 1, 2].map(i => `<span class="${i < n ? '' : 'off'}">★</span>`).join(''); }
+
+function showMap() {
+  state = null; stopTimer();
+  app.innerHTML = header() + `
+  <details class="cheat"><summary>Ściąga kierowcy</summary>
+    <div class="ladder"><span class="u">km</span><span class="x">×1000 →</span><span class="u">m</span><span class="x">×10 →</span><span class="u">dm</span><span class="x">×10 →</span><span class="u">cm</span><span class="x">×10 →</span><span class="u">mm</span></div>
+    <p class="sub" style="margin:8px 0 0">W prawo (na mniejszą jednostkę) mnożysz, w lewo dzielisz. 1 m = 100 cm, więc 0,07 m = 7 cm, a 0,7 m = 70 cm.</p>
+  </details>
+  <div class="stations">${STATIONS.map((s, i) => `
+    <button class="st ${s.race ? 'race' : ''}" data-i="${i}">
+      <span class="km">${s.km}</span><h3>${s.name}</h3><p>${s.desc}</p>
+      <span class="ex">${s.race ? 'rekord: ' + (best ? best + ' pkt' : '—') : s.ex}</span>
+      ${s.race ? '' : `<span class="stars" aria-label="${stars[s.id] || 0} z 3 gwiazdek">${starStr(stars[s.id] || 0)}</span>`}
+    </button>`).join('')}</div>`;
+  bindCommon();
+  app.querySelectorAll('.st').forEach(b => b.onclick = () => start(STATIONS[+b.dataset.i]));
+}
+function bindCommon() {
+  const s = document.getElementById('snd');
+  if (s) s.onclick = () => { soundOn = !soundOn; store.set('sound', soundOn); s.textContent = soundOn ? 'Dźwięk: wł.' : 'Dźwięk: wył.'; if (soundOn) sfx.ok(); };
+}
+
+// ---------- game state ----------
+let state = null, timer = null;
+function stopTimer() { if (timer) clearInterval(timer); timer = null; }
+function start(st) {
+  state = { st, i: 0, good: 0, bad: 0, combo: 0, score: 0, time: 60, q: null, vals: [], active: 0, order: [], locked: false, mistakes: [] };
+  app.innerHTML = header() + `
+    <div class="hud"><div class="left"><button class="pillbtn" id="back">← Trasa</button><b style="font-family:var(--display);font-size:20px">${st.name}</b></div>
+      <div class="left" id="chips"></div></div>
+    <div class="track" id="track"><canvas id="tape"></canvas><div class="flag">🏁</div><div class="rover" id="rover">${roverSVG}</div></div>
+    <div class="card" id="card"></div>`;
+  bindCommon();
+  document.getElementById('back').onclick = showMap;
+  drawTape();
+  if (st.race) { timer = setInterval(() => { state.time--; chips(); if (state.time <= 0) finish(); }, 1000); }
+  next();
+}
+function drawTape() {
+  const c = document.getElementById('tape'); if (!c) return;
+  const r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  c.width = r.width * dpr; c.height = r.height * dpr; const g = c.getContext('2d'); g.scale(dpr, dpr);
+  const ink = getComputedStyle(document.documentElement).getPropertyValue('--tape-ink').trim() || '#2B2410';
+  g.strokeStyle = ink; g.fillStyle = ink; g.font = '600 12px Fredoka, sans-serif';
+  const step = 6, h = r.height;
+  for (let x = 0, i = 0; x < r.width; x += step, i++) {
+    const len = i % 10 === 0 ? 22 : i % 5 === 0 ? 15 : 8;
+    g.globalAlpha = .75; g.beginPath(); g.moveTo(x + .5, h); g.lineTo(x + .5, h - len); g.stroke();
+    if (i % 10 === 0 && i) { g.globalAlpha = 1; g.fillText(String(i / 10), x + 2, h - 24); }
+  }
+  g.globalAlpha = .3; g.fillRect(0, 0, r.width, 2);
+}
+function moveRover() {
+  const tr = document.getElementById('track'), rv = document.getElementById('rover'); if (!tr) return;
+  const total = state.st.race ? 30 : state.st.n;
+  const frac = Math.min(1, state.good / total);
+  rv.style.left = `calc(${frac} * (100% - 104px))`;
+  tr.classList.remove('bump'); void tr.offsetWidth; tr.classList.add('bump');
+}
+function chips() {
+  const el = document.getElementById('chips'); if (!el || !state) return;
+  const s = state;
+  el.innerHTML = (s.st.race ? `<span class="chip time">⏱ ${s.time} s</span><span class="chip">${s.score} pkt</span>`
+    : `<span class="chip">Pytanie ${Math.min(s.i + 1, s.st.n)} / ${s.st.n}</span><span class="chip">✔ ${s.good}  ✘ ${s.bad}</span>`)
+    + (s.combo >= 3 ? `<span class="chip combo">Seria ×${s.combo}</span>` : '');
+}
+
+function next() {
+  const s = state;
+  if (!s.st.race && s.i >= s.st.n) return finish();
+  s.q = s.st.gen(); s.vals = []; s.active = 0; s.order = []; s.locked = false; s.tries = 0;
+  chips(); renderQ();
+}
+function renderQ(fb) {
+  const s = state, q = s.q, card = document.getElementById('card');
+  card.className = 'card' + (fb ? (fb.ok ? ' ok' : ' no') : '');
+  let body = `<div class="q-title">${q.title}</div>`;
+  if (q.kind === 'fields') {
+    body += `<div class="q">` + q.parts.map(p => typeof p === 'string' ? `<span${/^(mm|cm|dm|m|km)$/.test(p) ? ' class="unit"' : ''}>${p}</span>`
+      : `<span class="field ${s.active === p.f && !s.locked ? 'active' : ''}" tabindex="0" data-f="${p.f}" role="textbox" aria-label="okienko ${p.f + 1}">${s.vals[p.f] || ''}</span>`).join('') + `</div>`;
+    if (!s.locked) body += `<div class="keypad">${['7', '8', '9', '4', '5', '6', '1', '2', '3', ',', '0', '⌫'].map(k => `<button class="key ${k === '⌫' ? 'small' : ''}" data-k="${k}">${k}</button>`).join('')}<button class="key go" data-k="ok">Sprawdź</button></div>`;
+  } else if (q.kind === 'cmp') {
+    body += `<div class="cmp"><div class="side">${q.a}</div><div class="mid">${s.locked ? (fb && fb.pick) || '' : ''}</div><div class="side">${q.b}</div></div>`;
+    if (!s.locked) body += `<div class="cmpbtns">${['<', '=', '>'].map(k => `<button data-c="${k}">${k}</button>`).join('')}</div>`;
+  } else {
+    body += `<div class="tiles">${q.items.map((it, i) => { const n = s.order.indexOf(i); return `<button class="tile ${n >= 0 ? 'picked' : ''}" data-t="${i}" ${s.locked ? 'disabled' : ''}>${n >= 0 ? `<span class="n">${n + 1}</span>` : ''}${it.s}</button>`; }).join('')}</div>`;
+    if (!s.locked && s.order.length) body += `<div class="row"><button class="btn ghost" id="undo">Cofnij</button></div>`;
+  }
+  if (fb) {
+    body += fb.ok ? `<div class="fb ok"><b>${pick(['Brawo!', 'Świetnie!', 'Pełny gaz!', 'Dokładnie tak!'])}</b> ${fb.extra || ''}</div>`
+      : `<div class="fb no"><b>Prawie!</b> Poprawnie: <b>${q.answer}</b><br>${q.why}</div>`;
+    body += `<div class="row"><span></span><button class="btn" id="nextb">${!s.st.race && s.i + 1 >= s.st.n ? 'Meta!' : 'Dalej →'}</button></div>`;
+  }
+  card.innerHTML = body;
+  card.querySelectorAll('.field').forEach(f => f.onclick = () => { if (!s.locked) { s.active = +f.dataset.f; renderQ(); } });
+  card.querySelectorAll('.key').forEach(k => k.onclick = () => key(k.dataset.k));
+  card.querySelectorAll('[data-c]').forEach(b => b.onclick = () => answer(b.dataset.c));
+  card.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { if (s.locked || s.order.includes(+b.dataset.t)) return; s.order.push(+b.dataset.t); tone([440 + s.order.length * 80], .07); if (s.order.length === 4) answer(s.order); else renderQ(); });
+  const u = document.getElementById('undo'); if (u) u.onclick = () => { s.order.pop(); renderQ(); };
+  const nb = document.getElementById('nextb'); if (nb) { nb.onclick = () => { s.i++; next(); }; if (!fb.ok) nb.focus(); }
+}
+function key(k) {
+  const s = state; if (!s || s.locked || s.q.kind !== 'fields') return;
+  const nf = s.q.parts.filter(p => typeof p === 'object').length;
+  const v = s.vals[s.active] || '';
+  if (k === 'ok') {
+    if (s.vals.filter(Boolean).length < nf) { const empty = [...Array(nf).keys()].find(i => !s.vals[i]); s.active = empty; renderQ(); return; }
+    return answer(s.vals);
+  }
+  if (k === '⌫') s.vals[s.active] = v.slice(0, -1);
+  else if (k === ',') { if (!v.includes(',') && v) s.vals[s.active] = v + ','; }
+  else if (v.length < 9) s.vals[s.active] = v + k;
+  renderQ();
+}
+document.addEventListener('keydown', e => {
+  if (!state || state.locked) { if (state && state.locked && e.key === 'Enter') { const nb = document.getElementById('nextb'); if (nb) { e.preventDefault(); nb.click(); } } return; }
+  const q = state.q;
+  if (q.kind === 'fields') {
+    if (/^[0-9]$/.test(e.key)) key(e.key);
+    else if (e.key === ',' || e.key === '.') key(',');
+    else if (e.key === 'Backspace') { e.preventDefault(); key('⌫'); }
+    else if (e.key === 'Enter') { e.preventDefault(); key('ok'); }
+    else if (e.key === 'Tab' || e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      const nf = q.parts.filter(p => typeof p === 'object').length; if (nf > 1) { e.preventDefault(); state.active = (state.active + 1) % nf; renderQ(); }
+    }
+  } else if (q.kind === 'cmp' && ['<', '>', '='].includes(e.key)) answer(e.key);
+});
+
+function answer(v) {
+  const s = state, ok = s.q.check(v);
+  s.locked = true;
+  if (ok) {
+    s.good++; s.combo++;
+    const gain = 50 * rnd(2, 7) + (s.combo >= 3 ? 250 : 0);
+    odo += gain; store.set('odo', odo);
+    if (s.st.race) s.score += 10 + Math.min(s.combo, 10) * 2;
+    s.combo >= 3 && s.combo % 3 === 0 ? sfx.combo() : sfx.ok();
+    moveRover();
+    document.querySelector('.odo').outerHTML = odoHTML();
+    renderQ({ ok: true, pick: v, extra: `+${gain} m trasy${s.combo >= 3 ? ' (premia za serię!)' : ''}` });
+    if (s.st.race) setTimeout(() => { if (state === s && s.time > 0) { s.i++; next(); } }, 650);
+  } else {
+    s.bad++; s.combo = 0; sfx.no();
+    s.mistakes.push(s.q.answer);
+    const card = document.getElementById('card'); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+    if (s.st.race) { renderQ({ ok: false, pick: v }); }
+    else renderQ({ ok: false, pick: v });
+  }
+  chips();
+}
+
+function finish() {
+  const s = state; stopTimer(); if (!s) return;
+  let n = 0, html;
+  if (s.st.race) {
+    const rec = s.score > best; if (rec) { best = s.score; store.set('best', best); }
+    html = `<div class="big">${s.score} pkt</div><div>Dobre odpowiedzi: ${s.good}, błędne: ${s.bad}</div>${rec ? '<h2>Nowy rekord!</h2>' : `<div class="sub">Rekord: ${best} pkt</div>`}`;
+    n = s.good >= 12 ? 3 : s.good >= 7 ? 2 : 1;
+  } else {
+    n = s.bad <= 1 ? 3 : s.bad <= 3 ? 2 : 1;
+    if (n > (stars[s.st.id] || 0)) { stars[s.st.id] = n; store.set('stars', stars); }
+    html = `<div class="stars">${starStr(n)}</div><h2>${n === 3 ? 'Mistrz trasy!' : n === 2 ? 'Dobra jazda!' : 'Meta! Spróbuj jeszcze raz po 3 gwiazdki.'}</h2><div>Dobre odpowiedzi: ${s.good} z ${s.st.n}</div>`;
+  }
+  if (s.mistakes.length) html += `<div class="fb no" style="text-align:left;align-self:stretch"><b>Do powtórki:</b><br>${s.mistakes.slice(0, 6).join('<br>')}</div>`;
+  html += `<div class="row" style="justify-content:center"><button class="btn ghost" id="mapb">← Trasa</button><button class="btn" id="again">Jeszcze raz</button></div>`;
+  const card = document.getElementById('card'); card.className = 'card result'; card.innerHTML = html;
+  document.getElementById('chips').innerHTML = '';
+  const st = s.st; state = { ...s, locked: true, q: { kind: 'done' } };
+  document.getElementById('mapb').onclick = showMap;
+  document.getElementById('again').onclick = () => start(st);
+  if (n === 3) { sfx.win(); confetti(); }
+}
+
+// ---------- confetti ----------
+function confetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c = document.getElementById('confetti'), g = c.getContext('2d');
+  c.width = innerWidth; c.height = innerHeight;
+  const cols = ['#F4C430', '#0E8576', '#D0453A', '#2B7BD6', '#1F9D55'];
+  const ps = Array.from({ length: 140 }, () => ({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * .5, w: 6 + Math.random() * 8, h: 3 + Math.random() * 3, vy: 2 + Math.random() * 3, vx: -1 + Math.random() * 2, r: Math.random() * 6, c: pick(cols) }));
+  let f = 0;
+  (function loop() {
+    g.clearRect(0, 0, c.width, c.height);
+    ps.forEach(p => { p.y += p.vy; p.x += p.vx; p.r += .1; g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.fillStyle = p.c; g.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); g.restore(); });
+    if (f++ < 200) requestAnimationFrame(loop); else g.clearRect(0, 0, c.width, c.height);
+  })();
+}
+addEventListener('resize', () => drawTape());
+document.fonts && document.fonts.ready.then(() => drawTape());
+showMap();
+</script>
+
+</body></html>

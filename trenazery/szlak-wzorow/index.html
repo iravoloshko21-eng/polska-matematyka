@@ -1,0 +1,716 @@
+<!doctype html><html lang="pl"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"></head><body>
+<a href="../" style="position:fixed;z-index:9999;left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));background:#151515;color:#fbf6ea;font:700 13px/1 Inter,system-ui,sans-serif;text-decoration:none;border-radius:999px;padding:10px 14px;box-shadow:3px 3px 0 #5157d6">← Trenażery</a>
+<title>Szlak Wzorów E8</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=STIX+Two+Text:ital,wght@0,500;1,500&display=swap">
+<style>
+/* Layout: a mountain-trail guidebook. Home = 10 trail stations marked like Polish szlaki (white-colour-white), quiz = one card per step */
+:root {
+  --bg: #EDF0E8; --surface: #FFFFFF; --ink: #1D2620; --muted: #58665D; --line: #C9D2C6;
+  --accent: #2D6A4C; --accent-ink: #FFFFFF; --soft: #DDE7DC;
+  --good: #1E8C4E; --good-bg: #DFF3E5; --bad: #C2382B; --bad-bg: #FBE3DF;
+  --t-red: #D4382B; --t-blue: #2A62C9; --t-green: #2E9A4D; --t-yellow: #E5B30C; --t-black: #222;
+  --mark-white: #FFFFFF; --star: #E5A50C;
+  --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --math: "STIX Two Text", "Cambria Math", "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121814; --surface: #1B231D; --ink: #E6ECE6; --muted: #9DAAA0; --line: #2F3B33;
+  --accent: #58B386; --accent-ink: #0B1F14; --soft: #233128;
+  --good: #4CC27F; --good-bg: #16301F; --bad: #F06E60; --bad-bg: #3A1D1A;
+  --t-black: #0A0A0A; --mark-white: #F2F2F2; --star: #F2BE3A; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121814; --surface: #1B231D; --ink: #E6ECE6; --muted: #9DAAA0; --line: #2F3B33;
+  --accent: #58B386; --accent-ink: #0B1F14; --soft: #233128;
+  --good: #4CC27F; --good-bg: #16301F; --bad: #F06E60; --bad-bg: #3A1D1A;
+  --t-black: #0A0A0A; --mark-white: #F2F2F2; --star: #F2BE3A; color-scheme: dark }
+
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 18px; line-height: 1.45; }
+.wrap { max-width: 880px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px 40px; display: flex; flex-direction: column; gap: 20px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; line-height: 1.1; }
+h1 { font-size: clamp(34px, 7vw, 58px); font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: 26px; font-weight: 800; }
+h3 { font-size: 20px; font-weight: 600; }
+p { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.muted { color: var(--muted); }
+
+/* trail marker: white – colour – white */
+.mk { display: inline-flex; flex-direction: column; width: 26px; height: 26px; border-radius: 3px; overflow: hidden; border: 1.5px solid var(--line); flex: none; }
+.mk i { flex: 1; background: var(--mark-white); }
+.mk i:nth-child(2) { background: var(--c); }
+.mk.big { width: 40px; height: 40px; }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: 20px; }
+.ghost { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 16px; font-size: 16px; }
+.ghost:hover { border-color: var(--accent); }
+
+.hero { display: flex; flex-direction: column; gap: 10px; padding-block: 6px 4px; }
+.hero p { max-width: 60ch; color: var(--muted); }
+.eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+
+.modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.mode { text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.mode:hover { border-color: var(--accent); transform: translateY(-1px); }
+.mode b { font-family: var(--display); font-size: 20px; }
+.mode span { color: var(--muted); font-size: 15px; }
+.mode .best { color: var(--accent); font-weight: 700; font-size: 14px; }
+
+.trail { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 28px; }
+.trail::before { content: ""; position: absolute; left: 50%; top: 10px; bottom: 10px; border-left: 3px dashed var(--line); }
+.st { position: relative; text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; min-width: 0; }
+.st:hover { border-color: var(--c); }
+.st .nm { font-family: var(--display); font-weight: 600; font-size: 19px; line-height: 1.15; }
+.st .ds { color: var(--muted); font-size: 14px; }
+.st .stars { font-size: 18px; letter-spacing: 1px; color: var(--line); white-space: nowrap; }
+.st .stars b { color: var(--star); font-weight: 400; }
+.st .km { font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.sum { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; color: var(--muted); font-size: 15px; }
+.sum b { color: var(--ink); }
+
+/* quiz */
+.bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.bar .ttl { display: flex; gap: 10px; align-items: center; font-family: var(--display); font-weight: 800; font-size: 22px; flex: 1; min-width: 0; }
+.dots { display: flex; gap: 6px; }
+.dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); }
+.dots i.ok { background: var(--good); border-color: var(--good); }
+.dots i.half { background: var(--star); border-color: var(--star); }
+.dots i.no { background: var(--bad); border-color: var(--bad); }
+.dots i.now { border-color: var(--accent); }
+.pts { font-variant-numeric: tabular-nums; font-weight: 700; background: var(--soft); border-radius: 999px; padding: 4px 12px; font-size: 16px; }
+.timer { font-family: var(--display); font-weight: 800; font-size: 26px; font-variant-numeric: tabular-nums; min-width: 3ch; text-align: right; }
+.timer.low { color: var(--bad); }
+.tbar { height: 8px; border-radius: 99px; background: var(--soft); overflow: hidden; }
+.tbar i { display: block; height: 100%; background: var(--accent); transition: width .25s linear; }
+
+.card { background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.qtag { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+.qtext { font-size: 22px; line-height: 1.5; }
+.fig { display: flex; justify-content: center; }
+.fig svg { width: 100%; max-width: 300px; height: auto; color: var(--ink); }
+.fig .sh { fill: var(--soft); stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+.fig .ln { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.fig .dsh { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; }
+.fig .hid { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-dasharray: 4 4; opacity: .6; }
+.fig .arc { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+.fig .arc2 { fill: none; stroke: var(--t-red); stroke-width: 2.5; }
+.fig .lb { font-family: var(--math); font-style: italic; font-size: 17px; fill: currentColor; text-anchor: middle; dominant-baseline: middle; }
+.fig .lb.up { font-style: normal; font-size: 14px; fill: var(--muted); }
+
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.opt { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--surface); border: 2px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 20px; min-height: 64px; min-width: 0; }
+.opt:hover:not(:disabled) { border-color: var(--accent); background: var(--soft); }
+.opt .k { flex: none; width: 26px; height: 26px; border-radius: 6px; background: var(--soft); color: var(--muted); font-size: 14px; font-weight: 700; display: grid; place-items: center; }
+.opt.right { border-color: var(--good); background: var(--good-bg); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt:disabled { cursor: default; }
+.numrow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.numrow input { font: inherit; font-size: 24px; width: 9ch; padding: 10px 14px; border: 2px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--ink); font-variant-numeric: tabular-nums; }
+.numrow input:focus { border-color: var(--accent); outline: none; }
+.numrow .u { font-size: 20px; color: var(--muted); }
+.btn { border: none; background: var(--accent); color: var(--accent-ink); border-radius: 12px; padding: 12px 22px; font-weight: 700; font-size: 18px; }
+.btn:hover { filter: brightness(1.08); }
+.btn.sec { background: var(--soft); color: var(--ink); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.fb { border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.fb.good { background: var(--good-bg); }
+.fb.bad { background: var(--bad-bg); }
+.fb .h { font-weight: 700; font-size: 19px; }
+.fb.good .h { color: var(--good); }
+.fb.bad .h { color: var(--bad); }
+.wz { background: var(--surface); border: 1.5px dashed var(--line); border-radius: 10px; padding: 8px 12px; font-size: 20px; }
+.wz small { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-family: var(--body); font-weight: 700; }
+
+/* math typesetting */
+.m, .opt, .wz, .qtext .m, .ff { font-family: var(--math); }
+.m i, .opt i, .wz i, .ff i, .tile i, .rv i { font-style: italic; }
+.fr { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: .85em; margin: 0 .12em; line-height: 1.15; }
+.fr > span:first-child { border-bottom: 1.5px solid currentColor; padding: 0 .2em .05em; }
+.fr > span:last-child { padding: .05em .2em 0; }
+.rt { white-space: nowrap; display: inline-flex; align-items: baseline; }
+.rt .ri { font-size: .6em; margin-right: -.35em; transform: translateY(-.55em); }
+.rt .ra { border-top: 1.5px solid currentColor; padding: .05em .12em 0; margin-left: .02em; }
+sup { font-size: .65em; line-height: 0; }
+
+/* results */
+.big-stars { font-size: 54px; letter-spacing: 6px; color: var(--line); line-height: 1; }
+.big-stars b { color: var(--star); font-weight: 400; }
+.review { display: flex; flex-direction: column; gap: 10px; }
+.rv { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.rv .a { color: var(--good); font-weight: 700; }
+
+/* flashcards */
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 15px; display: inline-flex; gap: 6px; align-items: center; }
+.chip .mk { width: 14px; height: 14px; border-width: 1px; border-radius: 2px; }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--soft); font-weight: 700; }
+.flash { perspective: 1200px; }
+.flash .in { position: relative; min-height: 330px; transition: transform .5s; transform-style: preserve-3d; cursor: pointer; }
+.flash .in.flip { transform: rotateY(180deg); }
+.face { position: absolute; inset: 0; backface-visibility: hidden; background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
+.face.back { transform: rotateY(180deg); background: var(--soft); }
+.face .nm { font-family: var(--display); font-weight: 800; font-size: 28px; }
+.face .ff { font-size: 30px; }
+.face .tap { font-size: 14px; color: var(--muted); }
+.face .fig svg { max-width: 230px; }
+@media (prefers-reduced-motion: reduce) { .flash .in { transition: none; } .mode:hover { transform: none; } }
+
+/* pairs */
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.tile { min-height: 84px; background: var(--surface); border: 2px solid var(--line); border-radius: 12px; padding: 8px; font-size: 17px; display: grid; place-items: center; text-align: center; min-width: 0; overflow-wrap: anywhere; }
+.tile.f { font-family: var(--math); font-size: 20px; }
+.tile.sel { border-color: var(--accent); background: var(--soft); }
+.tile.done { border-color: var(--good); background: var(--good-bg); opacity: .55; cursor: default; }
+.tile.shake { animation: sh .35s; border-color: var(--bad); }
+@keyframes sh { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+@media (prefers-reduced-motion: reduce) { .tile.shake { animation: none; } }
+
+.foot { color: var(--muted); font-size: 13px; }
+
+@media (max-width: 640px) {
+  .modes { grid-template-columns: minmax(0, 1fr); }
+  .trail { grid-template-columns: minmax(0, 1fr); }
+  .trail::before { left: 26px; }
+  .opts { grid-template-columns: minmax(0, 1fr); }
+  .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .qtext { font-size: 20px; }
+  .bar .ttl { flex-basis: 100%; }
+  .card { padding: 16px; }
+}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><span class="mk" style="--c: var(--t-red)"><i></i><i></i><i></i></span>Szlak Wzorów</div>
+    <button class="ghost" id="homeBtn" hidden>← Mapa szlaku</button>
+  </div>
+
+  <!-- HOME -->
+  <section id="vHome" class="wrap" style="padding:0">
+    <div class="hero">
+      <span class="eyebrow">Egzamin ósmoklasisty · matematyka</span>
+      <h1>Przejdź szlak wzorów E8</h1>
+      <p>Dziesięć odcinków, jak na karcie wzorów: od jednostek po wyrażenia algebraiczne. Na każdym odcinku 8 zadań. Odpowiedź bez podpowiedzi daje 2 punkty, z podpowiedzią 1 punkt. Zbierz trzy gwiazdki na każdym odcinku.</p>
+    </div>
+    <div class="modes">
+      <button class="mode" id="mBlitz"><b>Błyskawica</b><span>90 sekund, zadania ze wszystkich działów.</span><span class="best" id="bestBlitz"></span></button>
+      <button class="mode" id="mCards"><b>Fiszki</b><span>Nazwa z przodu, wzór z tyłu. Ucz się przed grą.</span></button>
+      <button class="mode" id="mPairs"><b>Pary</b><span>Połącz nazwę z wzorem lub jednostką.</span><span class="best" id="bestPairs"></span></button>
+    </div>
+    <div class="sum" id="sum"></div>
+    <div class="trail" id="trail"></div>
+    <p class="foot">Wyniki zapisują się tylko w tej przeglądarce.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="vQuiz" hidden class="wrap" style="padding:0">
+    <div class="bar">
+      <div class="ttl" id="qTitle"></div>
+      <div class="dots" id="qDots"></div>
+      <span class="timer" id="qTimer" hidden></span>
+      <span class="pts" id="qPts"></span>
+    </div>
+    <div class="tbar" id="qTbar" hidden><i></i></div>
+    <div class="card" id="qCard"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="vRes" hidden class="wrap" style="padding:0"></section>
+
+  <!-- FLASHCARDS -->
+  <section id="vCards" hidden class="wrap" style="padding:0">
+    <h2>Fiszki</h2>
+    <div class="chips" id="cChips"></div>
+    <div class="row muted" id="cInfo"></div>
+    <div class="flash"><div class="in" id="cIn" tabindex="0" role="button" aria-label="Odwróć fiszkę">
+      <div class="face front" id="cFront"></div>
+      <div class="face back" id="cBack"></div>
+    </div></div>
+    <div class="row">
+      <button class="btn sec" id="cAgain">Jeszcze raz</button>
+      <button class="btn" id="cKnow">Umiem</button>
+    </div>
+  </section>
+
+  <!-- PAIRS -->
+  <section id="vPairs" hidden class="wrap" style="padding:0">
+    <h2>Pary</h2>
+    <div class="chips" id="pChips"></div>
+    <div class="row muted" id="pInfo"></div>
+    <div class="tiles" id="pTiles"></div>
+    <div class="row"><button class="btn" id="pNew">Nowa plansza</button></div>
+  </section>
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const uniq = a => [...new Set(a)];
+function fmt(n) {
+  n = Math.round(n * 1e6) / 1e6;
+  let [i, d] = String(Math.abs(n)).split('.');
+  if (i.length > 4) i = i.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return (n < 0 ? '−' : '') + i + (d ? ',' + d : '');
+}
+function parseNum(s) {
+  s = String(s).trim().replace(/[\s  ]/g, '').replace('−', '-').replace(',', '.');
+  if (/^-?\d+\/\d+$/.test(s)) { const [a, b] = s.split('/'); return Number(a) / Number(b); }
+  return s === '' ? NaN : Number(s);
+}
+// italicise latin/greek letters outside tags
+const M = s => '<span class="m">' + String(s).split(/(<[^>]+>)/).map(p => p.startsWith('<') ? p : p.replace(/[A-Za-zα-ω]/g, '<i>$&</i>')).join('') + '</span>';
+const fr = (a, b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const sq = x => `<span class="rt"><span class="rs">√</span><span class="ra">${x}</span></span>`;
+const cb = x => `<span class="rt"><sup class="ri">3</sup><span class="rs">√</span><span class="ra">${x}</span></span>`;
+const P = (b, e) => `${b}<sup>${e}</sup>`;
+const store = {
+  get() { try { return JSON.parse(localStorage.getItem('szlakWzorowE8')) || {}; } catch (e) { return {}; } },
+  set(v) { try { localStorage.setItem('szlakWzorowE8', JSON.stringify(v)); } catch (e) {} }
+};
+let SAVE = store.get(); SAVE.stars = SAVE.stars || {};
+
+/* ---------- figures ---------- */
+const L = (x, y, t, c = '') => `<text x="${x}" y="${y}" class="lb ${c}">${t}</text>`;
+const svg = (body, vb = '0 0 240 150') => `<svg viewBox="${vb}" role="img" aria-hidden="true">${body}</svg>`;
+const rad = d => d * Math.PI / 180;
+const pt = (cx, cy, r, d) => [cx + r * Math.cos(rad(d)), cy - r * Math.sin(rad(d))];
+function arc(cx, cy, r, a1, a2, cls = 'arc') {
+  if (a2 - a1 >= 359.9) return `<circle cx="${cx}" cy="${cy}" r="${r}" class="${cls}"/>`;
+  const [x1, y1] = pt(cx, cy, r, a1), [x2, y2] = pt(cx, cy, r, a2);
+  return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${a2 - a1 > 180 ? 1 : 0} 0 ${x2.toFixed(1)} ${y2.toFixed(1)}" class="${cls}"/>`;
+}
+const FIG = {
+  kwadrat: () => svg(`<rect x="70" y="18" width="100" height="100" class="sh"/><line x1="70" y1="118" x2="170" y2="18" class="dsh"/>${L(120, 136, 'a')}${L(182, 68, 'a')}${L(128, 60, 'd')}`),
+  prostokat: () => svg(`<rect x="45" y="28" width="150" height="85" class="sh"/>${L(120, 132, 'a')}${L(207, 71, 'b')}`),
+  trojkat: () => svg(`<polygon points="30,122 205,122 145,22" class="sh"/><line x1="145" y1="22" x2="145" y2="122" class="dsh"/><path d="M135 122V112H145" class="ln" style="stroke-width:1.5"/>${L(118, 140, 'a')}${L(153, 80, 'h')}${L(185, 66, 'b')}${L(78, 64, 'c')}`),
+  rownoboczny: () => svg(`<polygon points="50,135 190,135 120,14" class="sh"/><line x1="120" y1="14" x2="120" y2="135" class="dsh"/>${L(120, 147, 'a')}${L(73, 70, 'a')}${L(167, 70, 'a')}${L(128, 92, 'h')}`, '0 0 240 152'),
+  prostokatny: () => svg(`<polygon points="50,122 200,122 50,28" class="sh"/><path d="M50 110H62V122" class="ln" style="stroke-width:1.5"/>${L(125, 140, 'a')}${L(36, 76, 'b')}${L(134, 66, 'c')}`),
+  romb: () => svg(`<polygon points="120,8 185,75 120,142 55,75" class="sh"/><line x1="120" y1="8" x2="120" y2="142" class="dsh"/><line x1="55" y1="75" x2="185" y2="75" class="dsh"/>${L(128, 44, 'e')}${L(90, 66, 'f')}${L(163, 120, 'a')}`),
+  rownoleglobok: () => svg(`<polygon points="30,122 160,122 210,30 80,30" class="sh"/><line x1="80" y1="30" x2="80" y2="122" class="dsh"/>${L(95, 140, 'a')}${L(197, 82, 'b')}${L(88, 80, 'h')}`),
+  trapez: () => svg(`<polygon points="25,122 215,122 160,30 75,30" class="sh"/><line x1="75" y1="30" x2="75" y2="122" class="dsh"/>${L(120, 140, 'a')}${L(118, 20, 'b')}${L(197, 76, 'c')}${L(40, 76, 'd')}${L(84, 82, 'h')}`),
+  deltoid: () => svg(`<polygon points="120,8 172,52 120,142 68,52" class="sh"/><line x1="120" y1="8" x2="120" y2="142" class="dsh"/><line x1="68" y1="52" x2="172" y2="52" class="dsh"/>${L(155, 24, 'a')}${L(156, 104, 'b')}${L(128, 92, 'e')}${L(94, 44, 'f')}`),
+  szesciokat: () => svg(`<polygon points="182,75 151,21.3 89,21.3 58,75 89,128.7 151,128.7" class="sh"/><line x1="58" y1="75" x2="182" y2="75" class="dsh"/><line x1="89" y1="21.3" x2="89" y2="128.7" class="dsh"/>${L(120, 12, 'a')}${L(140, 66, 'D')}${L(98, 104, 'd')}`),
+  szescian: () => svg(`<polygon points="55,50 95,18 175,18 135,50" class="sh"/><polygon points="135,50 175,18 175,98 135,130" class="sh"/><rect x="55" y="50" width="80" height="80" class="sh"/><path d="M95 18V98M95 98L55 130M95 98H175" class="hid"/><line x1="55" y1="130" x2="175" y2="18" class="dsh"/>${L(95, 143, 'a')}${L(122, 82, 'd')}`),
+  prostopadloscian: () => svg(`<polygon points="40,62 85,27 210,27 165,62" class="sh"/><polygon points="165,62 210,27 210,97 165,132" class="sh"/><rect x="40" y="62" width="125" height="70" class="sh"/><path d="M85 27V97M85 97L40 132M85 97H210" class="hid"/><line x1="40" y1="132" x2="210" y2="27" class="dsh"/>${L(102, 146, 'a')}${L(197, 124, 'b')}${L(28, 97, 'c')}${L(128, 72, 'd')}`),
+  graniastoslup: () => svg(`<polygon points="45,40 145,40 110,18" class="sh"/><rect x="45" y="40" width="100" height="92" class="sh"/><path d="M145 40L110 18" class="ln"/><path d="M110 18V112M110 112L45 132M110 112L145 132" class="hid"/><line x1="165" y1="40" x2="165" y2="132" class="dsh"/>${L(177, 88, 'H')}${L(95, 88, 'ściana boczna', 'up')}`),
+  ostroslup: () => svg(`<polygon points="40,122 150,122 200,92 120,15" class="sh"/><path d="M40 122L120 15L150 122M150 122L120 15" class="ln"/><path d="M40 122L90 92H200M90 92L120 15" class="hid"/><line x1="120" y1="15" x2="120" y2="107" class="dsh"/>${L(128, 70, 'H')}${L(108, 138, 'podstawa', 'up')}`),
+  angle: d => svg(`<line x1="120" y1="80" x2="205" y2="80" class="ln"/>${(() => { const [x, y] = pt(120, 80, 85, d); return `<line x1="120" y1="80" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" class="ln"/>`; })()}${arc(120, 80, d >= 300 ? 22 : 26, 0, d)}<circle cx="120" cy="80" r="3" fill="currentColor"/>${(() => { const [x, y] = pt(120, 80, 42, d / 2); return d >= 359 ? L(150, 42, 'α') : L(x.toFixed(1), y.toFixed(1), 'α'); })()}`, '0 0 240 165'),
+  przylegle: a => { const [x, y] = pt(120, 110, 95, a); const [ax, ay] = pt(120, 110, 40, a / 2), [bx, by] = pt(120, 110, 40, (a + 180) / 2);
+    return svg(`<line x1="15" y1="110" x2="225" y2="110" class="ln"/><line x1="120" y1="110" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" class="ln"/>${arc(120, 110, 24, 0, a)}${arc(120, 110, 18, a, 180, 'arc2')}${L(ax.toFixed(1), ay.toFixed(1), 'α')}${L(bx.toFixed(1), by.toFixed(1), 'β')}`, '0 0 240 130'); },
+  wierzcholkowe: () => { const l = (d) => { const [x1, y1] = pt(120, 72, 100, d), [x2, y2] = pt(120, 72, 100, d + 180); return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="ln"/>`; };
+    const [ax, ay] = pt(120, 72, 38, 175), [bx, by] = pt(120, 72, 38, 355);
+    return svg(`${l(25)}${l(145)}${arc(120, 72, 22, 145, 205)}${arc(120, 72, 22, 325, 385, 'arc2')}${L(ax.toFixed(1), ay.toFixed(1), 'α')}${L(bx.toFixed(1), by.toFixed(1), 'β')}`); },
+  rownolegle: (wa, wb) => {
+    // k: y=48, l: y=118; transversal x(y) = 95 + (y-48)*4/7
+    const X = y => 95 + (y - 48) * 4 / 7, T = 119.7;
+    const W = { ur: [0, T], ul: [T, 180], ll: [180, 180 + T], lr: [180 + T, 360] };
+    const mark = (cx, cy, w, cls, t) => { const [a1, a2] = W[w], [x, y] = pt(cx, cy, 30, (a1 + a2) / 2); return arc(cx, cy, 16, a1, a2, cls) + L(x.toFixed(1), y.toFixed(1), t); };
+    return svg(`<line x1="10" y1="48" x2="230" y2="48" class="ln"/><line x1="10" y1="118" x2="230" y2="118" class="ln"/><line x1="${X(4).toFixed(1)}" y1="4" x2="${X(160).toFixed(1)}" y2="160" class="ln"/>${L(222, 36, 'k')}${L(222, 106, 'l')}${mark(95, 48, wa, 'arc', 'α')}${mark(135, 118, wb, 'arc2', 'β')}`, '0 0 240 165');
+  }
+};
+
+/* ---------- sections ---------- */
+const SEC = [
+  { id: 'jed', n: 'Jednostki', d: 'długość, pole, masa, objętość, czas', c: 'var(--t-red)' },
+  { id: 'fig', n: 'Figury', d: 'pola, obwody, Pitagoras, wielokąty', c: 'var(--t-blue)' },
+  { id: 'bry', n: 'Bryły', d: 'objętość, pole powierzchni, przekątne', c: 'var(--t-green)' },
+  { id: 'pot', n: 'Potęgi', d: 'działania na potęgach, kwadraty liczb', c: 'var(--t-yellow)' },
+  { id: 'pie', n: 'Pierwiastki', d: 'kwadratowe i sześcienne', c: 'var(--t-black)' },
+  { id: 'pre', n: 'Prędkość, droga, czas', d: 'v = s : t i zamiana jednostek', c: 'var(--t-red)' },
+  { id: 'sre', n: 'Średnia arytmetyczna', d: 'suma podzielona przez liczbę danych', c: 'var(--t-blue)' },
+  { id: 'kat', n: 'Kąty', d: 'rodzaje kątów, kąty przy prostych równoległych', c: 'var(--t-green)' },
+  { id: 'ska', n: 'Skala', d: 'mapa, plan, powiększenie', c: 'var(--t-yellow)' },
+  { id: 'wyr', n: 'Wyrażenia algebraiczne', d: 'o ile więcej, ile razy, procenty', c: 'var(--t-black)' },
+];
+const secById = Object.fromEntries(SEC.map(s => [s.id, s]));
+const marker = (c, cls = '') => `<span class="mk ${cls}" style="--c:${c}"><i></i><i></i><i></i></span>`;
+
+/* ---------- formula catalogue (flashcards + pairs) ---------- */
+const half = fr(1, 2);
+const CAT = [
+  ['jed', '1 km', '1000 m'], ['jed', '1 m', '100 cm'], ['jed', '1 dm', '10 cm'], ['jed', '1 cm', '10 mm'],
+  ['jed', '1 m²', '100 dm²'], ['jed', '1 cm²', '100 mm²'], ['jed', '1 a (ar)', '100 m²'], ['jed', '1 ha (hektar)', '100 a = 10 000 m²'], ['jed', '1 km²', '100 ha'],
+  ['jed', '1 kg', '100 dag'], ['jed', '1 dag', '10 g'], ['jed', '1 g', '1000 mg'], ['jed', '1 t', '1000 kg'],
+  ['jed', '1 litr', '1 dm³ = 1000 cm³'], ['jed', '1 ml', '1 cm³'], ['jed', '1 m³', '1000 l'], ['jed', '1 hektolitr', '100 l'],
+  ['jed', '1 godzina', '60 min = 3600 s'], ['jed', '1 kwadrans', '15 min'], ['jed', '1 doba', '24 h'], ['jed', '1 kwartał', '3 miesiące'], ['jed', '1 rok przestępny', '366 dni'],
+
+  ['fig', 'Pole kwadratu', M(`P = ${P('a', 2)} = ${fr(P('d', 2), 2)}`), 'kwadrat'], ['fig', 'Przekątna kwadratu', M(`d = a${sq(2)}`), 'kwadrat'], ['fig', 'Obwód kwadratu', M('Ob = 4a'), 'kwadrat'],
+  ['fig', 'Pole prostokąta', M('P = a · b'), 'prostokat'], ['fig', 'Obwód prostokąta', M('Ob = 2a + 2b'), 'prostokat'],
+  ['fig', 'Pole trójkąta', M(`P = ${half}a · h`), 'trojkat'], ['fig', 'Obwód trójkąta', M('Ob = a + b + c'), 'trojkat'],
+  ['fig', 'Wysokość trójkąta równobocznego', M(`h = ${fr(`a${sq(3)}`, 2)}`), 'rownoboczny'], ['fig', 'Pole trójkąta równobocznego', M(`P = ${fr(`${P('a', 2)}${sq(3)}`, 4)}`), 'rownoboczny'],
+  ['fig', 'Twierdzenie Pitagorasa', M(`${P('a', 2)} + ${P('b', 2)} = ${P('c', 2)}`), 'prostokatny'],
+  ['fig', 'Pole rombu', M(`P = a · h = ${half}e · f`), 'romb'], ['fig', 'Pole równoległoboku', M('P = a · h'), 'rownoleglobok'],
+  ['fig', 'Pole trapezu', M(`P = ${half}(a + b) · h`), 'trapez'], ['fig', 'Pole deltoidu', M(`P = ${half}e · f`), 'deltoid'],
+  ['fig', 'Pole sześciokąta foremnego', M(`P = 6 · ${fr(`${P('a', 2)}${sq(3)}`, 4)}`), 'szesciokat'], ['fig', 'Przekątne sześciokąta foremnego', M(`d = a${sq(3)}, D = 2a`), 'szesciokat'],
+  ['fig', 'Trójkąt 45°, 45°, 90°', M(`x, x, x${sq(2)}`)], ['fig', 'Trójkąt 30°, 60°, 90°', M(`x, x${sq(3)}, 2x`)],
+  ['fig', 'Liczba przekątnych n-kąta', M(`p = ${fr('n(n − 3)', 2)}`)], ['fig', 'Suma kątów n-kąta', M('s = (n − 2) · 180°')], ['fig', 'Kąt n-kąta foremnego', M(`α = ${fr('(n − 2) · 180°', 'n')}`)],
+
+  ['bry', 'Objętość sześcianu', M(`V = ${P('a', 3)}`), 'szescian'], ['bry', 'Pole powierzchni sześcianu', M(`P<sub>c</sub> = 6${P('a', 2)}`), 'szescian'], ['bry', 'Przekątna sześcianu', M(`d = a${sq(3)}`), 'szescian'],
+  ['bry', 'Objętość prostopadłościanu', M('V = a · b · c'), 'prostopadloscian'], ['bry', 'Pole powierzchni prostopadłościanu', M('P<sub>c</sub> = 2(ab + bc + ac)'), 'prostopadloscian'], ['bry', 'Przekątna prostopadłościanu', M(`d = ${sq(`${P('a', 2)} + ${P('b', 2)} + ${P('c', 2)}`)}`), 'prostopadloscian'],
+  ['bry', 'Objętość graniastosłupa', M('V = P<sub>p</sub> · H'), 'graniastoslup'], ['bry', 'Pole powierzchni graniastosłupa', M('P<sub>c</sub> = 2P<sub>p</sub> + P<sub>b</sub>'), 'graniastoslup'], ['bry', 'Pole boczne graniastosłupa', M('P<sub>b</sub> = Ob<sub>p</sub> · H'), 'graniastoslup'],
+  ['bry', 'Objętość ostrosłupa', M(`V = ${fr(1, 3)}P<sub>p</sub> · H`), 'ostroslup'], ['bry', 'Pole powierzchni ostrosłupa', M('P<sub>c</sub> = P<sub>p</sub> + P<sub>b</sub>'), 'ostroslup'],
+
+  ['pot', 'Mnożenie potęg o tej samej podstawie', M(`${P('a', 'n')} · ${P('a', 'm')} = ${P('a', 'n + m')}`)], ['pot', 'Dzielenie potęg o tej samej podstawie', M(`${P('a', 'n')} : ${P('a', 'm')} = ${P('a', 'n − m')}`)],
+  ['pot', 'Potęga potęgi', M(`(${P('a', 'n')})<sup>m</sup> = ${P('a', 'n · m')}`)], ['pot', 'Iloczyn potęg o tym samym wykładniku', M(`${P('a', 'n')} · ${P('b', 'n')} = (a · b)<sup>n</sup>`)],
+  ['pot', 'Iloraz potęg o tym samym wykładniku', M(`${P('a', 'n')} : ${P('b', 'n')} = (a : b)<sup>n</sup>`)], ['pot', 'Potęga o wykładniku 0', M(`${P('a', 0)} = 1, a ≠ 0`)],
+  ['pot', 'Potęga o wykładniku 1', M(`${P('a', 1)} = a`)], ['pot', 'Potęga o wykładniku −1', M(`${P('a', '−1')} = ${fr(1, 'a')}, a ≠ 0`)],
+
+  ['pie', 'Iloczyn pierwiastków', M(`${sq('a')} · ${sq('b')} = ${sq('a · b')}`)], ['pie', 'Iloraz pierwiastków', M(`${sq('a')} : ${sq('b')} = ${sq('a : b')}`)],
+  ['pie', 'Pierwiastek z kwadratu', M(`${sq(P('a', 2))} = a, a ≥ 0`)], ['pie', 'Kwadrat pierwiastka', M(`(${sq('a')})<sup>2</sup> = a`)],
+  ['pie', 'Pierwiastek sześcienny z sześcianu', M(`${cb(P('a', 3))} = a`)], ['pie', 'Iloczyn pierwiastków sześciennych', M(`${cb('a')} · ${cb('b')} = ${cb('a · b')}`)],
+  ['pie', 'Pierwiastek z 0 i z 1', M(`${sq(0)} = 0, ${sq(1)} = 1`)],
+
+  ['pre', 'Prędkość', M(`v = ${fr('s', 't')}`)], ['pre', 'Droga', M('s = v · t')], ['pre', 'Czas', M(`t = ${fr('s', 'v')}`)],
+  ['pre', '1 m/s w km/h', '3,6 km/h'], ['pre', '36 km/h w m/s', '10 m/s'],
+
+  ['sre', 'Średnia arytmetyczna', M(`s = ${fr(`a<sub>1</sub> + a<sub>2</sub> + … + a<sub>n</sub>`, 'n')}`)], ['sre', 'Suma liczb, gdy znasz średnią', '<span class="m">suma = <i>s</i> · <i>n</i></span>'],
+
+  ['kat', 'Kąt prosty', M('α = 90°')], ['kat', 'Kąt ostry', M('0° < α < 90°')], ['kat', 'Kąt rozwarty', M('90° < α < 180°')], ['kat', 'Kąt półpełny', M('α = 180°')],
+  ['kat', 'Kąt pełny', M('α = 360°')], ['kat', 'Kąt zerowy', M('α = 0°')], ['kat', 'Kąt wklęsły', M('180° < α < 360°')],
+  ['kat', 'Kąty przyległe', M('α + β = 180°'), 'przylegle'], ['kat', 'Kąty wierzchołkowe', M('α = β'), 'wierzcholkowe'],
+  ['kat', 'Kąty odpowiadające (k ∥ l)', 'są równe', 'odp'], ['kat', 'Kąty naprzemianległe (k ∥ l)', 'są równe', 'nap'],
+
+  ['ska', 'Skala 1 : 1', 'rzeczywista wielkość'], ['ska', 'Skala 4 : 1', 'powiększenie 4 razy'], ['ska', 'Skala 1 : 4', 'pomniejszenie 4 razy'], ['ska', 'Skala 1 : 3000', '1 cm na mapie = 30 m w terenie'],
+
+  ['wyr', 'Liczba o 5 większa od x', M('x + 5')], ['wyr', 'Liczba o 5 mniejsza od x', M('x − 5')], ['wyr', 'Liczba 5 razy większa od x', M('5x')],
+  ['wyr', 'Liczba 5 razy mniejsza od x', M(`${fr('x', 5)}`)], ['wyr', 'Liczba o 5% większa od x', M('1,05x')], ['wyr', 'Liczba o 5% mniejsza od x', M('0,95x')],
+].map(([s, n, f, fig]) => ({ s, n, f, fig }));
+const figOf = k => k === 'odp' ? FIG.rownolegle('ur', 'ur') : k === 'nap' ? FIG.rownolegle('lr', 'ul') : k === 'przylegle' ? FIG.przylegle(60) : k ? FIG[k]() : '';
+const hintOf = name => { const c = CAT.find(x => x.n === name); return c ? c.f : ''; };
+
+/* ---------- question generators ---------- */
+const mc = (q, ok, bad, hint, fig) => ({ t: 'mc', q, ok, opts: shuffle(uniq([ok, ...bad]).slice(0, 4)), hint, fig });
+const num = (q, a, unit, hint, fig) => ({ t: 'num', q, a, unit, hint, fig });
+const B = s => `<b>${s}</b>`;
+
+const CONV = [['m', 'cm', 100], ['km', 'm', 1000], ['dm', 'cm', 10], ['cm', 'mm', 10], ['m', 'dm', 10], ['m²', 'dm²', 100], ['dm²', 'cm²', 100], ['cm²', 'mm²', 100], ['m²', 'cm²', 10000], ['ha', 'm²', 10000], ['ha', 'a', 100], ['a', 'm²', 100], ['km²', 'ha', 100], ['kg', 'dag', 100], ['kg', 'g', 1000], ['t', 'kg', 1000], ['dag', 'g', 10], ['g', 'mg', 1000], ['l', 'ml', 1000], ['l', 'cm³', 1000], ['m³', 'l', 1000], ['m³', 'dm³', 1000], ['hl', 'l', 100], ['h', 'min', 60], ['min', 's', 60], ['h', 's', 3600]];
+const TRIPLES = [[3, 4, 5], [6, 8, 10], [5, 12, 13], [8, 15, 17], [9, 12, 15], [12, 16, 20], [7, 24, 25]];
+const AREA_F = [
+  ['kwadratu', M(`P = ${P('a', 2)}`), 'kwadrat'], ['prostokąta', M('P = a · b'), 'prostokat'], ['trójkąta', M(`P = ${half}a · h`), 'trojkat'],
+  ['równoległoboku', M('P = a · h'), 'rownoleglobok'], ['trapezu', M(`P = ${half}(a + b) · h`), 'trapez'], ['deltoidu', M(`P = ${half}e · f`), 'deltoid'],
+  ['trójkąta równobocznego', M(`P = ${fr(`${P('a', 2)}${sq(3)}`, 4)}`), 'rownoboczny'],
+];
+const ANG = ['ostry', 'prosty', 'rozwarty', 'półpełny', 'wklęsły', 'pełny', 'zerowy'];
+
+const G = {
+  jed: [
+    () => { const c = pick(CONV), k = pick([2, 3, 4, 5, 6, 8, 12, 0.5, 1.5, 2.5]); return num(`Zamień: ${B(`${fmt(k)} ${c[0]}`)} = ? ${c[1]}`, k * c[2], c[1], `1 ${c[0]} = ${fmt(c[2])} ${c[1]}`); },
+    () => { const c = pick(CONV), k = pick([2, 3, 4, 5, 7, 0.5, 1.5, 2.5]); return num(`Zamień: ${B(`${fmt(k * c[2])} ${c[1]}`)} = ? ${c[0]}`, k, c[0], `1 ${c[0]} = ${fmt(c[2])} ${c[1]}`); },
+    () => { const c = pick(CONV), k = pick([3, 4, 6, 1.5, 2.5]); return num(`Zamień: ${B(`${fmt(k)} ${c[0]}`)} = ? ${c[1]}`, k * c[2], c[1], `1 ${c[0]} = ${fmt(c[2])} ${c[1]}`); },
+    () => { const f = pick([
+        ['1 ha to:', '10 000 m²', ['1000 m²', '100 m²', '100 000 m²'], '1 ha = 100 a = 10 000 m²'],
+        ['1 litr to:', '1 dm³', ['1 cm³', '1 m³', '10 dm³'], '1 l = 1 dm³ = 1000 cm³'],
+        ['1 ml to:', '1 cm³', ['1 dm³', '10 cm³', '1 mm³'], '1 ml = 1 cm³'],
+        ['1 m² to:', '100 dm²', ['10 dm²', '1000 dm²', '10 000 dm²'], '1 m² = 100 dm²'],
+        ['1 m³ to:', '1000 l', ['100 l', '10 l', '10 000 l'], '1 m³ = 1000 l'],
+        ['1 km² to:', '100 ha', ['10 ha', '1000 ha', '10 000 ha'], '1 km² = 100 ha'],
+        ['1 kg to:', '100 dag', ['10 dag', '1000 dag', '100 g'], '1 kg = 100 dag = 1000 g'],
+        ['1 ar to:', '100 m²', ['10 m²', '1000 m²', '10 000 m²'], '1 a = 100 m²'],
+      ]); return mc(f[0], f[1], f[2], f[3]); },
+    () => { const f = pick([[2, '2 kwadranse'], [3, '3 kwadranse'], [5, '5 kwadransów'], [6, '6 kwadransów']]); return num(`Ile minut to ${B(f[1])}?`, f[0] * 15, 'min', '1 kwadrans = 15 min'); },
+    () => { const f = pick([[2, '2 doby'], [3, '3 doby'], [5, '5 dób'], [7, '7 dób']]); return num(`Ile godzin to ${B(f[1])}?`, f[0] * 24, 'h', '1 doba = 24 h'); },
+    () => { const f = pick([[2, '2 kwartały'], [3, '3 kwartały'], [4, '4 kwartały']]); return num(`Ile miesięcy to ${B(f[1])}?`, f[0] * 3, 'mies.', '1 kwartał = 3 miesiące'); },
+    () => { const f = pick([['Ile dni ma <b>rok przestępny</b>?', 366, 'dni', 'rok przestępny = 366 dni'], ['Ile dni ma <b>zwykły rok</b>?', 365, 'dni', 'rok = 365 dni'], ['Ile kwartałów ma <b>rok</b>?', 4, '', 'rok = 4 kwartały'], ['Ile kwadransów ma <b>godzina</b>?', 4, '', '1 h = 4 kwadranse'], ['Ile sekund ma <b>godzina</b>?', 3600, 's', '1 h = 60 min = 3600 s']]); return num(f[0], f[1], f[2], f[3]); },
+  ],
+  fig: [
+    () => { const a = rnd(3, 12); return num(`Kwadrat ma bok ${B(a + ' cm')}. Oblicz jego pole.`, a * a, 'cm²', hintOf('Pole kwadratu'), FIG.kwadrat()); },
+    () => { const a = rnd(3, 15), b = rnd(2, 9); return num(`Prostokąt ma boki ${B(a + ' cm')} i ${B(b + ' cm')}. Oblicz jego obwód.`, 2 * a + 2 * b, 'cm', hintOf('Obwód prostokąta'), FIG.prostokat()); },
+    () => { const a = 2 * rnd(2, 9), h = rnd(3, 11); return num(`Trójkąt ma podstawę ${B(`a = ${a} cm`)} i wysokość ${B(`h = ${h} cm`)}. Oblicz pole.`, a * h / 2, 'cm²', hintOf('Pole trójkąta'), FIG.trojkat()); },
+    () => { const e = 2 * rnd(2, 8), f = rnd(3, 12); return num(`Przekątne rombu mają długości ${B(`e = ${e} cm`)} i ${B(`f = ${f} cm`)}. Oblicz pole.`, e * f / 2, 'cm²', hintOf('Pole rombu'), FIG.romb()); },
+    () => { const a = rnd(6, 14), b = rnd(2, a - 2); let h = rnd(2, 9); if ((a + b) * h % 2) h++; return num(`Trapez: podstawy ${B(`a = ${a} cm`)}, ${B(`b = ${b} cm`)}, wysokość ${B(`h = ${h} cm`)}. Oblicz pole.`, (a + b) * h / 2, 'cm²', hintOf('Pole trapezu'), FIG.trapez()); },
+    () => { const a = rnd(4, 15), h = rnd(2, 9); return num(`Równoległobok: bok ${B(`a = ${a} cm`)}, wysokość ${B(`h = ${h} cm`)}. Oblicz pole.`, a * h, 'cm²', hintOf('Pole równoległoboku'), FIG.rownoleglobok()); },
+    () => { const k = pick([1, 1, 2]), [a, b, c] = pick(TRIPLES).map(x => x * k); return Math.random() < .5
+        ? num(`Przyprostokątne mają ${B(`a = ${a}`)} i ${B(`b = ${b}`)}. Oblicz przeciwprostokątną ${M('c')}.`, c, '', hintOf('Twierdzenie Pitagorasa'), FIG.prostokatny())
+        : num(`Przeciwprostokątna ${B(`c = ${c}`)}, przyprostokątna ${B(`a = ${a}`)}. Oblicz ${M('b')}.`, b, '', hintOf('Twierdzenie Pitagorasa'), FIG.prostokatny()); },
+    () => { const [k, ok, f] = pick(AREA_F); return mc(`Który wzór to pole ${B(k)}?`, ok, shuffle(AREA_F.filter(x => x[0] !== k).map(x => x[1])), ok, FIG[f]()); },
+    () => mc(`Wysokość trójkąta równobocznego o boku ${M('a')} to:`, M(`h = ${fr(`a${sq(3)}`, 2)}`), [M(`h = a${sq(3)}`), M(`h = ${fr(`a${sq(2)}`, 2)}`), M(`h = ${fr(`${P('a', 2)}${sq(3)}`, 4)}`)], hintOf('Wysokość trójkąta równobocznego'), FIG.rownoboczny()),
+    () => { const a = rnd(2, 9); return mc(`Kwadrat ma bok ${B(a)}. Jego przekątna to:`, M(`${a}${sq(2)}`), [M(`${a}${sq(3)}`), M(`${2 * a}`), M(`${a * a}`)], hintOf('Przekątna kwadratu'), FIG.kwadrat()); },
+    () => { const n = pick([5, 6, 7, 8, 10, 12]); return num(`Ile przekątnych ma ${B(n + '-kąt')} wypukły?`, n * (n - 3) / 2, '', hintOf('Liczba przekątnych n-kąta')); },
+    () => { const n = pick([4, 5, 6, 7, 8, 10]); return num(`Jaka jest suma kątów wewnętrznych ${B(n + '-kąta')} wypukłego?`, (n - 2) * 180, '°', hintOf('Suma kątów n-kąta')); },
+    () => { const n = pick([3, 4, 5, 6, 8, 10, 12]); return num(`Ile stopni ma kąt wewnętrzny ${B(n + '-kąta foremnego')}?`, (n - 2) * 180 / n, '°', hintOf('Kąt n-kąta foremnego')); },
+    () => { const x = rnd(2, 12); return num(`Trójkąt o kątach 30°, 60°, 90°. Krótsza przyprostokątna ma ${B(x + ' cm')}. Ile ma przeciwprostokątna?`, 2 * x, 'cm', hintOf('Trójkąt 30°, 60°, 90°')); },
+    () => { const a = rnd(2, 15); return num(`Sześciokąt foremny ma bok ${B(a + ' cm')}. Ile ma jego najdłuższa przekątna ${M('D')}?`, 2 * a, 'cm', hintOf('Przekątne sześciokąta foremnego'), FIG.szesciokat()); },
+  ],
+  bry: [
+    () => { const a = rnd(2, 6); return num(`Sześcian ma krawędź ${B(a + ' cm')}. Oblicz objętość.`, a ** 3, 'cm³', hintOf('Objętość sześcianu'), FIG.szescian()); },
+    () => { const a = rnd(2, 8); return num(`Sześcian ma krawędź ${B(a + ' cm')}. Oblicz pole powierzchni całkowitej.`, 6 * a * a, 'cm²', hintOf('Pole powierzchni sześcianu'), FIG.szescian()); },
+    () => { const a = rnd(2, 6), b = rnd(2, 6), c = rnd(2, 10); return num(`Prostopadłościan ma wymiary ${B(`${a} cm × ${b} cm × ${c} cm`)}. Oblicz objętość.`, a * b * c, 'cm³', hintOf('Objętość prostopadłościanu'), FIG.prostopadloscian()); },
+    () => { const a = rnd(2, 6), b = rnd(2, 6), c = rnd(2, 8); return num(`Prostopadłościan ma wymiary ${B(`${a} cm × ${b} cm × ${c} cm`)}. Oblicz pole powierzchni całkowitej.`, 2 * (a * b + b * c + a * c), 'cm²', hintOf('Pole powierzchni prostopadłościanu'), FIG.prostopadloscian()); },
+    () => { const [a, b, c, d] = pick([[1, 2, 2, 3], [2, 3, 6, 7], [2, 4, 4, 6], [1, 4, 8, 9], [4, 4, 7, 9], [2, 6, 9, 11]]); return num(`Prostopadłościan ma wymiary ${B(`${a} × ${b} × ${c}`)}. Oblicz długość jego przekątnej.`, d, '', hintOf('Przekątna prostopadłościanu'), FIG.prostopadloscian()); },
+    () => { const pp = rnd(4, 20), h = rnd(3, 12); return num(`Graniastosłup: pole podstawy ${B(`P<sub>p</sub> = ${pp} cm²`)}, wysokość ${B(`H = ${h} cm`)}. Oblicz objętość.`, pp * h, 'cm³', hintOf('Objętość graniastosłupa'), FIG.graniastoslup()); },
+    () => { const pp = 3 * rnd(2, 8), h = rnd(2, 10); return num(`Ostrosłup: pole podstawy ${B(`P<sub>p</sub> = ${pp} cm²`)}, wysokość ${B(`H = ${h} cm`)}. Oblicz objętość.`, pp * h / 3, 'cm³', hintOf('Objętość ostrosłupa'), FIG.ostroslup()); },
+    () => mc('Objętość ostrosłupa to:', M(`V = ${fr(1, 3)}P<sub>p</sub> · H`), [M('V = P<sub>p</sub> · H'), M(`V = ${half}P<sub>p</sub> · H`), M('V = 3P<sub>p</sub> · H')], hintOf('Objętość ostrosłupa'), FIG.ostroslup()),
+    () => mc('Przekątna sześcianu o krawędzi <i>a</i> to:', M(`d = a${sq(3)}`), [M(`d = a${sq(2)}`), M('d = 3a'), M(`d = ${fr(`a${sq(3)}`, 2)}`)], hintOf('Przekątna sześcianu'), FIG.szescian()),
+    () => { const pp = rnd(4, 15), pb = rnd(20, 60); return num(`Graniastosłup: ${B(`P<sub>p</sub> = ${pp} cm²`)}, pole boczne ${B(`P<sub>b</sub> = ${pb} cm²`)}. Oblicz pole powierzchni całkowitej.`, 2 * pp + pb, 'cm²', hintOf('Pole powierzchni graniastosłupa'), FIG.graniastoslup()); },
+    () => { const pp = rnd(9, 36), pb = rnd(20, 80); return num(`Ostrosłup: ${B(`P<sub>p</sub> = ${pp} cm²`)}, ${B(`P<sub>b</sub> = ${pb} cm²`)}. Oblicz pole powierzchni całkowitej.`, pp + pb, 'cm²', hintOf('Pole powierzchni ostrosłupa'), FIG.ostroslup()); },
+    () => { const o = rnd(9, 24), h = rnd(3, 10); return num(`Graniastosłup prosty: obwód podstawy ${B(`${o} cm`)}, wysokość ${B(`H = ${h} cm`)}. Oblicz pole powierzchni bocznej.`, o * h, 'cm²', hintOf('Pole boczne graniastosłupa'), FIG.graniastoslup()); },
+    () => mc('Pole powierzchni całkowitej prostopadłościanu to:', M('P<sub>c</sub> = 2(ab + bc + ac)'), [M('P<sub>c</sub> = abc'), M('P<sub>c</sub> = 2ab + bc + ac'), M('P<sub>c</sub> = 6(a + b + c)')], hintOf('Pole powierzchni prostopadłościanu'), FIG.prostopadloscian()),
+  ],
+  pot: [
+    () => { const b = pick([2, 3, 5, 7, 'a']), n = rnd(3, 7), m = rnd(2, 6); return mc(`Zapisz w postaci jednej potęgi: ${M(`${P(b, n)} · ${P(b, m)}`)}`, M(P(b, n + m)), [M(P(b, n * m)), M(P(b, n + m + 1)), M(P(typeof b === 'number' ? b * b : '2a', n + m))], hintOf('Mnożenie potęg o tej samej podstawie')); },
+    () => { const b = pick([2, 3, 5, 7, 'a']), m = rnd(2, 5), n = m + rnd(2, 6); return mc(`Zapisz w postaci jednej potęgi: ${M(`${P(b, n)} : ${P(b, m)}`)}`, M(P(b, n - m)), [M(P(b, n + m)), M(P(1, n - m)), M(P(b, n / m === Math.floor(n / m) ? n / m + 10 : n * m))], hintOf('Dzielenie potęg o tej samej podstawie')); },
+    () => { const b = pick([2, 3, 4, 5, 'a']), n = rnd(2, 6), m = rnd(2, 5); return mc(`Zapisz w postaci jednej potęgi: ${M(`(${P(b, n)})<sup>${m}</sup>`)}`, M(P(b, n * m)), [M(P(b, n + m)), M(P(b, n * m + 1)), M(P(b, Math.abs(n - m) + 1 === n * m ? 99 : Math.abs(n - m) + 1))], hintOf('Potęga potęgi')); },
+    () => { const [a, b] = pick([[3, 4], [2, 5], [2, 3], [4, 5], [3, 5]]), n = rnd(3, 6); return mc(`Zapisz w postaci jednej potęgi: ${M(`${P(a, n)} · ${P(b, n)}`)}`, M(P(a * b, n)), [M(P(a + b, n)), M(P(a * b, 2 * n)), M(P(a * b, n * n))], hintOf('Iloczyn potęg o tym samym wykładniku')); },
+    () => { const [a, b] = pick([[15, 5], [12, 4], [20, 4], [18, 6], [14, 2]]), n = rnd(2, 5); return mc(`Zapisz w postaci jednej potęgi: ${M(`${P(a, n)} : ${P(b, n)}`)}`, M(P(a / b, n)), [M(P(a - b, n)), M(P(a / b, 0)), M(P(a / b, n * n))], hintOf('Iloraz potęg o tym samym wykładniku')); },
+    () => { const k = rnd(2, 22); return num(`Oblicz: ${M(P(k, 2))}`, k * k, '', 'Kwadraty liczb od 1 do 22 warto znać na pamięć.'); },
+    () => { const k = rnd(11, 22); return num(`Oblicz: ${M(P(k, 2))}`, k * k, '', 'Kwadraty liczb od 11 do 22 są na karcie wzorów.'); },
+    () => { const b = pick([7, 17, 123, 2026, '(−5)']); return num(`Oblicz: ${M(P(b, 0))}`, 1, '', hintOf('Potęga o wykładniku 0')); },
+    () => { const [p, q] = pick([[3, 5], [2, 7], [4, 9], [1, 6], [5, 8]]); return Math.random() < .5
+        ? mc(`Oblicz: ${M(`(${fr(p, q)})<sup>−1</sup>`)}`, M(fr(q, p)), [M(fr(p, q)), M(`−${fr(p, q)}`), M(`−${fr(q, p)}`)], hintOf('Potęga o wykładniku −1'))
+        : mc(`Oblicz: ${M(P(q, '−1'))}`, M(fr(1, q)), [M(`−${q}`), M(`−${fr(1, q)}`), M(String(q))], hintOf('Potęga o wykładniku −1')); },
+  ],
+  pie: [
+    () => { const k = rnd(2, 22); return num(`Oblicz: ${M(sq(k * k))}`, k, '', 'Pierwiastki z kwadratów liczb 1–22 warto znać na pamięć.'); },
+    () => { const k = pick([1, 2, 3, 4, 5, 10]); return num(`Oblicz: ${M(cb(k ** 3))}`, k, '', `${M(cb(P('a', 3)))} = a,  np. ${M(cb(8))} = 2, bo ${M(P(2, 3))} = 8`); },
+    () => { const [a, b, r] = pick([[2, 8, 4], [3, 12, 6], [50, 2, 10], [5, 20, 10], [2, 18, 6], [3, 27, 9], [2, 32, 8]]); return num(`Oblicz: ${M(`${sq(a)} · ${sq(b)}`)}`, r, '', hintOf('Iloczyn pierwiastków')); },
+    () => { const [a, b, r] = pick([[72, 2, 6], [50, 2, 5], [27, 3, 3], [98, 2, 7], [48, 3, 4], [125, 5, 5]]); return num(`Oblicz: ${M(`${fr(sq(a), sq(b))}`)}`, r, '', hintOf('Iloraz pierwiastków')); },
+    () => { const [a, b, r] = pick([[2, 4, 2], [4, 16, 4], [3, 9, 3], [25, 5, 5], [2, 32, 4]]); return num(`Oblicz: ${M(`${cb(a)} · ${cb(b)}`)}`, r, '', hintOf('Iloczyn pierwiastków sześciennych')); },
+    () => { const [a, b, r] = pick([[16, 2, 2], [54, 2, 3], [250, 2, 5], [81, 3, 3], [128, 2, 4]]); return num(`Oblicz: ${M(fr(cb(a), cb(b)))}`, r, '', M(`${cb('a')} : ${cb('b')} = ${cb('a : b')}`)); },
+    () => { const k = pick([3, 5, 7, 11, 13]); return num(`Oblicz: ${M(`(${sq(k)})<sup>2</sup>`)}`, k, '', hintOf('Kwadrat pierwiastka')); },
+    () => { const k = pick([3, 5, 7, 9, 15]); return num(`Oblicz: ${M(sq(P(k, 2)))}`, k, '', hintOf('Pierwiastek z kwadratu')); },
+    () => mc('Który wzór jest prawdziwy dla <i>a</i>, <i>b</i> ≥ 0?', M(`${sq('a')} · ${sq('b')} = ${sq('a · b')}`), [M(`${sq('a')} + ${sq('b')} = ${sq('a + b')}`), M(`${sq('a')} · ${sq('b')} = a · b`), M(`${sq('a')} · ${sq('b')} = ${sq('a + b')}`)], hintOf('Iloczyn pierwiastków')),
+    () => { const k = pick([0, 1]); return num(`Oblicz: ${M(sq(k))}`, k, '', hintOf('Pierwiastek z 0 i z 1')); },
+  ],
+  pre: [
+    () => { const t = rnd(2, 5), v = 10 * rnd(3, 9); return num(`Samochód przejechał ${B(v * t + ' km')} w ${B(t + ' h')}. Z jaką średnią prędkością jechał?`, v, 'km/h', hintOf('Prędkość')); },
+    () => { const t = rnd(2, 6), v = 5 * rnd(4, 18); return num(`Pociąg jedzie z prędkością ${B(v + ' km/h')} przez ${B(t + ' h')}. Jaką drogę pokona?`, v * t, 'km', hintOf('Droga')); },
+    () => { const t = rnd(2, 6), v = 10 * rnd(4, 9); return num(`Autobus ma do przejechania ${B(v * t + ' km')} z prędkością ${B(v + ' km/h')}. Ile godzin będzie jechał?`, t, 'h', hintOf('Czas')); },
+    () => { const k = pick([5, 10, 15, 20, 25, 30]); return num(`Zamień: ${B(k + ' m/s')} = ? km/h`, k * 3.6, 'km/h', '1 m/s = 3,6 km/h  (mnóż przez 3,6)'); },
+    () => { const k = pick([18, 36, 54, 72, 90, 108]); return num(`Zamień: ${B(k + ' km/h')} = ? m/s`, k / 3.6, 'm/s', `36 km/h = 10 m/s  (dziel przez 3,6)`); },
+    () => { const f = pick([['t', M(`t = ${fr('s', 'v')}`), [M('t = s · v'), M(`t = ${fr('v', 's')}`), M('t = s − v')]], ['v', M(`v = ${fr('s', 't')}`), [M('v = s · t'), M(`v = ${fr('t', 's')}`), M('v = s + t')]], ['s', M('s = v · t'), [M(`s = ${fr('v', 't')}`), M(`s = ${fr('t', 'v')}`), M('s = v + t')]]]);
+      return mc(`Który wzór pozwala obliczyć ${f[0] === 't' ? 'czas' : f[0] === 'v' ? 'prędkość' : 'drogę'}?`, f[1], f[2], f[1]); },
+    () => { const v = pick([60, 90, 120]), m = pick([20, 30, 40]); return num(`Samochód jedzie ${B(v + ' km/h')}. Ile kilometrów przejedzie w ${B(m + ' minut')}?`, v * m / 60, 'km', `${hintOf('Droga')}, a ${m} min = ${fr(m, 60)} h`); },
+    () => { const v = pick([4, 5, 6]), s = v * pick([1, 2, 3]) / 2; return num(`Ola idzie z prędkością ${B(v + ' km/h')}. Ile minut zajmie jej przejście ${B(fmt(s) + ' km')}?`, s / v * 60, 'min', `${hintOf('Czas')}, potem zamień godziny na minuty (1 h = 60 min).`); },
+  ],
+  sre: [
+    () => { const n = rnd(4, 6), s = rnd(3, 9); let a = Array.from({ length: n - 1 }, () => rnd(1, 12)); const last = s * n - a.reduce((x, y) => x + y, 0); if (last < 0 || last > 20) return G.sre[0](); a = shuffle([...a, last]); return num(`Oblicz średnią arytmetyczną liczb: ${B(a.join(', '))}`, s, '', hintOf('Średnia arytmetyczna')); },
+    () => { const n = rnd(3, 8), s = rnd(4, 15); return num(`Średnia arytmetyczna ${B(n)} liczb wynosi ${B(s)}. Ile wynosi suma tych liczb?`, s * n, '', 'suma = średnia · liczba danych'); },
+    () => { const a = rnd(2, 9), b = rnd(2, 9), s = rnd(Math.ceil((a + b) / 3) + 1, 10); return num(`Średnia liczb ${B(`${a}, ${b}`)} i ${M('x')} wynosi ${B(s)}. Oblicz ${M('x')}.`, 3 * s - a - b, '', `suma = ${s} · 3 = ${3 * s}, więc x = ${3 * s} − ${a} − ${b}`); },
+    () => { const g = shuffle(pick([[5, 4, 3, 4], [6, 5, 4, 5], [3, 4, 5, 4, 4], [5, 5, 4, 2], [6, 4, 5, 3], [2, 3, 4, 5, 6]])); return num(`Oceny Kuby z matematyki: ${B(g.join(', '))}. Oblicz średnią.`, g.reduce((x, y) => x + y, 0) / g.length, '', hintOf('Średnia arytmetyczna')); },
+    () => mc('Średnia arytmetyczna liczb <i>a</i><sub>1</sub>, …, <i>a</i><sub>n</sub> to:', hintOf('Średnia arytmetyczna'), [M('s = a<sub>1</sub> + a<sub>2</sub> + … + a<sub>n</sub>'), M(`s = ${fr('a<sub>1</sub> + a<sub>2</sub> + … + a<sub>n</sub>', 2)}`), M(`s = ${fr('n', 'a<sub>1</sub> + a<sub>2</sub> + … + a<sub>n</sub>')}`)], hintOf('Średnia arytmetyczna')),
+    () => { const n = pick([4, 5, 9]), s = rnd(4, 9), add = s + (n + 1) * rnd(1, 2); return num(`Średnia ${B(n)} liczb wynosi ${B(s)}. Dopisano liczbę ${B(add)}. Jaka jest nowa średnia?`, (s * n + add) / (n + 1), '', `nowa suma = ${s} · ${n} + ${add}, dzielimy przez ${n + 1}`); },
+  ],
+  kat: [
+    () => { const t = pick(['ostry', 'prosty', 'rozwarty', 'półpełny', 'wklęsły']); const d = { ostry: 5 * rnd(4, 15), prosty: 90, rozwarty: 5 * rnd(21, 33), półpełny: 180, wklęsły: 5 * rnd(42, 64) }[t];
+      return mc('Jaki to kąt?', `Kąt ${t}`, shuffle(ANG.filter(x => x !== t)).map(x => `Kąt ${x}`), hintOf('Kąt ' + t), FIG.angle(d)); },
+    () => { const [t, d] = pick([['ostry', 5 * rnd(2, 17)], ['prosty', 90], ['rozwarty', 5 * rnd(19, 35)], ['półpełny', 180], ['wklęsły', 5 * rnd(37, 71)], ['pełny', 360], ['zerowy', 0]]);
+      return mc(`Kąt ma miarę ${B(d + '°')}. Jaki to kąt?`, `Kąt ${t}`, shuffle(ANG.filter(x => x !== t)).map(x => `Kąt ${x}`), hintOf('Kąt ' + t)); },
+    () => { const a = 5 * rnd(6, 30); return num(`Kąty ${M('α')} i ${M('β')} są przyległe, ${M(`α = ${a}°`)}. Oblicz ${M('β')}.`, 180 - a, '°', hintOf('Kąty przyległe'), FIG.przylegle(a)); },
+    () => { const a = 5 * rnd(6, 30); return num(`Kąty ${M('α')} i ${M('β')} są wierzchołkowe, ${M(`α = ${a}°`)}. Oblicz ${M('β')}.`, a, '°', hintOf('Kąty wierzchołkowe'), FIG.wierzcholkowe()); },
+    () => { const W = ['ur', 'ul', 'll', 'lr'], obt = w => w === 'ur' || w === 'll'; const wa = pick(W), wb = pick(W);
+      const a = obt(wa) ? 5 * rnd(21, 28) : 5 * rnd(9, 15), b = obt(wa) === obt(wb) ? a : 180 - a;
+      const rel = wa === wb ? 'odpowiadające (równe)' : (wa === 'lr' && wb === 'ul') || (wa === 'll' && wb === 'ur') ? 'naprzemianległe wewnętrznie (równe)' : (wa === 'ul' && wb === 'lr') || (wa === 'ur' && wb === 'll') ? 'naprzemianległe zewnętrznie (równe)' : obt(wa) === obt(wb) ? 'równe (np. wierzchołkowy do odpowiadającego)' : 'dają razem 180° (przyległy do kąta odpowiadającego)';
+      return num(`Proste ${M('k')} i ${M('l')} są równoległe, ${M(`α = ${a}°`)}. Oblicz ${M('β')}.`, b, '°', `Tutaj kąty α i β są ${rel}.`, FIG.rownolegle(wa, wb)); },
+    () => mc('Kąty przyległe mają razem:', '180°', ['90°', '360°', '270°'], hintOf('Kąty przyległe'), FIG.przylegle(65)),
+    () => mc('Kąt wklęsły ma miarę:', M('180° < α < 360°'), [M('90° < α < 180°'), M('0° < α < 90°'), M('α = 180°')], hintOf('Kąt wklęsły')),
+    () => mc('Kąt rozwarty ma miarę:', M('90° < α < 180°'), [M('180° < α < 360°'), M('0° < α < 90°'), M('α = 90°')], hintOf('Kąt rozwarty')),
+  ],
+  ska: [
+    () => { const k = pick([100, 200, 500, 1000, 3000, 5000]), d = rnd(2, 9); return num(`Plan w skali ${B('1 : ' + fmt(k))}. Odcinek na planie ma ${B(d + ' cm')}. Ile metrów ma w rzeczywistości?`, d * k / 100, 'm', `1 cm na planie = ${fmt(k)} cm = ${fmt(k / 100)} m w rzeczywistości`); },
+    () => { const k = pick([100000, 200000, 50000]), d = rnd(2, 9); return num(`Mapa w skali ${B('1 : ' + fmt(k))}. Odległość na mapie to ${B(d + ' cm')}. Ile to kilometrów w terenie?`, d * k / 100000, 'km', `1 cm na mapie = ${fmt(k)} cm = ${fmt(k / 100000)} km`); },
+    () => { const k = pick([1000, 2000, 5000]), d = rnd(2, 8); return num(`Skala ${B('1 : ' + fmt(k))}. Działka ma w rzeczywistości ${B(fmt(d * k / 100) + ' m')}. Ile centymetrów ma na planie?`, d, 'cm', `1 cm na planie = ${fmt(k / 100)} m w rzeczywistości`); },
+    () => { const k = pick([2, 3, 4, 5, 10]), r = rnd(2, 6); return num(`Rysunek owada w skali ${B(k + ' : 1')}. Owad ma naprawdę ${B(r + ' mm')}. Ile mm ma na rysunku?`, r * k, 'mm', `Skala ${k} : 1 to powiększenie ${k} razy.`); },
+    () => { const k = pick([2, 4, 5, 10]), r = rnd(2, 6); return num(`Rysunek w skali ${B(k + ' : 1')} ma długość ${B(r * k + ' cm')}. Ile cm ma przedmiot naprawdę?`, r, 'cm', `Skala ${k} : 1 to powiększenie ${k} razy, więc dzielimy przez ${k}.`); },
+    () => { const k = pick([3, 4, 5, 10]); return mc(`Skala ${B('1 : ' + k)} oznacza:`, `pomniejszenie ${k} razy`, [`powiększenie ${k} razy`, 'rzeczywistą wielkość', `pomniejszenie o ${k} cm`], `1 : ${k} → pomniejszenie, ${k} : 1 → powiększenie`); },
+    () => { const k = pick([3, 4, 5, 10]); return mc(`Skala ${B(k + ' : 1')} oznacza:`, `powiększenie ${k} razy`, [`pomniejszenie ${k} razy`, 'rzeczywistą wielkość', `powiększenie o ${k} cm`], `${k} : 1 → powiększenie, 1 : ${k} → pomniejszenie`); },
+    () => { const m = pick([10, 20, 30, 50]); return num(`Na planie ${B('1 cm')} odpowiada ${B(m + ' m')} w rzeczywistości. Skala planu to 1 : ?`, m * 100, '', `${m} m = ${m * 100} cm`); },
+  ],
+  wyr: [
+    ...[['o', 'większa', k => `x + ${k}`], ['o', 'mniejsza', k => `x − ${k}`], ['razy', 'większa', k => `${k}x`], ['razy', 'mniejsza', k => fr('x', k)]].map(([t, w, f]) => () => {
+      const k = rnd(2, 9), all = { 'o większa': `x + ${k}`, 'o mniejsza': `x − ${k}`, 'razy większa': `${k}x`, 'razy mniejsza': fr('x', k) };
+      const ok = M(f(k)), txt = t === 'o' ? `o ${k} ${w}` : `${k} razy ${w}`;
+      return mc(`Liczba ${B(txt)} od ${M('x')} to:`, ok, Object.values(all).map(M).filter(x => x !== ok), hintOf(`Liczba ${t === 'o' ? 'o 5' : '5 razy'} ${w} od x`).replace(/5/g, k));
+    }),
+    () => { const p = pick([5, 10, 15, 20, 25, 30, 40]), up = Math.random() < .5; const c = fmt(1 + p / 100), d = fmt(1 - p / 100);
+      return mc(`Liczba o ${B(p + '%')} ${up ? 'większa' : 'mniejsza'} od ${M('x')} to:`, M(`${up ? c : d}x`), [M(`${up ? d : c}x`), M(`x ${up ? '+' : '−'} ${fmt(p / 100)}`), M(`${fmt(p / 100)}x`)], M(`x ${up ? '+' : '−'} ${p}%x = ${up ? c : d}x`)); },
+    () => { const p = pick([5, 10, 15, 20, 30]), up = Math.random() < .5; const v = fmt(up ? 1 + p / 100 : 1 - p / 100);
+      return mc(`Wyrażenie ${M(v + 'x')} oznacza liczbę:`, `o ${p}% ${up ? 'większą' : 'mniejszą'} od ${M('x')}`, [`o ${p}% ${up ? 'mniejszą' : 'większą'} od ${M('x')}`, `${v} razy mniejszą od ${M('x')}`, `o ${v} większą od ${M('x')}`], `${M('1,05x')} → o 5% większa, ${M('0,95x')} → o 5% mniejsza`); },
+    () => { const x = pick([20, 40, 60, 80, 200]), p = pick([10, 25, 50, 5]), up = Math.random() < .5; return num(`${M('x')} = ${B(x)}. Oblicz liczbę o ${B(p + '%')} ${up ? 'większą' : 'mniejszą'} od ${M('x')}.`, x * (1 + (up ? 1 : -1) * p / 100), '', M(`${fmt(1 + (up ? 1 : -1) * p / 100)}x`) + ` = ${fmt(1 + (up ? 1 : -1) * p / 100)} · ${x}`); },
+  ],
+};
+
+/* ---------- views ---------- */
+const views = ['vHome', 'vQuiz', 'vRes', 'vCards', 'vPairs'];
+function show(id) { views.forEach(v => $('#' + v).hidden = v !== id); $('#homeBtn').hidden = id === 'vHome'; window.scrollTo(0, 0); }
+$('#homeBtn').onclick = () => { stopTimer(); renderHome(); show('vHome'); };
+
+function starsHTML(n, max = 3) { return '<b>' + '★'.repeat(n) + '</b>' + '★'.repeat(max - n); }
+function renderHome() {
+  const st = SAVE.stars;
+  $('#trail').innerHTML = SEC.map((s, i) => `<button class="st" style="--c:${s.c}" data-s="${s.id}">
+      ${marker(s.c, 'big')}
+      <span style="min-width:0"><span class="km">Odcinek ${i + 1}</span><br><span class="nm">${s.n}</span><br><span class="ds">${s.d}</span></span>
+      <span class="stars" aria-label="${st[s.id] || 0} z 3 gwiazdek">${starsHTML(st[s.id] || 0)}</span></button>`).join('');
+  document.querySelectorAll('.st').forEach(b => b.onclick = () => startTrail(b.dataset.s));
+  const tot = SEC.reduce((a, s) => a + (st[s.id] || 0), 0);
+  $('#sum').innerHTML = `<span>Gwiazdki: <b>${tot} / 30</b></span><span>Ukończone odcinki: <b>${SEC.filter(s => st[s.id]).length} / 10</b></span>`;
+  $('#bestBlitz').textContent = SAVE.blitz ? `Rekord: ${SAVE.blitz} pkt` : '';
+  $('#bestPairs').textContent = SAVE.pairs ? `Najmniej ruchów: ${SAVE.pairs}` : '';
+}
+
+/* ---------- quiz engine ---------- */
+let S = null, timerId = null;
+function stopTimer() { if (timerId) clearInterval(timerId); timerId = null; }
+function makeQs(sid, n) { const gens = G[sid]; let order = []; while (order.length < n) order.push(...shuffle(gens)); return order.slice(0, n).map(g => ({ ...g(), sid })); }
+
+function startTrail(sid) {
+  S = { mode: 'trail', sid, qs: makeQs(sid, 8), i: 0, pts: 0, res: [] };
+  const s = secById[sid];
+  $('#qTitle').innerHTML = `${marker(s.c)}<span>${s.n}</span>`;
+  $('#qTimer').hidden = true; $('#qTbar').hidden = true; $('#qDots').hidden = false;
+  show('vQuiz'); renderQ();
+}
+function startBlitz() {
+  S = { mode: 'blitz', i: 0, pts: 0, res: [], left: 90, qs: [] };
+  $('#qTitle').innerHTML = `${marker('var(--t-yellow)')}<span>Błyskawica</span>`;
+  $('#qTimer').hidden = false; $('#qTbar').hidden = false; $('#qDots').hidden = true;
+  show('vQuiz'); nextBlitzQ(); renderQ();
+  stopTimer(); updTimer();
+  timerId = setInterval(() => { S.left--; updTimer(); if (S.left <= 0) { stopTimer(); finish(); } }, 1000);
+}
+function nextBlitzQ() { const sid = pick(SEC).id; S.qs.push({ ...pick(G[sid])(), sid }); }
+function updTimer() { $('#qTimer').textContent = S.left; $('#qTimer').classList.toggle('low', S.left <= 10); $('#qTbar i').style.width = (S.left / 90 * 100) + '%'; }
+
+function renderQ() {
+  const q = S.qs[S.i]; q.hintUsed = false; S.locked = false;
+  if (S.mode === 'trail') {
+    $('#qDots').innerHTML = S.qs.map((_, j) => `<i class="${j < S.i ? S.res[j].cls : j === S.i ? 'now' : ''}"></i>`).join('');
+    $('#qPts').textContent = `${S.pts} / 16 pkt`;
+  } else $('#qPts').textContent = `${S.pts} pkt`;
+  const tag = S.mode === 'trail' ? `Zadanie ${S.i + 1} z 8` : secById[q.sid].n;
+  let ans = '';
+  if (q.t === 'mc') ans = `<div class="opts">${q.opts.map((o, j) => `<button class="opt" data-j="${j}"><span class="k">${'ABCD'[j]}</span><span>${o}</span></button>`).join('')}</div>`;
+  else ans = `<form class="numrow" id="numF" autocomplete="off"><input id="numIn" inputmode="decimal" aria-label="Twoja odpowiedź" placeholder="?"><span class="u">${q.unit || ''}</span><button class="btn" type="submit">Sprawdź</button></form>`;
+  $('#qCard').innerHTML = `<span class="qtag">${tag}</span><div class="qtext">${q.q}</div>${q.fig ? `<div class="fig">${q.fig}</div>` : ''}${ans}
+    <div class="row" id="hintRow">${S.mode === 'trail' ? '<button class="btn sec" id="hintB">Pokaż wzór (−1 pkt)</button>' : ''}</div><div id="fb"></div>`;
+  if (q.t === 'mc') document.querySelectorAll('.opt').forEach(b => b.onclick = () => answer(q.opts[+b.dataset.j], b));
+  else { $('#numF').onsubmit = e => { e.preventDefault(); const v = parseNum($('#numIn').value); if (isNaN(v)) { $('#numIn').focus(); return; } answer(v); }; setTimeout(() => $('#numIn') && $('#numIn').focus({ preventScroll: true }), 30); }
+  const hb = $('#hintB'); if (hb) hb.onclick = () => { q.hintUsed = true; $('#hintRow').innerHTML = `<div class="wz"><small>Podpowiedź</small>${q.hint}</div>`; };
+}
+function answer(v, btn) {
+  if (S.locked) return; S.locked = true;
+  const q = S.qs[S.i];
+  const ok = q.t === 'mc' ? v === q.ok : Math.abs(v - q.a) < 1e-6;
+  const right = q.t === 'mc' ? q.ok : `${fmt(q.a)}${q.unit ? (q.unit === '°' ? '' : ' ') + q.unit : ''}`;
+  if (q.t === 'mc') document.querySelectorAll('.opt').forEach(b => { b.disabled = true; if (q.opts[+b.dataset.j] === q.ok) b.classList.add('right'); });
+  if (btn && !ok) btn.classList.add('wrong');
+  if (q.t === 'num') { $('#numIn').disabled = true; $('#numF button').disabled = true; }
+  let gain = ok ? (S.mode === 'trail' ? (q.hintUsed ? 1 : 2) : 1) : 0;
+  S.pts += gain;
+  S.res[S.i] = { ok, cls: ok ? (q.hintUsed ? 'half' : 'ok') : 'no', q, right };
+  $('#qPts').textContent = S.mode === 'trail' ? `${S.pts} / 16 pkt` : `${S.pts} pkt`;
+  $('#hintRow').innerHTML = '';
+  const last = S.mode === 'trail' && S.i === S.qs.length - 1;
+  $('#fb').innerHTML = `<div class="fb ${ok ? 'good' : 'bad'}"><span class="h">${ok ? pick(['Dobrze!', 'Brawo!', 'Świetnie!', 'Tak jest!']) + (S.mode === 'trail' ? ` +${gain} pkt` : '') : 'Nie tym razem. Poprawna odpowiedź: ' + right}</span>
+    <div class="wz"><small>Wzór do zapamiętania</small>${q.hint}</div>
+    ${S.mode === 'trail' ? `<div class="row"><button class="btn" id="nextB">${last ? 'Zobacz wynik' : 'Dalej →'}</button></div>` : ''}</div>`;
+  if (S.mode === 'trail') { const nb = $('#nextB'); nb.onclick = next; nb.focus({ preventScroll: true }); }
+  else setTimeout(() => { if (S && S.mode === 'blitz' && S.left > 0) { S.i++; nextBlitzQ(); renderQ(); } }, ok ? 700 : 2200);
+}
+function next() { if (S.i < S.qs.length - 1) { S.i++; renderQ(); } else finish(); }
+function finish() {
+  stopTimer();
+  const wrong = S.res.filter(r => r && !r.ok);
+  let head;
+  if (S.mode === 'trail') {
+    const stars = S.pts >= 15 ? 3 : S.pts >= 11 ? 2 : S.pts >= 7 ? 1 : 0;
+    if (stars > (SAVE.stars[S.sid] || 0)) { SAVE.stars[S.sid] = stars; store.set(SAVE); }
+    const s = secById[S.sid];
+    const msg = stars === 3 ? 'Odcinek zdobyty! Trzy gwiazdki.' : stars === 2 ? 'Bardzo dobrze. Do trzeciej gwiazdki brakuje niewiele.' : stars === 1 ? 'Odcinek zaliczony. Powtórz wzory poniżej i spróbuj jeszcze raz.' : 'Ten odcinek jeszcze przed Tobą. Zajrzyj do fiszek i wróć.';
+    const nextSec = SEC[(SEC.indexOf(s) + 1) % SEC.length];
+    head = `<div class="card" style="align-items:flex-start">${marker(s.c, 'big')}<h2>${s.n}</h2><div class="big-stars">${starsHTML(stars)}</div>
+      <p style="font-size:20px"><b>${S.pts} / 16 pkt</b>. ${msg}</p>
+      <div class="row"><button class="btn" id="again">Jeszcze raz</button><button class="btn sec" id="nextSec">Następny odcinek: ${nextSec.n}</button><button class="btn sec" id="toCards">Fiszki: ${s.n}</button></div></div>`;
+    $('#vRes').innerHTML = head + reviewHTML(wrong);
+    $('#again').onclick = () => startTrail(S.sid); $('#nextSec').onclick = () => startTrail(nextSec.id); $('#toCards').onclick = () => openCards(S.sid);
+  } else {
+    const rec = S.pts > (SAVE.blitz || 0); if (rec) { SAVE.blitz = S.pts; store.set(SAVE); }
+    const done = S.res.filter(Boolean).length;
+    head = `<div class="card" style="align-items:flex-start"><h2>Koniec czasu!</h2><p style="font-size:22px"><b>${S.pts} pkt</b> · poprawnie ${S.pts} z ${done} zadań${rec ? ' · <b>nowy rekord!</b>' : ''}</p>
+      <div class="row"><button class="btn" id="again">Zagraj jeszcze raz</button></div></div>`;
+    $('#vRes').innerHTML = head + reviewHTML(wrong);
+    $('#again').onclick = startBlitz;
+  }
+  show('vRes');
+}
+function reviewHTML(wrong) {
+  if (!wrong.length) return '';
+  return `<h3>Do powtórki</h3><div class="review">${wrong.map(r => `<div class="rv"><span class="qtag">${secById[r.q.sid].n}</span><div>${r.q.q}</div><span class="a">Odpowiedź: ${r.right}</span><div class="wz"><small>Wzór</small>${r.q.hint}</div></div>`).join('')}</div>`;
+}
+document.addEventListener('keydown', e => {
+  if ($('#vQuiz').hidden || !S) return;
+  const q = S.qs[S.i];
+  if (!S.locked && q.t === 'mc' && /^[1-4]$/.test(e.key)) { const b = document.querySelector(`.opt[data-j="${+e.key - 1}"]`); if (b) b.click(); }
+  if (!S.locked && q.t === 'mc' && /^[a-dA-D]$/.test(e.key)) { const b = document.querySelector(`.opt[data-j="${'abcd'.indexOf(e.key.toLowerCase())}"]`); if (b) b.click(); }
+});
+
+/* ---------- flashcards ---------- */
+let C = null;
+function chips(el, cur, fn) {
+  el.innerHTML = [`<button class="chip" data-s="all" aria-pressed="${cur === 'all'}">Wszystkie</button>`, ...SEC.map(s => `<button class="chip" data-s="${s.id}" aria-pressed="${cur === s.id}">${marker(s.c)}${s.n}</button>`)].join('');
+  el.querySelectorAll('.chip').forEach(b => b.onclick = () => fn(b.dataset.s));
+}
+function openCards(sid = 'all') {
+  chips($('#cChips'), sid, openCards);
+  C = { sid, deck: shuffle(CAT.filter(c => sid === 'all' || c.s === sid)), known: 0 };
+  C.total = C.deck.length; show('vCards'); drawCard();
+}
+function drawCard() {
+  const inEl = $('#cIn'); inEl.classList.remove('flip');
+  if (!C.deck.length) {
+    $('#cFront').innerHTML = `<span class="nm">Talia przerobiona!</span><p class="muted">Znasz ${C.total} z ${C.total} fiszek. Sprawdź się na szlaku.</p>`;
+    $('#cBack').innerHTML = ''; $('#cInfo').textContent = ''; $('#cKnow').hidden = $('#cAgain').hidden = true; return;
+  }
+  $('#cKnow').hidden = $('#cAgain').hidden = false;
+  const c = C.deck[0], s = secById[c.s];
+  $('#cInfo').innerHTML = `Umiem: <b style="margin-left:6px">${C.known} / ${C.total}</b>`;
+  $('#cFront').innerHTML = `${marker(s.c)}<span class="qtag">${s.n}</span><span class="nm">${c.n}</span>${c.fig ? `<div class="fig">${figOf(c.fig)}</div>` : ''}<span class="tap">Dotknij, aby odwrócić</span>`;
+  $('#cBack').innerHTML = `<span class="qtag">${c.n}</span><span class="ff">${c.f}</span><span class="tap">Wiesz? Kliknij „Umiem”. Nie? „Jeszcze raz”.</span>`;
+}
+$('#cIn').onclick = () => $('#cIn').classList.toggle('flip');
+$('#cIn').onkeydown = e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); $('#cIn').classList.toggle('flip'); } };
+$('#cKnow').onclick = () => { C.deck.shift(); C.known++; drawCard(); };
+$('#cAgain').onclick = () => { const c = C.deck.shift(); C.deck.splice(Math.min(C.deck.length, 3 + Math.floor(Math.random() * 3)), 0, c); drawCard(); };
+
+/* ---------- pairs ---------- */
+let PR = null;
+function openPairs(sid = PR ? PR.sid : 'all') {
+  chips($('#pChips'), sid, openPairs);
+  const seen = new Set(), pool = shuffle(CAT.filter(c => sid === 'all' || c.s === sid)).filter(c => !seen.has(c.f) && seen.add(c.f));
+  const items = pool.slice(0, 6);
+  const tiles = shuffle(items.flatMap((c, i) => [{ k: i, h: c.n, f: false }, { k: i, h: c.f, f: true }]));
+  PR = { sid, tiles, sel: null, moves: 0, left: items.length };
+  $('#pTiles').innerHTML = tiles.map((t, j) => `<button class="tile ${t.f ? 'f' : ''}" data-j="${j}">${t.h}</button>`).join('');
+  $('#pTiles').querySelectorAll('.tile').forEach(b => b.onclick = () => tapTile(b));
+  pInfo(); show('vPairs');
+}
+function pInfo() { $('#pInfo').innerHTML = PR.left ? `Ruchy: <b style="margin:0 14px 0 6px">${PR.moves}</b> Zostało par: <b style="margin-left:6px">${PR.left}</b>` : `Gotowe w <b style="margin:0 6px">${PR.moves}</b> ruchach!${SAVE.pairs === PR.moves ? ' To Twój rekord.' : ''}`; }
+function tapTile(b) {
+  const j = +b.dataset.j, t = PR.tiles[j];
+  if (b.classList.contains('done')) return;
+  if (PR.sel === null) { PR.sel = j; b.classList.add('sel'); return; }
+  const a = document.querySelector(`.tile[data-j="${PR.sel}"]`);
+  if (PR.sel === j) { a.classList.remove('sel'); PR.sel = null; return; }
+  PR.moves++;
+  const ta = PR.tiles[PR.sel];
+  if (ta.k === t.k && ta.f !== t.f) { a.classList.remove('sel'); a.classList.add('done'); b.classList.add('done'); PR.left--;
+    if (!PR.left && (!SAVE.pairs || PR.moves < SAVE.pairs)) { SAVE.pairs = PR.moves; store.set(SAVE); } }
+  else { a.classList.remove('sel'); [a, b].forEach(x => { x.classList.remove('shake'); void x.offsetWidth; x.classList.add('shake'); }); }
+  PR.sel = null; pInfo();
+}
+$('#pNew').onclick = () => openPairs();
+
+$('#mBlitz').onclick = startBlitz;
+$('#mCards').onclick = () => openCards('all');
+$('#mPairs').onclick = () => openPairs('all');
+renderHome();
+</script>
+
+</body></html>

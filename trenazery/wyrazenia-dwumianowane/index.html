@@ -1,0 +1,151 @@
+<!doctype html><html lang="pl"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"></head><body>
+<a href="../" style="position:fixed;z-index:9999;left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));background:#151515;color:#fbf6ea;font:700 13px/1 Inter,system-ui,sans-serif;text-decoration:none;border-radius:999px;padding:10px 14px;box-shadow:3px 3px 0 #5157d6">← Trenażery</a>
+<title>Wyrażenia dwumianowane</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Nunito:wght@400;700;800&display=swap">
+<style>
+/* Layout: jedna kolumna; karta z zadaniem jak notatka z gazetki, dwa pola na odpowiedź. Paleta Iryny. */
+:root {
+  --bg: #F9F6F1; --card: #ffffff; --ink: #2A1F1B; --olive: #575D45; --blue: #627CF2; --muted: #6d6656; --line: #d9d2c4;
+  --note: #eef0e6; --good: #3f7d4e; --bad: #b8452f;
+  --display: "Fraunces", Georgia, serif; --body: "Nunito", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1d1714; --card: #2a221e; --ink: #f2ede4; --olive: #a7b08d; --blue: #8c9ef7; --muted: #b9b09f; --line: #4a3f38;
+  --note: #2f3326; --good: #7cc08b; --bad: #f08a72; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #1d1714; --card: #2a221e; --ink: #f2ede4; --olive: #a7b08d; --blue: #8c9ef7; --muted: #b9b09f; --line: #4a3f38;
+  --note: #2f3326; --good: #7cc08b; --bad: #f08a72; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 22px 40px; display: grid; gap: 14px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-family: var(--display); font-size: 2.1rem; margin: 0; color: var(--olive); text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font: 700 .95rem var(--body); border: 2px solid var(--olive); background: var(--card); color: var(--olive); border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+.pill[aria-pressed="true"] { background: var(--olive); color: var(--bg); }
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 14px; }
+.note { background: var(--note); border-radius: 10px; padding: 14px 16px; font-size: 1.1rem; line-height: 1.5; }
+.note u { text-decoration-color: var(--bad); text-decoration-thickness: 2px; font-weight: 800; }
+.eq { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; font: 800 1.5rem var(--body); }
+.eq input { font: 800 1.4rem var(--body); width: 5.5ch; text-align: center; padding: 6px; border: 2px solid var(--blue); border-radius: 10px; background: var(--bg); color: var(--ink); }
+.eq input.ok { border-color: var(--good); } .eq input.bad { border-color: var(--bad); }
+.btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.next { font: 800 1rem var(--body); background: var(--blue); color: #fff; border: none; border-radius: 10px; padding: 11px 20px; cursor: pointer; }
+.fb { min-height: 2.8em; font-weight: 700; text-align: center; }
+.fb.good { color: var(--good); } .fb.wrong { color: var(--bad); }
+.fb .z { color: var(--blue); }
+.score { font-weight: 800; color: var(--olive); font-variant-numeric: tabular-nums; }
+.tip { color: var(--muted); font-size: .95rem; margin: 0; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--bad); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <h1>Wyrażenia dwumianowane</h1>
+  <p class="sub">Zamieniaj ułamki dziesiętne na dwie jednostki i z powrotem. Klasa 5.</p>
+  <div class="bar">
+    <button class="pill" data-m="to2" aria-pressed="true">3,2 m = ? m ? cm</button>
+    <button class="pill" data-m="to1" aria-pressed="false">3 m 20 cm = ? m</button>
+    <button class="pill" data-m="news" aria-pressed="false">Gazetka</button>
+  </div>
+  <section class="card">
+    <div id="task"></div>
+    <div class="btns"><button class="next" id="check">Sprawdź</button><button class="next" id="next" hidden>Dalej</button></div>
+    <div class="fb" id="fb"></div>
+    <div class="score" id="score"></div>
+  </section>
+  <p class="tip">Ściąga: 1 zł = 100 gr · 1 m = 100 cm · 1 kg = 100 dag · 1 km = 1000 m · 1 t = 1000 kg · 1 kg = 1000 g. Gdy w jednej dużej jest 100 małych, po przecinku mają być 2 cyfry; gdy 1000, to 3 cyfry. Brakujące miejsca uzupełnij zerami.</p>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[rnd(0, a.length - 1)];
+const U = [['zł', 'gr', 100], ['m', 'cm', 100], ['kg', 'dag', 100], ['km', 'm', 1000], ['t', 'kg', 1000], ['kg', 'g', 1000]];
+const NEWS = [
+  (v, u) => `Kirył skoczył w dal na odległość <u>${v} ${u}</u>.`,
+  (v, u) => `Plecak Oli waży <u>${v} ${u}</u>.`,
+  (v, u) => `Do szkoły jest <u>${v} ${u}</u>.`,
+  (v, u) => `Pociąg wiezie węgiel o masie <u>${v} ${u}</u>.`,
+  (v, u) => `Za lody zapłaciliśmy <u>${v} ${u}</u>.`,
+  (v, u) => `Ogromny tort ze szkolnego festynu ważył <u>${v} ${u}</u>.`,
+];
+const NEWS_U = [['m', 'cm', 100], ['kg', 'dag', 100], ['km', 'm', 1000], ['t', 'kg', 1000], ['kg', 'dag', 100], ['kg', 'g', 1000]];
+const NEWS_ZL = ['zł', 'gr', 100];
+let mode = 'to2', round = 0, good = 0, cur = null, locked = false;
+const fmt = (n, d) => (Math.round(n * 1e6) / 1e6).toFixed(d).replace(/\.?0+$/, '').replace('.', ',');
+function make(unit) {
+  const [big, small, k] = unit, d = k === 100 ? 2 : 3;
+  const whole = rnd(1, 25);
+  // celowo częste „pułapki”: 3,2 / 4,05 / 4,12 km / 2,1 kg
+  const style = rnd(0, 3);
+  let part;
+  if (style === 0) part = rnd(1, 9) * (k / 10);          // 3,2 m -> 20 cm
+  else if (style === 1) part = rnd(1, 9) * (k === 100 ? 1 : 10); // 4,05 m / 2,05 t
+  else if (style === 2 && k === 1000) part = rnd(11, 99) * 10; // 4,12 km -> 120 m
+  else part = rnd(11, k - 1);
+  const dec = whole + part / k;
+  return { big, small, k, d, whole, part, dec, decStr: fmt(dec, d) };
+}
+function render() {
+  locked = false; $('fb').textContent = ''; $('fb').className = 'fb'; $('next').hidden = true; $('check').hidden = false;
+  $('score').textContent = `Zadanie ${round + 1} z 10 · dobrze: ${good}`;
+  if (mode === 'news') {
+    const i = rnd(0, NEWS.length - 1); cur = make(i === 4 ? NEWS_ZL : NEWS_U[i]);
+    $('task').innerHTML = `<div class="note">${NEWS[i](cur.decStr, cur.big)}</div><p style="margin:0;text-align:center">Zapisz podkreśloną wielkość za pomocą wyrażenia dwumianowanego.</p>` + twoInputs();
+  } else if (mode === 'to2') {
+    cur = make(pick(U));
+    $('task').innerHTML = `<p style="margin:0;text-align:center;font-weight:700">Zapisz w postaci wyrażenia dwumianowanego.</p>` + twoInputs();
+  } else {
+    cur = make(pick(U));
+    $('task').innerHTML = `<p style="margin:0;text-align:center;font-weight:700">Zapisz w postaci ułamka dziesiętnego.</p>
+      <div class="eq"><span>${cur.whole} ${cur.big} ${cur.part} ${cur.small} =</span><input id="i1" inputmode="decimal" aria-label="liczba" autocomplete="off"><span>${cur.big}</span></div>`;
+  }
+  $('i1').focus({ preventScroll: true });
+}
+function twoInputs() {
+  return `<div class="eq"><span>${cur.decStr} ${cur.big} =</span><input id="i1" inputmode="numeric" aria-label="${cur.big}" autocomplete="off"><span>${cur.big}</span><input id="i2" inputmode="numeric" aria-label="${cur.small}" autocomplete="off"><span>${cur.small}</span></div>`;
+}
+function why() {
+  const [w, f = ''] = cur.decStr.split(',');
+  const padded = f.padEnd(cur.d, '0');
+  return `1 ${cur.big} = ${cur.k} ${cur.small}, więc po przecinku liczymy ${cur.d} cyfry: ${w},<span class="z">${padded}</span> ${cur.big} = ${cur.whole} ${cur.big} ${cur.part} ${cur.small}.`;
+}
+function check() {
+  if (locked) return;
+  const num = s => s.trim().replace(/\s/g, '').replace(',', '.');
+  let ok;
+  if (mode === 'to1') {
+    const v = parseFloat(num($('i1').value)); if (isNaN(v)) { $('fb').textContent = 'Wpisz liczbę, np. 3,2'; $('fb').className = 'fb wrong'; return; }
+    ok = Math.abs(v - cur.dec) < 1e-9; $('i1').className = ok ? 'ok' : 'bad';
+  } else {
+    const a = num($('i1').value), b = num($('i2').value);
+    if (a === '' || b === '') { $('fb').textContent = 'Uzupełnij oba pola.'; $('fb').className = 'fb wrong'; return; }
+    const okA = +a === cur.whole, okB = +b === cur.part; ok = okA && okB;
+    $('i1').className = okA ? 'ok' : 'bad'; $('i2').className = okB ? 'ok' : 'bad';
+  }
+  locked = true; if (ok) good++;
+  const right = mode === 'to1' ? `${cur.decStr} ${cur.big}` : `${cur.whole} ${cur.big} ${cur.part} ${cur.small}`;
+  $('fb').innerHTML = (ok ? 'Dobrze! ' : `Poprawnie: ${right}. `) + why();
+  $('fb').className = 'fb ' + (ok ? 'good' : 'wrong');
+  $('check').hidden = true; $('next').hidden = false; $('next').textContent = round >= 9 ? 'Wynik' : 'Dalej';
+  $('score').textContent = `Zadanie ${round + 1} z 10 · dobrze: ${good}`;
+}
+function next() {
+  if (round >= 9) {
+    if ($('next').textContent === 'Zagraj od nowa') { round = 0; good = 0; render(); return; }
+    $('task').innerHTML = `<div class="eq">Wynik: ${good} / 10</div>`; $('fb').textContent = good >= 8 ? 'Świetnie!' : 'Zagraj jeszcze raz, będzie lepiej!';
+    $('fb').className = 'fb good'; $('next').textContent = 'Zagraj od nowa'; $('score').textContent = ''; return;
+  }
+  round++; render();
+}
+$('check').addEventListener('click', check);
+$('next').addEventListener('click', next);
+document.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); locked ? $('next').click() : check(); } });
+document.querySelectorAll('[data-m]').forEach(b => b.addEventListener('click', () => {
+  mode = b.dataset.m; document.querySelectorAll('[data-m]').forEach(x => x.setAttribute('aria-pressed', x === b)); round = 0; good = 0; render();
+}));
+render();
+</script>
+
+</body></html>

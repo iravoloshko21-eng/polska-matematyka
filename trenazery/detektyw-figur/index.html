@@ -1,0 +1,295 @@
+<!doctype html><html lang="pl"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"></head><body>
+<a href="../" style="position:fixed;z-index:9999;left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));background:#151515;color:#fbf6ea;font:700 13px/1 Inter,system-ui,sans-serif;text-decoration:none;border-radius:999px;padding:10px 14px;box-shadow:3px 3px 0 #5157d6">← Trenażery</a>
+<title>Detektyw figur</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<style>
+/* Layout: one column "case file" — mode tabs on top, one task card at a time, score strip. Palette: Iryna's VOLOSHKO/MATH colours. */
+:root{
+  --bg:#F3EFE5; --card:#FFFDF8; --ink:#1B1713; --muted:#6b6258; --ind:#5257CE; --ind-soft:#E6E7FA;
+  --sage:#CED392; --sage-soft:#F1F3E1; --sal:#E5AA91; --sal-soft:#FBF0EA; --line:#d9d2c3;
+  --ok:#4f7a3a; --bad:#b4532f;
+  --serif:"STIX Two Text","CMU Serif","Latin Modern Roman",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1a1814; --card:#25221d; --ink:#f1ece2; --muted:#b4ab9d; --ind:#9599f0; --ind-soft:#2d2f55;
+  --sage:#7f8550; --sage-soft:#2b2d1f; --sal:#d08d72; --sal-soft:#3a2a22; --line:#3d3830; --ok:#9cc684; --bad:#ec9a7c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1a1814; --card:#25221d; --ink:#f1ece2; --muted:#b4ab9d; --ind:#9599f0; --ind-soft:#2d2f55;
+  --sage:#7f8550; --sage-soft:#2b2d1f; --sal:#d08d72; --sal-soft:#3a2a22; --line:#3d3830; --ok:#9cc684; --bad:#ec9a7c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:10px}
+h1{margin:0;font-size:2rem;font-weight:700;letter-spacing:.01em;text-wrap:balance}
+h1 span{color:var(--ind)}
+.sub{margin:2px 0 0;color:var(--muted);font-style:italic}
+.score{display:flex;gap:8px;font-variant-numeric:tabular-nums}
+.pill{border:1.5px solid var(--ink);border-radius:999px;padding:2px 12px;background:var(--card);white-space:nowrap}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tab{font:inherit;font-size:.95rem;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 6px;cursor:pointer;line-height:1.2}
+.tab b{display:block;font-size:1.05rem}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.tab:focus-visible,.btn:focus-visible,.chip:focus-visible,input:focus-visible{outline:3px solid var(--ind);outline-offset:2px}
+.card{background:var(--card);border:1.5px solid var(--ink);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.kicker{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.q{font-size:1.3rem;font-weight:600;margin:0;text-wrap:balance}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.chip{font:inherit;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:8px 4px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.9rem;min-width:0}
+.chip svg{width:100%;max-width:70px;height:44px}
+.chip[aria-pressed="true"]{border-color:var(--ind);background:var(--ind-soft);box-shadow:inset 0 0 0 1.5px var(--ind)}
+.chip.ok{border-color:var(--ok);box-shadow:inset 0 0 0 2px var(--ok)}
+.chip.bad{border-color:var(--bad);box-shadow:inset 0 0 0 2px var(--bad)}
+.chip.miss{border-style:dashed;border-color:var(--bad)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;border:1.5px solid var(--ink);background:var(--ind);color:#fff;border-radius:10px;padding:8px 18px;cursor:pointer;font-weight:600}
+.btn.ghost{background:var(--card);color:var(--ink)}
+.btn.pf{min-width:120px;font-size:1.1rem}
+.btn[disabled]{opacity:.45;cursor:default}
+input.num{font:inherit;font-size:1.2rem;width:9rem;padding:6px 10px;border:1.5px solid var(--ink);border-radius:10px;background:var(--bg);color:var(--ink);font-variant-numeric:tabular-nums}
+.fb{border-radius:10px;padding:10px 14px;border-left:5px solid var(--ok);background:var(--sage-soft)}
+.fb.no{border-left-color:var(--bad);background:var(--sal-soft)}
+.fb b{display:block}
+.fig{display:flex;justify-content:center}
+.fig svg{max-width:100%;height:auto}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.1;margin:0 3px}
+.fr span+span{border-top:1.5px solid currentColor}
+.hint{color:var(--muted);font-size:.92rem}
+details{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px 14px}
+summary{cursor:pointer;font-weight:600}
+.voc{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;margin-top:8px;font-size:.95rem}
+.voc span:nth-child(odd){font-weight:600}
+@media (max-width:560px){
+  .tabs{grid-template-columns:repeat(2,1fr)}
+  .chips{grid-template-columns:repeat(3,1fr)}
+  h1{font-size:1.6rem}
+  .voc{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out}@keyframes in{from{transform:translateY(4px)}to{transform:none}}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Detektyw <span>figur</span></h1>
+      <p class="sub">Własności trójkątów i czworokątów · klasa 8</p>
+    </div>
+    <div class="score"><span class="pill" id="pts">★ 0</span><span class="pill" id="streak">seria 0</span></div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-cechy" aria-selected="true" data-mode="cechy"><b>Kto to ma?</b>własności</button>
+    <button class="tab" role="tab" id="t-pf" aria-selected="false" data-mode="pf"><b>P czy F?</b>zdania</button>
+    <button class="tab" role="tab" id="t-katy" aria-selected="false" data-mode="katy"><b>Kąty</b>oblicz</button>
+    <button class="tab" role="tab" id="t-pole" aria-selected="false" data-mode="pole"><b>Pola</b>oblicz</button>
+  </div>
+
+  <section class="card" id="card" aria-live="polite"></section>
+
+  <details>
+    <summary>Słowniczek PL–UA</summary>
+    <div class="voc">
+      <span>trapez</span><span>трапеція (у Польщі: щонайменше одна пара паралельних сторін)</span>
+      <span>równoległobok</span><span>паралелограм</span>
+      <span>romb / prostokąt / kwadrat</span><span>ромб / прямокутник / квадрат</span>
+      <span>przekątna</span><span>діагональ</span>
+      <span>prostopadłe / równoległe</span><span>перпендикулярні / паралельні</span>
+      <span>kąt przyległy / wierzchołkowy</span><span>суміжний / вертикальний кут</span>
+      <span>kąt zewnętrzny</span><span>зовнішній кут</span>
+      <span>trójkąt równoramienny / równoboczny</span><span>рівнобедрений / рівносторонній</span>
+      <span>ramię / podstawa / wysokość</span><span>бічна сторона / основа / висота</span>
+    </div>
+  </details>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const card = $('#card');
+let mode = 'cechy', pts = 0, streak = 0;
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const fmt = n => String(Math.round(n * 100) / 100).replace('.', ',');
+const FR = (a, b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+
+function score(ok) {
+  if (ok) { pts += 1; streak += 1; } else streak = 0;
+  $('#pts').textContent = '★ ' + pts;
+  $('#streak').textContent = 'seria ' + streak;
+}
+
+/* ---------- figure icons ---------- */
+const S = 'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"';
+const ICON = {
+  trapez: `<svg viewBox="0 0 70 44"><path ${S} d="M6 38 L64 38 L50 7 L20 7 Z"/></svg>`,
+  rownoleglobok: `<svg viewBox="0 0 70 44"><path ${S} d="M4 38 L50 38 L66 7 L20 7 Z"/></svg>`,
+  romb: `<svg viewBox="0 0 70 44"><path ${S} d="M35 3 L56 22 L35 41 L14 22 Z"/></svg>`,
+  prostokat: `<svg viewBox="0 0 70 44"><path ${S} d="M8 8 H62 V36 H8 Z"/></svg>`,
+  kwadrat: `<svg viewBox="0 0 70 44"><path ${S} d="M21 6 H49 V36 H21 Z"/></svg>`
+};
+const FIG = [['trapez', 'trapez'], ['rownoleglobok', 'równoległobok'], ['romb', 'romb'], ['prostokat', 'prostokąt'], ['kwadrat', 'kwadrat']];
+
+/* ---------- mode 1: which figures ALWAYS have the property ---------- */
+const PROPS = [
+  ['ma co najmniej jedną parę boków równoległych', [1, 1, 1, 1, 1], 'Tak definiujemy trapez w Polsce, a każdy równoległobok też ją ma.'],
+  ['ma dwie pary boków równoległych', [0, 1, 1, 1, 1], 'To definicja równoległoboku; romb, prostokąt i kwadrat są równoległobokami.'],
+  ['ma wszystkie boki równe', [0, 0, 1, 0, 1], 'Romb i kwadrat (kwadrat jest rombem).'],
+  ['ma wszystkie kąty proste', [0, 0, 0, 1, 1], 'Prostokąt i kwadrat (kwadrat jest prostokątem).'],
+  ['ma przekątne, które przecinają się w połowie', [0, 1, 1, 1, 1], 'Tak jest w każdym równoległoboku.'],
+  ['ma przekątne prostopadłe', [0, 0, 1, 0, 1], 'Romb i kwadrat. W prostokącie przekątne nie są prostopadłe (chyba że to kwadrat).'],
+  ['ma przekątne równej długości', [0, 0, 0, 1, 1], 'Prostokąt i kwadrat. (Trapez równoramienny też, ale nie każdy trapez.)'],
+  ['ma przeciwległe kąty równe', [0, 1, 1, 1, 1], 'Każdy równoległobok.'],
+  ['ma przeciwległe boki równe', [0, 1, 1, 1, 1], 'Każdy równoległobok.'],
+  ['ma sumę kątów równą 360°', [1, 1, 1, 1, 1], 'Każdy czworokąt: przekątna dzieli go na dwa trójkąty, 2 · 180° = 360°.'],
+  ['ma przekątne, które dzielą kąty na połowy', [0, 0, 1, 0, 1], 'Romb i kwadrat.'],
+  ['ma pole P = e · f : 2 (przekątne)', [0, 0, 1, 0, 1], 'Wzór z przekątnych działa dla rombu i kwadratu (dla kwadratu P = d² : 2).'],
+  ['ma pole P = a · h (bok razy wysokość na ten bok)', [0, 1, 1, 1, 1], 'Każdy równoległobok; w prostokącie wysokością jest drugi bok.'],
+  ['ma kąty przy tym samym ramieniu dające razem 180°', [1, 1, 1, 1, 1], 'Każdy trapez, więc też każdy równoległobok.']
+];
+let deck1 = [];
+function renderCechy() {
+  if (!deck1.length) deck1 = shuffle(PROPS);
+  const [txt, ans, why] = deck1.pop();
+  const sel = [0, 0, 0, 0, 0];
+  card.innerHTML = `<div class="kicker">Kto to ma? Zaznacz wszystkie figury, które ZAWSZE mają tę własność</div>
+    <p class="q">Czworokąt, który ${txt}</p>
+    <div class="chips">${FIG.map(([k, n], i) => `<button class="chip" id="ch${i}" aria-pressed="false" data-i="${i}">${ICON[k]}<span>${n}</span></button>`).join('')}</div>
+    <div class="row"><button class="btn" id="chk">Sprawdź</button></div><div id="out"></div>`;
+  card.querySelectorAll('.chip').forEach(b => b.onclick = () => {
+    if (b.disabled) return;
+    const i = +b.dataset.i; sel[i] = 1 - sel[i]; b.setAttribute('aria-pressed', sel[i] ? 'true' : 'false');
+  });
+  $('#chk').onclick = () => {
+    let ok = true;
+    card.querySelectorAll('.chip').forEach(b => {
+      const i = +b.dataset.i; b.disabled = true;
+      if (sel[i] && ans[i]) b.classList.add('ok');
+      else if (sel[i] && !ans[i]) { b.classList.add('bad'); ok = false; }
+      else if (!sel[i] && ans[i]) { b.classList.add('miss'); ok = false; }
+    });
+    score(ok);
+    $('#out').innerHTML = `<div class="fb ${ok ? '' : 'no'}"><b>${ok ? 'Dobrze!' : 'Nie całkiem. Przerywana ramka = figura, której zabrakło.'}</b>${why}</div>
+      <div class="row" style="margin-top:10px"><button class="btn" id="nx">Dalej</button></div>`;
+    $('#chk').disabled = true; $('#nx').onclick = renderCechy; $('#nx').focus();
+  };
+}
+
+/* ---------- mode 2: true / false ---------- */
+const PF = [
+  ['Suma kątów trójkąta wynosi 180°.', 1, ''],
+  ['Trójkąt może mieć dwa kąty rozwarte.', 0, 'Dwa kąty rozwarte to już ponad 180°.'],
+  ['Istnieje trójkąt o bokach 3 cm, 4 cm i 8 cm.', 0, '3 + 4 = 7, a najdłuższy bok musi być krótszy od sumy pozostałych.'],
+  ['Istnieje trójkąt o bokach 5 cm, 5 cm i 9 cm.', 1, '5 + 5 = 10, a 10 jest większe od 9.'],
+  ['Każdy trójkąt równoboczny jest równoramienny.', 1, 'Ma nawet trzy równe boki, więc na pewno dwa.'],
+  ['Każdy trójkąt równoramienny jest równoboczny.', 0, 'Np. boki 5, 5, 8.'],
+  ['Trójkąt prostokątny może być równoramienny.', 1, 'Kąty 90°, 45°, 45°.'],
+  ['W trójkącie równobocznym każdy kąt ma 60°.', 1, '180° : 3 = 60°.'],
+  ['Kąt zewnętrzny trójkąta jest równy sumie dwóch kątów wewnętrznych do niego nieprzyległych.', 1, ''],
+  ['Kąty wierzchołkowe dają razem 180°.', 0, 'Kąty wierzchołkowe są równe. 180° dają kąty przyległe.'],
+  ['Kąty przyległe dają razem 180°.', 1, ''],
+  ['W trójkącie prostokątnym dwa kąty ostre dają razem 90°.', 1, '180° − 90° = 90°.'],
+  ['Każdy kwadrat jest prostokątem.', 1, 'Ma wszystkie kąty proste.'],
+  ['Każdy prostokąt jest kwadratem.', 0, 'Prostokąt nie musi mieć równych boków.'],
+  ['Każdy romb jest równoległobokiem.', 1, ''],
+  ['Każdy równoległobok jest trapezem.', 1, 'W Polsce trapez ma co najmniej jedną parę boków równoległych.'],
+  ['Każdy trapez jest równoległobokiem.', 0, 'Trapez może mieć tylko jedną parę boków równoległych.'],
+  ['Kwadrat jest rombem.', 1, 'Ma wszystkie boki równe.'],
+  ['Przekątne każdego prostokąta są prostopadłe.', 0, 'Tylko w kwadracie.'],
+  ['Przekątne rombu są prostopadłe.', 1, ''],
+  ['Suma kątów czworokąta wynosi 360°.', 1, ''],
+  ['W trapezie równoramiennym przekątne mają równą długość.', 1, ''],
+  ['Jeśli dwa trójkąty mają takie same kąty, to są przystające.', 0, 'Mogą mieć inną wielkość (jeden jest powiększeniem drugiego).'],
+  ['Cecha bkb: dwa boki i kąt między nimi.', 1, ''],
+  ['W równoległoboku sąsiednie kąty są równe.', 0, 'Równe są przeciwległe; sąsiednie dają 180°.'],
+  ['Wysokość równoległoboku opuszczona na dłuższy bok jest krótsza.', 1, 'Pole jest stałe: dłuższy bok razy krótsza wysokość.']
+];
+let deck2 = [];
+function renderPF() {
+  if (!deck2.length) deck2 = shuffle(PF);
+  const [txt, ans, why] = deck2.pop();
+  card.innerHTML = `<div class="kicker">Prawda czy fałsz?</div><p class="q">${txt}</p>
+    <div class="row"><button class="btn pf" id="bP">P</button><button class="btn pf ghost" id="bF">F</button></div><div id="out"></div>`;
+  const go = v => {
+    const ok = v === ans; score(ok);
+    $('#bP').disabled = $('#bF').disabled = true;
+    $('#out').innerHTML = `<div class="fb ${ok ? '' : 'no'}"><b>${ok ? 'Dobrze!' : 'Źle.'} Odpowiedź: ${ans ? 'P (prawda)' : 'F (fałsz)'}.</b>${why}</div>
+      <div class="row" style="margin-top:10px"><button class="btn" id="nx">Dalej</button></div>`;
+    $('#nx').onclick = renderPF; $('#nx').focus();
+  };
+  $('#bP').onclick = () => go(1); $('#bF').onclick = () => go(0);
+}
+
+/* ---------- mode 3: angles (generated) ---------- */
+const svgWrap = (w, h, body) => `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" font-family="STIX Two Text, serif" font-size="15">${body}</svg>`;
+const P_ = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"';
+function angleTask() {
+  const t = rnd(0, 5);
+  if (t === 0) { const a = rnd(25, 85), b = rnd(20, 175 - a - 10), c = 180 - a - b;
+    return { q: `Dwa kąty trójkąta mają ${a}° i ${b}°. Oblicz trzeci kąt.`, ans: c, why: `180° − ${a}° − ${b}° = ${c}°.`,
+      fig: svgWrap(240, 120, `<path ${P_} d="M20 105 L220 105 L130 15 Z"/><text x="38" y="98">${a}°</text><text x="178" y="98">${b}°</text><text x="122" y="42">?</text>`) }; }
+  if (t === 1) { const top = 2 * rnd(10, 60), base = (180 - top) / 2;
+    return { q: `Kąt między ramionami trójkąta równoramiennego ma ${top}°. Oblicz kąt przy podstawie.`, ans: base, why: `(180° − ${top}°) : 2 = ${base}°.`,
+      fig: svgWrap(240, 120, `<path ${P_} d="M30 105 L210 105 L120 12 Z"/><text x="111" y="40">${top}°</text><text x="48" y="98">?</text>`) }; }
+  if (t === 2) { const a = rnd(35, 80);
+    return { q: `W trapezie kąt przy dłuższej podstawie ma ${a}°. Oblicz kąt przy tym samym ramieniu, przy krótszej podstawie.`, ans: 180 - a, why: `Kąty przy tym samym ramieniu dają 180°: 180° − ${a}° = ${180 - a}°.`,
+      fig: svgWrap(260, 110, `<path ${P_} d="M15 95 L245 95 L185 20 L70 20 Z"/><text x="30" y="88">${a}°</text><text x="72" y="40">?</text>`) }; }
+  if (t === 3) { const a = rnd(40, 80);
+    return { q: `Kąt ostry równoległoboku ma ${a}°. Oblicz kąt rozwarty.`, ans: 180 - a, why: `Sąsiednie kąty równoległoboku dają 180°: 180° − ${a}° = ${180 - a}°.`,
+      fig: svgWrap(260, 110, `<path ${P_} d="M10 95 L190 95 L250 18 L70 18 Z"/><text x="26" y="88">${a}°</text><text x="170" y="88">?</text>`) }; }
+  if (t === 4) { const a = rnd(25, 75);
+    return { q: `Przekątna rombu tworzy z bokiem kąt ${a}°. Oblicz kąt rombu przy tym wierzchołku.`, ans: 2 * a, why: `Przekątna rombu dzieli kąt na połowy: 2 · ${a}° = ${2 * a}°.`,
+      fig: svgWrap(240, 120, `<path ${P_} d="M120 8 L215 60 L120 112 L25 60 Z"/><line x1="25" y1="60" x2="215" y2="60" stroke="currentColor" stroke-width="1.2"/><text x="48" y="54">${a}°</text>`) }; }
+  const a = rnd(30, 70), b = rnd(30, 80);
+  return { q: `W trójkącie dwa kąty mają ${a}° i ${b}°. Oblicz kąt zewnętrzny przy trzecim wierzchołku.`, ans: a + b, why: `Kąt zewnętrzny = suma dwóch kątów nieprzyległych: ${a}° + ${b}° = ${a + b}°.`,
+    fig: svgWrap(260, 120, `<path ${P_} d="M15 105 L185 105 L110 15 Z"/><line x1="185" y1="105" x2="250" y2="105" stroke="currentColor" stroke-width="2"/><text x="32" y="98">${a}°</text><text x="102" y="42">${b}°</text><text x="200" y="98">?</text>`) };
+}
+
+/* ---------- mode 4: areas (generated) ---------- */
+function areaTask() {
+  const t = rnd(0, 5);
+  if (t === 0) { const a = rnd(4, 14), h = rnd(3, 12);
+    return { q: `Trójkąt ma podstawę ${a} cm i wysokość ${h} cm. Oblicz pole (cm²).`, ans: a * h / 2, why: `P = ${FR('a · h', '2')} = ${FR(a + ' · ' + h, '2')} = ${fmt(a * h / 2)} cm².` }; }
+  if (t === 1) { const a = rnd(5, 14), h = rnd(3, 10);
+    return { q: `Równoległobok ma bok ${a} cm i wysokość ${h} cm opuszczoną na ten bok. Oblicz pole (cm²).`, ans: a * h, why: `P = a · h = ${a} · ${h} = ${a * h} cm².` }; }
+  if (t === 2) { const e = rnd(4, 14), f = rnd(4, 14);
+    return { q: `Przekątne rombu mają ${e} cm i ${f} cm. Oblicz pole (cm²).`, ans: e * f / 2, why: `P = ${FR('e · f', '2')} = ${FR(e + ' · ' + f, '2')} = ${fmt(e * f / 2)} cm².` }; }
+  if (t === 3) { const a = rnd(6, 14), b = rnd(2, a - 2), h = rnd(3, 9);
+    return { q: `Trapez ma podstawy ${a} cm i ${b} cm, a wysokość ${h} cm. Oblicz pole (cm²).`, ans: (a + b) * h / 2, why: `P = ${FR('(a + b) · h', '2')} = ${FR('(' + a + ' + ' + b + ') · ' + h, '2')} = ${fmt((a + b) * h / 2)} cm².` }; }
+  if (t === 4) { const a = rnd(3, 12), b = rnd(3, 12), P = a * b;
+    return { q: `Prostokąt ma pole ${P} cm², a jeden bok ${a} cm. Oblicz drugi bok (cm).`, ans: b, why: `P = a · b, więc b = ${P} : ${a} = ${b} cm.` }; }
+  const d = 2 * rnd(2, 7);
+  return { q: `Przekątna kwadratu ma ${d} cm. Oblicz pole kwadratu (cm²).`, ans: d * d / 2, why: `Kwadrat to też romb: P = ${FR('d²', '2')} = ${FR(d + '²', '2')} = ${fmt(d * d / 2)} cm².` };
+}
+
+function renderNum(gen, kicker, unit) {
+  const T = gen();
+  card.innerHTML = `<div class="kicker">${kicker}</div><p class="q">${T.q}</p>${T.fig ? `<div class="fig">${T.fig}</div>` : ''}
+    <form class="row" id="f"><label for="ans" class="hint">Odpowiedź:</label><input class="num" id="ans" inputmode="decimal" autocomplete="off"><span>${unit}</span><button class="btn" id="chk">Sprawdź</button></form><div id="out"></div>`;
+  const inp = $('#ans'); inp.focus({ preventScroll: true });
+  $('#f').onsubmit = e => {
+    e.preventDefault();
+    const v = parseFloat(inp.value.replace(',', '.').replace(/[^0-9.\-]/g, ''));
+    if (isNaN(v)) { inp.focus(); return; }
+    const ok = Math.abs(v - T.ans) < 0.01; score(ok);
+    inp.disabled = true; $('#chk').disabled = true;
+    $('#out').innerHTML = `<div class="fb ${ok ? '' : 'no'}"><b>${ok ? 'Dobrze!' : 'Źle. Poprawnie: ' + fmt(T.ans) + ' ' + unit}</b>${T.why}</div>
+      <div class="row" style="margin-top:10px"><button class="btn" id="nx">Dalej</button></div>`;
+    $('#nx').onclick = () => renderNum(gen, kicker, unit); $('#nx').focus();
+  };
+}
+
+const MODES = {
+  cechy: renderCechy, pf: renderPF,
+  katy: () => renderNum(angleTask, 'Oblicz kąt (w stopniach)', '°'),
+  pole: () => renderNum(areaTask, 'Oblicz (wpisz samą liczbę, ułamek dziesiętny z przecinkiem)', '')
+};
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t ? 'true' : 'false'));
+  mode = t.dataset.mode; MODES[mode]();
+});
+renderCechy();
+</script>
+
+</body></html>

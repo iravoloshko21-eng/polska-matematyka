@@ -1,0 +1,238 @@
+<!doctype html><html lang="pl"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"></head><body>
+<a href="../" style="position:fixed;z-index:9999;left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));background:#151515;color:#fbf6ea;font:700 13px/1 Inter,system-ui,sans-serif;text-decoration:none;border-radius:999px;padding:10px 14px;box-shadow:3px 3px 0 #5157d6">← Trenażery</a>
+<title>Liczbowe łowy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Nunito:wght@400;700;800&display=swap">
+<style>
+/* Layout: zeszyt w kratkę — jedna kolumna, zakładki z grami, duże przyciski do klikania palcem */
+:root {
+  --paper: #fbfcf8; --grid: #dfe7f1; --ink: #1d2b4f; --pen: #2450b8; --red: #c8352e; --green: #23834c;
+  --card: #ffffff; --muted: #66718a; --chip: #eaf0fb; --line: #c9d3e6;
+  --display: "Gochi Hand", "Comic Sans MS", cursive; --body: "Nunito", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #141a26; --grid: #1f2838; --ink: #e5ebf7; --pen: #7fa6ff; --red: #ff7a6e; --green: #5fd18f;
+  --card: #1b2333; --muted: #9aa6bf; --chip: #263250; --line: #34415c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #141a26; --grid: #1f2838; --ink: #e5ebf7; --pen: #7fa6ff; --red: #ff7a6e; --green: #5fd18f;
+  --card: #1b2333; --muted: #9aa6bf; --chip: #263250; --line: #34415c; color-scheme: dark }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 22px 22px; }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-family: var(--display); font-weight: 400; font-size: 2.6rem; margin: 0; color: var(--pen); text-wrap: balance; }
+.sub { color: var(--muted); margin: 2px 0 16px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.tab { font: 700 1rem var(--body); border: 2px solid var(--pen); background: var(--card); color: var(--pen);
+  border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--pen); color: var(--paper); }
+.panel { background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 14px; }
+.panel h2 { font-family: var(--display); font-weight: 400; font-size: 1.9rem; margin: 0; }
+.rule { background: var(--chip); border-radius: 10px; padding: 10px 14px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.score { font-weight: 800; font-variant-numeric: tabular-nums; }
+button.big { font: 800 1.05rem var(--body); border: none; border-radius: 10px; padding: 12px 20px; cursor: pointer;
+  background: var(--pen); color: var(--paper); }
+button.ghost { background: transparent; color: var(--pen); border: 2px solid var(--pen); }
+button:focus-visible, .cell:focus-visible, .bin:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+.board { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
+.cell { aspect-ratio: 1; max-width: 100%; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper);
+  color: var(--ink); font: 800 clamp(.8rem, 3.2vw, 1.15rem) var(--body); cursor: pointer; font-variant-numeric: tabular-nums; padding: 0; }
+.cell.on { background: var(--pen); color: var(--paper); border-color: var(--pen); }
+.cell.ok { background: var(--green); color: var(--paper); border-color: var(--green); }
+.cell.bad { background: var(--red); color: var(--paper); border-color: var(--red); }
+.cell.miss { border: 3px dashed var(--red); }
+.target { font-family: var(--display); font-size: 2.2rem; color: var(--red); }
+.q { font-size: 1.5rem; font-weight: 800; text-align: center; }
+.feedback { min-height: 2.6em; font-weight: 700; }
+.feedback.good { color: var(--green); } .feedback.wrong { color: var(--red); }
+.bins { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.bin { border: 2px dashed var(--pen); border-radius: 12px; background: var(--paper); color: var(--pen); padding: 14px 6px;
+  font: 800 1.05rem var(--body); cursor: pointer; }
+.bin.on { background: var(--pen); color: var(--paper); border-style: solid; }
+.bin.ok { background: var(--green); border-color: var(--green); color: var(--paper); border-style: solid; }
+.bin.bad { background: var(--red); border-color: var(--red); color: var(--paper); border-style: solid; }
+.bigNum { font-family: var(--display); font-size: 3.6rem; text-align: center; color: var(--ink); line-height: 1; }
+.bigNum .last { color: var(--red); text-decoration: underline; }
+.progress { color: var(--muted); font-weight: 700; }
+@media (max-width: 480px) { .bins { grid-template-columns: repeat(2, 1fr); } .board { gap: 3px; } }
+@media (prefers-reduced-motion: no-preference) { .cell, .bin, .tab { transition: background .15s, color .15s; } }
+</style>
+
+<div class="wrap">
+  <h1>Liczbowe łowy</h1>
+  <p class="sub">Trzy gry o wielokrotnościach, dzielnikach i cechach podzielności. Klasa 5.</p>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t1" aria-selected="true" data-p="p1">Łowca wielokrotności</button>
+    <button class="tab" role="tab" id="t2" aria-selected="false" data-p="p2">Dzielnik czy nie?</button>
+    <button class="tab" role="tab" id="t3" aria-selected="false" data-p="p3">Sortownia</button>
+  </div>
+
+  <section class="panel" id="p1">
+    <h2>Łowca wielokrotności</h2>
+    <div class="rule">Kliknij <b>wszystkie wielokrotności</b> liczby <span class="target" id="mTarget">4</span> na planszy, a potem naciśnij „Sprawdź”.</div>
+    <div class="board" id="board"></div>
+    <div class="row">
+      <button class="big" id="mCheck">Sprawdź</button>
+      <button class="big ghost" id="mNext">Nowa liczba</button>
+      <span class="score" id="mScore">Punkty: 0</span>
+    </div>
+    <div class="feedback" id="mFb"></div>
+  </section>
+
+  <section class="panel" id="p2" hidden>
+    <h2>Dzielnik czy nie?</h2>
+    <div class="rule">Odpowiedz <b>TAK</b> albo <b>NIE</b>. Podpowiedź: podziel w pamięci i sprawdź, czy zostaje reszta.</div>
+    <div class="progress" id="dProg">Pytanie 1 z 10</div>
+    <div class="q" id="dQ"></div>
+    <div class="row" style="justify-content:center">
+      <button class="big" id="dYes">TAK</button>
+      <button class="big" id="dNo">NIE</button>
+    </div>
+    <div class="feedback" id="dFb"></div>
+    <div class="row"><span class="score" id="dScore">Dobrze: 0</span><button class="big ghost" id="dRestart">Zagraj od nowa</button></div>
+  </section>
+
+  <section class="panel" id="p3" hidden>
+    <h2>Sortownia</h2>
+    <div class="rule">Zaznacz <b>wszystkie</b> koszyki, do których pasuje liczba. Patrz na <b>ostatnie cyfry</b>! Może pasować kilka koszyków albo żaden.</div>
+    <div class="progress" id="sProg">Liczba 1 z 10</div>
+    <div class="bigNum" id="sNum"></div>
+    <div class="bins">
+      <button class="bin" data-d="2">przez 2</button>
+      <button class="bin" data-d="5">przez 5</button>
+      <button class="bin" data-d="10">przez 10</button>
+      <button class="bin" data-d="100">przez 100</button>
+    </div>
+    <div class="row"><button class="big" id="sCheck">Sprawdź</button><button class="big ghost" id="sNext" hidden>Dalej</button>
+      <span class="score" id="sScore">Dobrze: 0</span></div>
+    <div class="feedback" id="sFb"></div>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = rnd(0, i); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => { x.setAttribute('aria-selected', x === t); $(x.dataset.p).hidden = x !== t; });
+}));
+
+/* Gra 1 */
+let mN = 4, mScore = 0, mDone = false, mPrev = 0;
+function mBuild() {
+  const b = $('board'); b.innerHTML = '';
+  for (let i = 1; i <= 50; i++) {
+    const c = document.createElement('button'); c.className = 'cell'; c.textContent = i; c.dataset.v = i;
+    c.addEventListener('click', () => { if (!mDone) c.classList.toggle('on'); });
+    b.appendChild(c);
+  }
+}
+function mNew() {
+  const opts = [2, 3, 4, 5, 6, 7, 8, 9, 10].filter(x => x !== mPrev);
+  mN = opts[rnd(0, opts.length - 1)]; mPrev = mN; mDone = false;
+  $('mTarget').textContent = mN; $('mFb').textContent = ''; $('mFb').className = 'feedback'; mBuild();
+}
+$('mCheck').addEventListener('click', () => {
+  if (mDone) return; mDone = true;
+  let good = 0, bad = 0, miss = 0;
+  document.querySelectorAll('.cell').forEach(c => {
+    const v = +c.dataset.v, isM = v % mN === 0, on = c.classList.contains('on');
+    c.classList.remove('on');
+    if (isM && on) { c.classList.add('ok'); good++; }
+    else if (!isM && on) { c.classList.add('bad'); bad++; }
+    else if (isM) { c.classList.add('miss'); miss++; }
+  });
+  mScore += good - bad;
+  $('mScore').textContent = 'Punkty: ' + mScore;
+  const fb = $('mFb');
+  if (!bad && !miss) { fb.textContent = 'Brawo! Wszystkie ' + good + ' wielokrotności liczby ' + mN + ' znalezione.'; fb.className = 'feedback good'; }
+  else { fb.textContent = 'Dobrze: ' + good + '. Pomyłki (czerwone): ' + bad + '. Przegapione (przerywana ramka): ' + miss + '. Wielokrotności ' + mN + ' to: ' + mN + ', ' + 2*mN + ', ' + 3*mN + ', …'; fb.className = 'feedback wrong'; }
+});
+$('mNext').addEventListener('click', mNew);
+mNew();
+
+/* Gra 2 */
+let dQs = [], dI = 0, dGood = 0, dLock = false;
+function dMake() {
+  const qs = [];
+  while (qs.length < 10) {
+    const d = rnd(2, 9), yes = Math.random() < 0.5;
+    let n = d * rnd(2, 10);
+    if (!yes) n += rnd(1, d - 1);
+    const form = rnd(0, 2);
+    const text = form === 0 ? `Czy ${d} jest dzielnikiem liczby ${n}?`
+      : form === 1 ? `Czy ${n} jest wielokrotnością liczby ${d}?`
+      : `Czy ${n} dzieli się przez ${d}?`;
+    qs.push({ d, n, yes: n % d === 0, text });
+  }
+  return qs;
+}
+function dShow() {
+  dLock = false;
+  if (dI >= dQs.length) {
+    $('dQ').textContent = `Koniec! Wynik: ${dGood} / 10`;
+    $('dFb').textContent = dGood >= 8 ? 'Świetnie!' : 'Zagraj jeszcze raz, będzie lepiej!';
+    $('dFb').className = 'feedback good'; $('dProg').textContent = ''; return;
+  }
+  $('dProg').textContent = `Pytanie ${dI + 1} z 10`; $('dQ').textContent = dQs[dI].text;
+  $('dFb').textContent = ''; $('dFb').className = 'feedback';
+}
+function dAnswer(ans) {
+  if (dLock || dI >= dQs.length) return; dLock = true;
+  const q = dQs[dI], r = q.n % q.d, ok = ans === q.yes;
+  if (ok) dGood++;
+  const why = r === 0 ? `${q.n} : ${q.d} = ${q.n / q.d} (bez reszty)` : `${q.n} : ${q.d} = ${Math.floor(q.n / q.d)} r. ${r}`;
+  $('dFb').textContent = (ok ? 'Dobrze! ' : 'Nie tym razem. ') + why;
+  $('dFb').className = 'feedback ' + (ok ? 'good' : 'wrong');
+  $('dScore').textContent = 'Dobrze: ' + dGood;
+  setTimeout(() => { dI++; dShow(); }, 1800);
+}
+function dStart() { dQs = dMake(); dI = 0; dGood = 0; $('dScore').textContent = 'Dobrze: 0'; dShow(); }
+$('dYes').addEventListener('click', () => dAnswer(true));
+$('dNo').addEventListener('click', () => dAnswer(false));
+$('dRestart').addEventListener('click', dStart);
+dStart();
+
+/* Gra 3 */
+const sPool = [14, 25, 30, 47, 60, 75, 88, 100, 105, 120, 133, 200, 245, 310, 500, 512, 625, 990, 1000, 1005, 1236, 2300, 3450, 7001];
+let sNums = [], sI = 0, sGood = 0, sDone = false;
+const bins = [...document.querySelectorAll('.bin')];
+bins.forEach(b => b.addEventListener('click', () => { if (!sDone) b.classList.toggle('on'); }));
+function sShow() {
+  sDone = false; bins.forEach(b => b.className = 'bin');
+  $('sCheck').hidden = false; $('sNext').hidden = true; $('sFb').textContent = ''; $('sFb').className = 'feedback';
+  if (sI >= 10) { $('sNum').textContent = `${sGood} / 10`; $('sProg').textContent = 'Koniec gry'; $('sCheck').hidden = true; $('sNext').hidden = false; $('sNext').textContent = 'Zagraj od nowa'; return; }
+  $('sProg').textContent = `Liczba ${sI + 1} z 10`;
+  $('sNum').textContent = sNums[sI];
+}
+$('sCheck').addEventListener('click', () => {
+  if (sDone) return; sDone = true;
+  const n = sNums[sI]; let all = true;
+  bins.forEach(b => {
+    const fits = n % +b.dataset.d === 0, on = b.classList.contains('on');
+    b.classList.remove('on');
+    if (fits) b.classList.add(on ? 'ok' : 'bad'); else if (on) b.classList.add('bad');
+    if (fits !== on) all = false;
+  });
+  if (all) sGood++;
+  const s = String(n), last = s.slice(-1), two = s.slice(-2);
+  const fitsList = [2, 5, 10, 100].filter(d => n % d === 0);
+  $('sNum').innerHTML = s.length > 2 && n % 100 === 0 ? s.slice(0, -2) + '<span class="last">' + two + '</span>' : s.slice(0, -1) + '<span class="last">' + last + '</span>';
+  $('sFb').textContent = (all ? 'Dobrze! ' : 'Prawie! ') + `Ostatnia cyfra to ${last}. ` +
+    (fitsList.length ? `${n} dzieli się przez: ${fitsList.join(', ')}.` : `${n} nie dzieli się przez 2, 5, 10 ani 100.`);
+  $('sFb').className = 'feedback ' + (all ? 'good' : 'wrong');
+  $('sScore').textContent = 'Dobrze: ' + sGood;
+  $('sCheck').hidden = true; $('sNext').hidden = false; $('sNext').textContent = 'Dalej';
+});
+$('sNext').addEventListener('click', () => {
+  if (sI >= 10) { sStart(); return; }
+  sI++; sShow();
+});
+function sStart() { sNums = shuffle([...sPool]).slice(0, 10); sI = 0; sGood = 0; $('sScore').textContent = 'Dobrze: 0'; sShow(); }
+sStart();
+</script>
+
+</body></html>

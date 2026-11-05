@@ -1,0 +1,322 @@
+<!doctype html><html lang="pl"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"></head><body>
+<a href="../" style="position:fixed;z-index:9999;left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));background:#151515;color:#fbf6ea;font:700 13px/1 Inter,system-ui,sans-serif;text-decoration:none;border-radius:999px;padding:10px 14px;box-shadow:3px 3px 0 #5157d6">← Trenażery</a>
+<title>Potęgowy sprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: one centred card on squared exercise-book paper; question big, four answers in a 2x2 grid. */
+:root {
+  --paper: #fbfcfe;
+  --grid: #dce6f2;
+  --ink: #1b2a3a;
+  --muted: #5d6c7d;
+  --card: #ffffff;
+  --line: #c9d5e3;
+  --accent: #d1422c;      /* red teacher's pen */
+  --accent-ink: #ffffff;
+  --good: #1f7a4a;
+  --good-bg: #e2f3e9;
+  --bad: #b3261e;
+  --bad-bg: #fbe5e2;
+  --font-display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-math: "Space Mono", "DejaVu Sans Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #121a24; --grid: #1e2a38; --ink: #e8eef5; --muted: #9aabbd; --card: #18222e; --line: #2c3a4b;
+  --accent: #ff6b52; --accent-ink: #1a0d0a; --good: #6fd39c; --good-bg: #173326; --bad: #ff8a80; --bad-bg: #3a1c1a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #121a24; --grid: #1e2a38; --ink: #e8eef5; --muted: #9aabbd; --card: #18222e; --line: #2c3a4b;
+  --accent: #ff6b52; --accent-ink: #1a0d0a; --good: #6fd39c; --good-bg: #173326; --bad: #ff8a80; --bad-bg: #3a1c1a; color-scheme: dark }
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 32px;
+}
+.wrap { max-width: 640px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 7vw, 40px); margin: 0; letter-spacing: -0.02em; line-height: 1; }
+h1 sup { color: var(--accent); font-size: 0.55em; }
+.tag { font-size: 13px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 18px; }
+.hud { display: flex; gap: 10px; flex-wrap: wrap; font-family: var(--font-math); font-variant-numeric: tabular-nums; }
+.pill { border: 1.5px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+.pill b { font-weight: 700; }
+.pill.time b { color: var(--accent); }
+.bar { height: 6px; border-radius: 3px; background: var(--grid); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 100%; background: var(--accent); transition: width 0.25s linear; }
+.cat { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.q { font-family: var(--font-math); font-size: clamp(26px, 7vw, 40px); text-align: center; padding: 10px 0; line-height: 1.5; overflow-wrap: anywhere; }
+.q sup, .opt sup { font-size: 0.6em; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.opt { font-family: var(--font-math); font-size: clamp(20px, 5.5vw, 28px); padding: 16px 10px; border-radius: 12px; border: 2px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; min-height: 72px; display: flex; align-items: center; justify-content: center; gap: 8px; position: relative; }
+.opt .k { position: absolute; top: 6px; left: 9px; font-size: 11px; color: var(--muted); font-family: var(--font-body); }
+.opt:hover:not(:disabled) { border-color: var(--accent); }
+.opt:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.opt.ok { background: var(--good-bg); border-color: var(--good); color: var(--good); }
+.opt.no { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+.opt:disabled { cursor: default; }
+.fb { min-height: 52px; font-size: 16px; line-height: 1.4; }
+.fb.good { color: var(--good); }
+.fb.bad { color: var(--bad); }
+.fb .rule { display: block; color: var(--ink); margin-top: 4px; font-family: var(--font-math); font-size: 15px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn { font-family: var(--font-body); font-weight: 700; font-size: 16px; border-radius: 10px; padding: 12px 18px; border: 2px solid var(--ink); background: var(--card); color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.mode { text-align: left; border: 2px solid var(--line); border-radius: 12px; padding: 16px; background: var(--card); color: var(--ink); cursor: pointer; display: grid; gap: 6px; font-family: var(--font-body); font-size: 15px; }
+.mode:hover { border-color: var(--accent); }
+.mode strong { font-family: var(--font-display); font-size: 21px; }
+.mode span { color: var(--muted); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { border: 1.5px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 14px; background: var(--card); color: var(--ink); cursor: pointer; font-family: var(--font-body); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.big { font-family: var(--font-display); font-weight: 800; font-size: 64px; line-height: 1; }
+.muted { color: var(--muted); }
+ul.rules { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-family: var(--font-math); font-size: 15px; }
+.sheet { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 16px; font-family: var(--font-math); font-size: 15px; }
+h2 { font-family: var(--font-display); font-size: 22px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .bar > i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Potęgowy sprint<sup>2</sup></h1>
+    <span class="tag">matura podstawowa · potęgi</span>
+  </header>
+
+  <section class="card" id="menu">
+    <div class="modes">
+      <button class="mode" id="m-sprint" type="button"><strong>Sprint 60 s</strong><span>Ile poprawnych odpowiedzi zdążysz w minutę? Seria 3 dobrych z rzędu daje bonus +1.</span></button>
+      <button class="mode" id="m-train" type="button"><strong>Trening</strong><span>Bez zegara. Wybierz działy, a po każdej odpowiedzi zobaczysz regułę.</span></button>
+    </div>
+    <div>
+      <div class="cat" style="margin-bottom:8px">Działy</div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <p class="muted" id="best" style="margin:0"></p>
+  </section>
+
+  <section class="card" id="game" hidden>
+    <div class="hud">
+      <span class="pill time" id="h-time"><b id="t">60</b> s</span>
+      <span class="pill">punkty <b id="s">0</b></span>
+      <span class="pill">seria <b id="st">0</b></span>
+    </div>
+    <div class="bar" id="barwrap"><i id="bar"></i></div>
+    <div class="cat" id="cat"></div>
+    <div class="q" id="q" aria-live="polite"></div>
+    <div class="opts" id="opts"></div>
+    <div class="fb" id="fb" aria-live="polite"></div>
+    <div class="row">
+      <button class="btn primary" id="next" type="button" hidden>Dalej (Enter)</button>
+      <button class="btn" id="stop" type="button">Zakończ</button>
+    </div>
+  </section>
+
+  <section class="card" id="end" hidden>
+    <div class="cat">Wynik</div>
+    <div class="row" style="gap:18px"><span class="big" id="e-score">0</span><span class="muted" id="e-info"></span></div>
+    <div id="e-rules"></div>
+    <div class="row">
+      <button class="btn primary" id="again" type="button">Jeszcze raz</button>
+      <button class="btn" id="tomenu" type="button">Menu</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Ściąga</h2>
+    <div class="sheet">
+      <div>a<sup>m</sup> · a<sup>n</sup> = a<sup>m+n</sup></div>
+      <div>a<sup>m</sup> : a<sup>n</sup> = a<sup>m−n</sup></div>
+      <div>(a<sup>m</sup>)<sup>n</sup> = a<sup>m·n</sup></div>
+      <div>(a·b)<sup>n</sup> = a<sup>n</sup>·b<sup>n</sup></div>
+      <div>a<sup>0</sup> = 1</div>
+      <div>a<sup>−n</sup> = 1/a<sup>n</sup></div>
+      <div>4 = 2<sup>2</sup>, 8 = 2<sup>3</sup>, 16 = 2<sup>4</sup></div>
+      <div>9 = 3<sup>2</sup>, 27 = 3<sup>3</sup>, 25 = 5<sup>2</sup></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const neg = (n) => (n < 0 ? "−" + Math.abs(n) : String(n));
+  const P = (b, e) => `${b}<sup>${neg(e)}</sup>`;
+  const fr = (n, d) => `${n}/${d}`;
+
+  const CATS = {
+    mul: { name: "Mnożenie", rule: "a<sup>m</sup> · a<sup>n</sup> = a<sup>m+n</sup> (dodajemy wykładniki)" },
+    div: { name: "Dzielenie", rule: "a<sup>m</sup> : a<sup>n</sup> = a<sup>m−n</sup> (odejmujemy wykładniki)" },
+    pow: { name: "Potęga potęgi", rule: "(a<sup>m</sup>)<sup>n</sup> = a<sup>m·n</sup> (mnożymy wykładniki)" },
+    negx: { name: "Wykładnik ujemny i zero", rule: "a<sup>−n</sup> = 1/a<sup>n</sup>, a<sup>0</sup> = 1, (1/a)<sup>−n</sup> = a<sup>n</sup>" },
+    base: { name: "Wspólna podstawa", rule: "4 = 2<sup>2</sup>, 8 = 2<sup>3</sup>, 9 = 3<sup>2</sup>, 27 = 3<sup>3</sup>, 25 = 5<sup>2</sup>, 0,5 = 2<sup>−1</sup>" },
+    add: { name: "Dodawanie", rule: "a<sup>n</sup> + a<sup>n</sup> + … (k razy) = k · a<sup>n</sup>; gdy k = a, to a<sup>n+1</sup>" },
+    prod: { name: "Potęga iloczynu", rule: "(a·b)<sup>n</sup> = a<sup>n</sup>·b<sup>n</sup>, np. 2<sup>n</sup>·5<sup>n</sup> = 10<sup>n</sup>" },
+    sci: { name: "Notacja wykładnicza", rule: "a · 10<sup>k</sup>, gdzie 1 ≤ a < 10; mała liczba → ujemny wykładnik" },
+  };
+
+  // Each generator returns { q, ok, bad: [3 strings] }
+  const GEN = {
+    mul() {
+      const a = pick([2, 3, 5, 7, 10]); let m = ri(2, 9), n = ri(2, 9); if (m === 2 && n === 2) n = 3;
+      return { q: `${P(a, m)} · ${P(a, n)}`, ok: P(a, m + n), bad: [P(a, m * n), P(a * a, m + n), P(a * a, m * n)] };
+    },
+    div() {
+      const a = pick([2, 3, 5, 10]); const n = ri(2, 7), m = n + ri(1, 8);
+      const bad = [P(a, m + n), P(a, n - m), m % n === 0 && m / n !== m - n ? P(a, m / n) : P(a, m * n)];
+      return { q: `${P(a, m)} : ${P(a, n)}`, ok: P(a, m - n), bad };
+    },
+    pow() {
+      const a = pick([2, 3, 5, 10]); let m = ri(2, 6), n = ri(2, 5); if (m === 2 && n === 2) m = 3;
+      return { q: `(${P(a, m)})<sup>${n}</sup>`, ok: P(a, m * n), bad: [P(a, m + n), `${n} · ${P(a, m)}`, P(a * n, m)] };
+    },
+    negx() {
+      const t = ri(0, 4);
+      if (t === 0) { const a = pick([5, 7, 12, 100, 2026]); return { q: P(a, 0), ok: "1", bad: ["0", String(a), "−1"] }; }
+      const a = pick([2, 3, 4, 5, 10]); const n = ri(1, 3); const v = Math.pow(a, n);
+      if (t <= 2) return { q: P(a, -n), ok: fr(1, v), bad: ["−" + v, String(v), "−" + fr(1, v)] };
+      return { q: `(1/${a})<sup>${neg(-n)}</sup>`, ok: String(v), bad: [fr(1, v), "−" + v, "−" + fr(1, v)] };
+    },
+    base() {
+      const t = ri(0, 2);
+      const T = [[2, 2], [2, 3], [2, 4], [2, 5], [3, 2], [3, 3], [3, 4], [5, 2], [5, 3], [10, 2], [10, 3]];
+      if (t === 0) {
+        const [b, k] = pick(T); const N = Math.pow(b, k);
+        return { q: `${N} = ${b}<sup>?</sup>`, ok: P(b, k), bad: [P(b, k + 1), P(b, k - 1 === 1 ? k + 2 : k - 1), P(b, N / b === k ? k + 3 : N / b)] };
+      }
+      if (t === 1) {
+        const F = [["0,5", 2, -1], ["0,25", 2, -2], ["1/8", 2, -3], ["1/3", 3, -1], ["1/9", 3, -2], ["1/27", 3, -3], ["0,2", 5, -1], ["0,04", 5, -2], ["0,1", 10, -1], ["0,01", 10, -2], ["0,001", 10, -3]];
+        const [s, b, k] = pick(F);
+        return { q: `${s} = ${b}<sup>?</sup>`, ok: P(b, k), bad: [P(b, -k), P(b, k - 1), P(b, k + 1 === 0 ? k - 2 : k + 1)] };
+      }
+      const C = [[4, 2, 2], [8, 2, 3], [16, 2, 4], [9, 3, 2], [27, 3, 3], [25, 5, 2], [125, 5, 3], [100, 10, 2]];
+      const [N, b, k] = pick(C); let n = ri(2, 12); if (n === k) n++;
+      return { q: `${P(N, n)} = ${b}<sup>?</sup>`, ok: P(b, k * n), bad: [P(b, k + n), P(b, n), P(b, k * n + k)] };
+    },
+    add() {
+      const a = pick([2, 3, 4, 5, 6]); const n = ri(5, 100);
+      const terms = Array(a).fill(P(a, n)).join(" + ");
+      return { q: terms, ok: P(a, n + 1), bad: [P(a, a * n), P(a * a, n), P(a, n + a)] };
+    },
+    prod() {
+      const t = ri(0, 1);
+      if (t === 0) { const n = ri(5, 30); return { q: `${P(2, n)} · ${P(5, n)}`, ok: P(10, n), bad: [P(10, 2 * n), P(7, n), P(10, n * n)] }; }
+      const n = ri(3, 20); return { q: `${P(6, n)} = ?`, ok: `${P(2, n)} · ${P(3, n)}`, bad: [`${P(2, n)} + ${P(3, n)}`, `${P(2, n)} · 3`, `2 · ${P(3, n)}`] };
+    },
+    sci() {
+      const d1 = ri(1, 9), d2 = ri(1, 9); const mant = `${d1},${d2}`; const big = Math.random() < 0.5;
+      let k, s;
+      if (big) { k = ri(3, 8); const raw = String(d1) + String(d2) + "0".repeat(k - 1); s = raw.replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+      else { k = -ri(2, 7); s = "0," + "0".repeat(-k - 1) + d1 + d2; }
+      const T = (e) => `${mant} · ${P(10, e)}`;
+      return { q: s, ok: T(k), bad: [T(k + 1), T(k - 1), T(-k)] };
+    },
+  };
+
+  function makeQ(cats) {
+    for (let tries = 0; tries < 30; tries++) {
+      const c = pick(cats); const g = GEN[c]();
+      const all = [g.ok, ...g.bad];
+      if (new Set(all).size === 4) return { cat: c, q: g.q, ok: g.ok, opts: shuffle(all.slice()) };
+    }
+    return makeQ(["mul"]);
+  }
+
+  // state
+  const ALL = Object.keys(CATS);
+  let selected = new Set(ALL);
+  let mode = "sprint", score = 0, streak = 0, answered = 0, correct = 0, timeLeft = 60, timer = null, cur = null, locked = false, missed = {};
+  const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+
+  function renderChips() {
+    const box = $("chips"); box.innerHTML = "";
+    ALL.forEach((c) => {
+      const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.id = "chip-" + c;
+      b.textContent = CATS[c].name; b.setAttribute("aria-pressed", selected.has(c) ? "true" : "false");
+      b.onclick = () => { if (selected.has(c) && selected.size > 1) selected.delete(c); else selected.add(c); renderChips(); };
+      box.appendChild(b);
+    });
+  }
+  function showBest() { const b = store.get("potegi-best"); $("best").textContent = b ? `Twój rekord w sprincie: ${b} pkt` : "Zagraj sprint i ustaw pierwszy rekord."; }
+
+  function start(m) {
+    mode = m; score = 0; streak = 0; answered = 0; correct = 0; timeLeft = 60; missed = {};
+    $("menu").hidden = true; $("end").hidden = true; $("game").hidden = false;
+    $("h-time").hidden = mode !== "sprint"; $("barwrap").hidden = mode !== "sprint";
+    upd(); next();
+    clearInterval(timer);
+    if (mode === "sprint") timer = setInterval(() => { timeLeft--; upd(); if (timeLeft <= 0) finish(); }, 1000);
+  }
+  function upd() { $("s").textContent = score; $("st").textContent = streak; $("t").textContent = Math.max(0, timeLeft); $("bar").style.width = (Math.max(0, timeLeft) / 60 * 100) + "%"; }
+
+  function next() {
+    locked = false; $("next").hidden = true; $("fb").className = "fb"; $("fb").innerHTML = "";
+    cur = makeQ([...selected]);
+    $("cat").textContent = CATS[cur.cat].name; $("q").innerHTML = cur.q;
+    const box = $("opts"); box.innerHTML = "";
+    cur.opts.forEach((o, i) => {
+      const b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.id = "opt-" + i;
+      b.innerHTML = `<span class="k">${"ABCD"[i]}</span>${o}`; b.onclick = () => answer(i);
+      box.appendChild(b);
+    });
+  }
+  function answer(i) {
+    if (locked) return; locked = true; answered++;
+    const btns = [...document.querySelectorAll(".opt")]; btns.forEach((b) => (b.disabled = true));
+    const okIdx = cur.opts.indexOf(cur.ok);
+    btns[okIdx].classList.add("ok");
+    if (i === okIdx) {
+      correct++; streak++; score += 1 + (streak > 0 && streak % 3 === 0 ? 1 : 0);
+      $("fb").className = "fb good"; $("fb").innerHTML = streak % 3 === 0 ? `Dobrze! Seria ${streak}, bonus +1.` : "Dobrze!";
+      upd(); setTimeout(() => { if (!$("game").hidden) next(); }, mode === "sprint" ? 450 : 700);
+    } else {
+      btns[i].classList.add("no"); streak = 0; missed[cur.cat] = (missed[cur.cat] || 0) + 1;
+      $("fb").className = "fb bad"; $("fb").innerHTML = `Poprawnie: ${cur.ok}<span class="rule">${CATS[cur.cat].rule}</span>`;
+      upd();
+      if (mode === "sprint") setTimeout(() => { if (!$("game").hidden) next(); }, 1600); else $("next").hidden = false;
+    }
+  }
+  function finish() {
+    clearInterval(timer); $("game").hidden = true; $("end").hidden = false;
+    $("e-score").textContent = score;
+    const acc = answered ? Math.round(correct / answered * 100) : 0;
+    let info = `${correct} z ${answered} poprawnie (${acc}%)`;
+    if (mode === "sprint") { const best = Number(store.get("potegi-best") || 0); if (score > best) { store.set("potegi-best", String(score)); info += " · nowy rekord!"; } else info += ` · rekord: ${best}`; }
+    $("e-info").textContent = info;
+    const cats = Object.keys(missed).sort((a, b) => missed[b] - missed[a]);
+    $("e-rules").innerHTML = cats.length ? `<div class="cat" style="margin-bottom:8px">Do powtórki</div><ul class="rules">${cats.map((c) => `<li><b>${CATS[c].name}</b> (${missed[c]}×): ${CATS[c].rule}</li>`).join("")}</ul>` : `<p class="muted" style="margin:0">Bez błędów. Spróbuj pobić wynik!</p>`;
+  }
+
+  $("m-sprint").onclick = () => start("sprint");
+  $("m-train").onclick = () => start("train");
+  $("next").onclick = next;
+  $("stop").onclick = finish;
+  $("again").onclick = () => start(mode);
+  $("tomenu").onclick = () => { $("end").hidden = true; $("menu").hidden = false; showBest(); };
+  document.addEventListener("keydown", (e) => {
+    if ($("game").hidden) return;
+    const k = e.key.toLowerCase(); const map = { "1": 0, "2": 1, "3": 2, "4": 3, a: 0, b: 1, c: 2, d: 3 };
+    if (k in map && !locked) answer(map[k]);
+    else if (e.key === "Enter" && !$("next").hidden) next();
+  });
+  renderChips(); showBest();
+})();
+</script>
+
+</body></html>
