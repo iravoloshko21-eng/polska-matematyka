@@ -159,6 +159,53 @@ dialog::backdrop { background: rgba(38, 32, 28, .35) }
 .muted-s { color: var(--muted); font-size: 13px; font-weight: 400 }
 .pr .st .btn-s { padding: 3px 12px; font-size: 12.5px }
 .pts.ok { color: var(--ok) } .pts.bad { color: var(--bad) } .pts.part { color: #8a5a12 }
+</style>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+<header class="site"><div class="in"><a class="logo" href="../">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../matura/">Matura</a><a href="../arkusze/">Arkusze</a><a href="../trenazery/">Trenażery</a><a href="../materialy/">Materiały</a><a href="../konto/" aria-current="page">Mój gabinet</a><a href="../o-mnie/">O mnie</a></nav><div class="authbar" id="authbar"></div></div></header><nav class="tabbar" aria-label="Menu"><a href=".././"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Start</span></a><a href="../e8/"><b>8</b><span>E8</span></a><a href="../matura/"><b>√</b><span>Matura</span></a><a href="../trenazery/"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg><span>Trenażery</span></a><a href="../konto/" aria-current="page"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Gabinet</span></a></nav>
+
+<header class="top"><div class="wrap">
+  <span class="pill">Twoje postępy · zadania i arkusze</span>
+  <h1 id="k-title">Mój gabinet</h1>
+  <p style="margin:0;max-width:62ch">Tu widzisz, które tematy już przerobiłeś, jakie masz wyniki z arkuszy i jak zmienia się Twój wynik z miesiąca na miesiąc.</p>
+  <div class="tiles" id="tiles"></div>
+</div></header>
+
+<div class="wrap" id="notice-wrap" style="padding-top:6px"></div>
+<main class="wrap" id="list"></main>
+
+<style>
+/* «Mój dzień» і мапа тем (Ірина, 2026-11-05, частина 3) */
+.dzien { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-bottom: 22px }
+.dalej { background: linear-gradient(135deg, #3b3bff, #6a4cff); color: #fff; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 14px 34px rgba(59,59,255,.25) }
+.dalej small { color: #fff; font-weight: 800; letter-spacing: .06em; opacity: .85; font-size: 12.5px } .dalej h2 { margin: 0; font-size: 28px; color: #fff }
+.dalej p { margin: 0; opacity: .92 } .dalej .bar { background: rgba(255,255,255,.25) } .dalej .bar i { background: #fff }
+.dalej a { align-self: flex-start; margin-top: 8px; background: #fff; color: var(--blue); font-weight: 700; text-decoration: none; border-radius: 999px; padding: 12px 22px; min-height: 48px; display: inline-flex; align-items: center }
+.pierscien { background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 20px; display: grid; justify-items: center; align-content: center; gap: 8px; text-align: center }
+.ring { width: 128px; height: 128px; border-radius: 50%; display: grid; place-items: center }
+.ring b { width: 98px; height: 98px; border-radius: 50%; background: var(--card); display: grid; place-items: center; font-size: 28px; font-weight: 800 }
+.nadzis { grid-column: span 2; background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 20px 22px }
+.nadzis h2 { margin: 0 0 4px; font-size: 22px }
+.zad { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); text-decoration: none; color: var(--ink) }
+.zad:first-of-type { border-top: 0 } .zad b { flex: 1; font-weight: 700 } .zad .chk { width: 28px; height: 28px; border-radius: 9px; box-shadow: inset 0 0 0 2px #dcdce8; flex: none; display: grid; place-items: center; font-weight: 800 }
+.zad .chk.ok { background: #1fae74; box-shadow: none; color: #fff } .zad .dal { color: var(--blue); font-weight: 800; font-size: 18px } .dzis { display: inline-block } .dzis::first-letter { text-transform: uppercase }
+.mapa-w { background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 22px; margin-bottom: 22px }
+.mapa-w h2 { margin: 0 0 4px; font-size: 24px } .legenda { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; color: var(--muted); margin: 8px 0 0 }
+.legenda i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px }
+.mapa { position: relative; max-width: 560px; margin: 10px auto 0 }
+.mapa svg { position: absolute; inset: 0; width: 100%; height: 100% }
+.wezel { position: absolute; transform: translateX(-50%); width: 170px; display: grid; justify-items: center; gap: 5px; text-align: center; text-decoration: none; color: var(--ink) }
+.wezel .kula { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 20px; background: #fff; color: var(--muted); box-shadow: 0 5px 0 #dcdce8, 0 8px 20px rgba(20,20,60,.08); transition: transform .15s }
+.wezel:hover .kula { transform: translateY(-3px) }
+.wezel.okp .kula { background: #1fae74; color: #fff; box-shadow: 0 5px 0 #138256 } .wezel.mid .kula { background: var(--yellow); color: var(--ink); box-shadow: 0 5px 0 #c9a100 }
+.wezel.tu .kula { width: 78px; height: 78px; background: var(--blue); color: #fff; box-shadow: 0 5px 0 #2525b8, 0 0 0 9px rgba(59,59,255,.15) }
+.wezel span { font-size: 13.5px; font-weight: 600; line-height: 1.3; background: rgba(255,255,255,.9); border-radius: 8px; padding: 1px 8px }
+.wezel em { font-style: normal; font-size: 12px; font-weight: 800; background: var(--ink); color: #fff; padding: 3px 10px; border-radius: 999px }
+details.lista-t { margin-top: 18px } details.lista-t summary { cursor: pointer; font-weight: 700; color: var(--blue); min-height: 44px; display: flex; align-items: center }
+@media (max-width: 760px) { .dzien { grid-template-columns: 1fr 1fr; gap: 12px } .dalej { grid-column: span 2 } .nadzis { grid-column: span 2 } .pierscien { grid-column: span 2; grid-template-columns: auto 1fr; justify-items: start; text-align: left; gap: 4px 16px }
+  .pierscien .ring { grid-row: span 3; width: 96px; height: 96px } .pierscien .ring b { width: 72px; height: 72px; font-size: 21px } .wezel { width: 130px } .wezel span { font-size: 12.5px } }
 
 /* Motyw «Wołoszko/Math» (обрала Ірина 2026-10-31): широкий гротеск Unbounded, чорні рамки, кольорові блоки, жорсткі тіні.
    build.py дописує цей файл у кінець стилів кожної сторінки, тож він перекриває старі значення. */
@@ -364,22 +411,6 @@ header.site { view-transition-name: menu; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 </style>
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-</head>
-<body>
-<header class="site"><div class="in"><a class="logo" href="../">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../matura/">Matura</a><a href="../arkusze/">Arkusze</a><a href="../trenazery/">Trenażery</a><a href="../materialy/">Materiały</a><a href="../konto/" aria-current="page">Mój gabinet</a><a href="../o-mnie/">O mnie</a></nav><div class="authbar" id="authbar"></div></div></header><nav class="tabbar" aria-label="Menu"><a href=".././"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Start</span></a><a href="../e8/"><b>8</b><span>E8</span></a><a href="../matura/"><b>√</b><span>Matura</span></a><a href="../trenazery/"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg><span>Trenażery</span></a><a href="../konto/" aria-current="page"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Gabinet</span></a></nav>
-
-<header class="top"><div class="wrap">
-  <span class="pill">Twoje postępy · zadania i arkusze</span>
-  <h1 id="k-title">Mój gabinet</h1>
-  <p style="margin:0;max-width:62ch">Tu widzisz, które tematy już przerobiłeś, jakie masz wyniki z arkuszy i jak zmienia się Twój wynik z miesiąca na miesiąc.</p>
-  <div class="tiles" id="tiles"></div>
-</div></header>
-
-<div class="wrap" id="notice-wrap" style="padding-top:6px"></div>
-<main class="wrap" id="list"></main>
-
 
 <dialog id="dlg"><form class="dlg" id="auth-form" method="dialog">
   <h2 id="dlg-title">Zaloguj się</h2>
@@ -782,7 +813,58 @@ function render() {
   else if (auth.user) $("#k-title").textContent = `Mój gabinet${auth.user.displayName ? " · " + auth.user.displayName.split(" ")[0] : ""}`;
   if (auth.db && PRACA.uid !== (UCZEN || auth.user?.uid)) wczytajPrace();
   const e8 = mojeDzialy().includes("e8");
-  $("#list").innerHTML = praca() + start() + (e8 ? miesiace() : "") + mojeDzialy().map(tematy).join("") + (e8 ? historia() : "");
+  $("#list").innerHTML = dzien() + praca() + start() + mojeDzialy().map(mapa).join("") + (e8 ? miesiace() : "") + (e8 ? historia() : "");
+}
+
+// «Mój dzień» (Ірина, 2026-11-05): що робити далі, кільце прогресу, список «na dziś»
+function stanTematu(d, temat) {
+  const l = d.zadania.filter(t => t.temat === temat), v = l.map(t => res[t.id]).filter(Boolean);
+  return { n: l.length, done: v.length, ok: v.filter(x => x === "ok").length };
+}
+// наступна тема: перша розпочата й не закінчена, інакше перша не розпочата (у порядку KOLEJNOSC)
+function nastepny(d) {
+  const s = d.tematy.map(t => ({ ...t, ...stanTematu(d, t.temat) }));
+  return s.find(t => t.done && t.done < t.n) || s.find(t => !t.done) || null;
+}
+function dzien() {
+  if (FB && !auth.user) return "";
+  const dz = mojeDzialy(); if (!dz.length) return "";
+  const d = DZIALY[dz[0]], nt = nastepny(d);
+  const z = dz.flatMap(k => DZIALY[k].zadania), v = z.map(t => res[t.id]).filter(Boolean), ok = v.filter(x => x === "ok").length;
+  const pr = z.length ? Math.round(100 * v.length / z.length) : 0;
+  const imie = UCZEN ? auth.uczen?.imie : auth.user?.displayName?.split(" ")[0];
+  const dzis = new Date().toLocaleDateString("pl-PL", { weekday: "long", day: "numeric", month: "long" });
+  // na dziś: до 2 незроблених домашніх, 3 завдання з наступної теми, аркуш місяця
+  const pd = sortPrac(PRACA.lista, res).filter(p => !stanPracy(p, res).zrobione).slice(0, 2)
+    .map(p => `<a class="zad" href="${linkPracy(p)}"><span class="chk"></span><b>Praca domowa: ${esc(tytulPracy(p))}</b><span class="dal">→</span></a>`);
+  const am = dz.includes("e8") ? arkuszMiesiaca() : null, rm = am && res["miesiac:" + MIESIAC];
+  const lista = [...pd,
+    nt ? `<a class="zad" href="${d.url}#temat=${encodeURIComponent(nt.temat)}"><span class="chk"></span><b>3 zadania: ${esc(nt.temat)}</b><span class="dal">→</span></a>` : "",
+    am ? `<a class="zad" href="../arkusze/#${am.slug}"><span class="chk${rm ? " ok" : ""}">${rm ? "✓" : ""}</span><b>Arkusz miesiąca: ${esc(label(am))}</b>${rm ? `<span class="muted-s">${proc(rm)}%</span>` : `<span class="dal">→</span>`}</a>` : ""].join("");
+  return `<div class="dzien">
+    <div class="dalej"><small>${nt && nt.done ? "KONTYNUUJ" : "NASTĘPNY TEMAT"}</small>${nt ? `<h2>${esc(nt.temat)}</h2>
+      <p>${nt.done ? `Zrobione ${nt.done} z ${nt.n} zadań` : `${nt.n} zadań · ${d.nazwa}`}</p><div class="bar"><i style="width:${nt.n ? Math.round(100 * nt.done / nt.n) : 0}%"></i></div>
+      <a href="${d.url}#temat=${encodeURIComponent(nt.temat)}">${nt.done ? "Dalej →" : "Zaczynam →"}</a>` : `<h2>Wszystkie tematy zrobione!</h2><p>Czas na arkusz egzaminacyjny.</p><a href="../arkusze/">Arkusze →</a>`}</div>
+    <div class="pierscien"><b>Postęp${imie ? " · " + esc(imie) : ""}</b><div class="ring" style="background:conic-gradient(var(--blue) 0 ${pr}%, var(--line) 0)"><b>${pr}%</b></div>
+      <span class="muted-s">${v.length} z ${z.length} zadań · poprawnie ${v.length ? Math.round(100 * ok / v.length) : 0}%</span></div>
+    <div class="nadzis"><h2>Na dziś</h2><span class="muted-s dzis">${dzis}</span>${lista}</div></div>`;
+}
+
+// мапа-шлях тем (Ірина, 2026-11-05): кульки по черзі KOLEJNOSC, зелена — ukończony, жовта — w trakcie, синя — «Tu jesteś»
+function mapa(k) {
+  const d = DZIALY[k], nt = nastepny(d), X = [50, 26, 50, 74], H = 100;
+  let ukon = 0;
+  const w = d.tematy.map((t, i) => {
+    const s = stanTematu(d, t.temat), [, cls] = etap(s, s.n); if (cls === "okp") ukon++;
+    const tu = nt && nt.temat === t.temat;
+    return `<a class="wezel ${cls}${tu ? " tu" : ""}" style="left:${X[i % 4]}%;top:${i * H}px" href="${d.url}#temat=${encodeURIComponent(t.temat)}" title="${esc(t.temat)}: ${s.done}/${s.n}">
+      <span class="kula">${cls === "okp" ? "✓" : t.nr || i + 1}</span><span>${esc(t.temat)}</span>${tu ? "<em>Tu jesteś</em>" : ""}</a>`;
+  });
+  const pts = d.tematy.map((t, i) => `${X[i % 4]},${i * H + 34}`).join(" "), h = d.tematy.length * H;
+  return `<section class="mapa-w"><h2>Twoja droga · ${d.nazwa}</h2><span class="muted-s">Ukończone tematy: ${ukon} z ${d.tematy.length}. Kliknij kulkę, aby ćwiczyć temat.</span>
+    <div class="legenda"><span><i style="background:#1fae74"></i>ukończony</span><span><i style="background:var(--yellow)"></i>w trakcie</span><span><i style="background:var(--blue)"></i>teraz</span><span><i style="background:#dcdce8"></i>jeszcze nie</span></div>
+    <div class="mapa" style="height:${h}px"><svg viewBox="0 0 100 ${h}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="#d6d6e6" stroke-width="5" stroke-dasharray="2 12" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>${w.join("")}</div>
+    <details class="lista-t"><summary>Szczegóły tematów (lista)</summary>${tematy(k)}</details></section>`;
 }
 
 // Praca domowa від вчителя: prace/{картка}; картку учень знає з powiazania/{uid}, вчитель на уроці — з ?uczen=
@@ -832,7 +914,7 @@ function miesiace() {
 }
 
 // теми: скільки завдань розв'язано з доступних, правильні/неправильні, що ще не почато
-function tematy(k) {
+function tematy(k) {   // повний список тем (тепер під мапою, у «Szczegóły»)
   let ukon = 0; const d = DZIALY[k];
   const rows = d.tematy.map(({ temat, nr }) => {
     const l = d.zadania.filter(t => t.temat === temat), n = l.length;
@@ -843,9 +925,7 @@ function tematy(k) {
         ${r.done < n ? `<a class="btn-s" style="margin-left:8px;text-decoration:none" href="${d.url}#temat=${encodeURIComponent(temat)}">Ćwicz</a>` : ""}</span>
       <div class="bar"><i class="ok" style="width:${Math.round(100 * r.ok / n)}%"></i><i class="bad" style="width:${Math.round(100 * (r.done - r.ok) / n)}%"></i></div></div>`;
   }).join("");
-  return `<section class="summary" style="margin-bottom:22px"><h2 style="font-family:var(--display);margin:0;font-size:24px">Tematy · ${d.nazwa}</h2>
-    <span style="color:var(--muted)">Ukończone tematy: ${ukon} z ${d.tematy.length}. „Ćwicz” otwiera zadania z tematu, których jeszcze nie rozwiązałeś.</span>
-    <div class="pt">${rows}</div></section>`;
+  return `<span style="color:var(--muted)">„Ćwicz” otwiera zadania z tematu, których jeszcze nie rozwiązałeś.</span><div class="pt">${rows}</div>`;
 }
 
 function historia() {
