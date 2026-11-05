@@ -200,7 +200,7 @@ details.test-rev:not([open]) { padding-bottom: 14px }
   --display: "Unbounded", system-ui, sans-serif; --body: "Inter", "Segoe UI", system-ui, sans-serif;
   --shadow: 5px 5px 0 var(--ink);
   /* легкий фон із формулами (x², √, π…) — ледь видно, картки його перекривають */
-  --doodles: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='440' height='440' viewBox='0 0 440 440'%3E%3Cg fill='%231c1712' fill-opacity='.075' font-family='Georgia,serif' font-style='italic'%3E%3Ctext x='24' y='52' font-size='30'%3Ex%C2%B2%3C/text%3E%3Ctext x='170' y='38' font-size='22' transform='rotate(-8 170 38)'%3Ea%C2%B2%2Bb%C2%B2=c%C2%B2%3C/text%3E%3Ctext x='352' y='70' font-size='34'%3E%CF%80%3C/text%3E%3Ctext x='60' y='150' font-size='26' transform='rotate(6 60 150)'%3E%E2%88%9A2%3C/text%3E%3Ctext x='250' y='132' font-size='20'%3Ey=ax%2Bb%3C/text%3E%3Ctext x='388' y='190' font-size='28'%3E%E2%88%9E%3C/text%3E%3Ctext x='20' y='262' font-size='22' transform='rotate(-6 20 262)'%3E2%E2%81%BF%3C/text%3E%3Ctext x='150' y='236' font-size='34'%3E%E2%88%91%3C/text%3E%3Ctext x='270' y='290' font-size='20' transform='rotate(5 270 290)'%3Esin %CE%B1%3C/text%3E%3Ctext x='96' y='340' font-size='24'%3E%C2%B3%E2%88%9A8=2%3C/text%3E%3Ctext x='300' y='384' font-size='26'%3E%C2%BD%3C/text%3E%3Ctext x='30' y='420' font-size='22' transform='rotate(-4 30 420)'%3E%CE%94=b%C2%B2%E2%88%924ac%3C/text%3E%3Ctext x='236' y='428' font-size='24'%3E%25%3C/text%3E%3Ctext x='380' y='308' font-size='24'%3E%C3%B7%3C/text%3E%3C/g%3E%3Cg fill='none' stroke='%231c1712' stroke-opacity='.075' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M330 222 l40 0 l-20 -34 z'/%3E%3Cpath d='M196 174 v60 M186 224 h80'/%3E%3Cpath d='M200 228 q24 -60 50 -10'/%3E%3Ccircle cx='120' cy='206' r='14'/%3E%3Cpath d='M106 206 h28'/%3E%3Cpath d='M360 400 l22 -22 l22 22'/%3E%3C/g%3E%3C/svg%3E");
+  --doodles: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='440' height='440' viewBox='0 0 440 440'%3E%3Cg fill='%231c1712' fill-opacity='.06' font-family='Georgia,serif' font-style='italic'%3E%3Ctext x='24' y='52' font-size='30'%3Ex%C2%B2%3C/text%3E%3Ctext x='170' y='38' font-size='22' transform='rotate(-8 170 38)'%3Ea%C2%B2%2Bb%C2%B2=c%C2%B2%3C/text%3E%3Ctext x='352' y='70' font-size='34'%3E%CF%80%3C/text%3E%3Ctext x='60' y='150' font-size='26' transform='rotate(6 60 150)'%3E%E2%88%9A2%3C/text%3E%3Ctext x='250' y='132' font-size='20'%3Ey=ax%2Bb%3C/text%3E%3Ctext x='388' y='190' font-size='28'%3E%E2%88%9E%3C/text%3E%3Ctext x='20' y='262' font-size='22' transform='rotate(-6 20 262)'%3E2%E2%81%BF%3C/text%3E%3Ctext x='150' y='236' font-size='34'%3E%E2%88%91%3C/text%3E%3Ctext x='270' y='290' font-size='20' transform='rotate(5 270 290)'%3Esin %CE%B1%3C/text%3E%3Ctext x='96' y='340' font-size='24'%3E%C2%B3%E2%88%9A8=2%3C/text%3E%3Ctext x='300' y='384' font-size='26'%3E%C2%BD%3C/text%3E%3Ctext x='30' y='420' font-size='22' transform='rotate(-4 30 420)'%3E%CE%94=b%C2%B2%E2%88%924ac%3C/text%3E%3Ctext x='236' y='428' font-size='24'%3E%25%3C/text%3E%3Ctext x='380' y='308' font-size='24'%3E%C3%B7%3C/text%3E%3C/g%3E%3Cg fill='none' stroke='%231c1712' stroke-opacity='.06' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M330 222 l40 0 l-20 -34 z'/%3E%3Cpath d='M196 174 v60 M186 224 h80'/%3E%3Cpath d='M200 228 q24 -60 50 -10'/%3E%3Ccircle cx='120' cy='206' r='14'/%3E%3Cpath d='M106 206 h28'/%3E%3Cpath d='M360 400 l22 -22 l22 22'/%3E%3C/g%3E%3C/svg%3E");
 }
 body { background: var(--cream) var(--doodles) repeat; background-size: 440px }
 @media (max-width: 760px) { body { background-size: 330px } }
@@ -295,6 +295,65 @@ header.site .authbar .btn-s, header.site .authbar button { font-size: 12.5px; pa
   header.site .in { flex-wrap: wrap }
   header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
 }
+
+
+/* ===== Стиль B «Яскраве bento» (обрала Ірина 2026-11-05): білий фон, насичені кольори, рамки 2px.
+   Пріоритет — читабельність і зручність: більший текст, сильніший контраст, великі кнопки (≥44px), чіткий фокус. ===== */
+:root {
+  --cream: #fffdf7; --card: #ffffff; --ink: #111111; --muted: #3d3d3d; --line: #e2e0da;
+  --blue: #3b3bff; --blue-soft: #e8e8ff; --lime: #ffd23f; --sage: #ffd23f; --coral: #ff7a59;
+  --mint: #b9f3d9; --lav: #e4d4ff; --pink: #ff5c8a; --yellow: #ffd23f;
+  --shadow: 4px 4px 0 var(--ink);
+}
+html { -webkit-text-size-adjust: 100% }
+body { font-size: 16.5px; line-height: 1.6; color: var(--ink); -webkit-font-smoothing: antialiased }
+p, li { max-width: 72ch }
+h1 { line-height: 1.08; letter-spacing: -.02em }
+h2 { line-height: 1.15; letter-spacing: -.01em }
+h3 { line-height: 1.25; letter-spacing: 0 }
+small, .muted, .muted-s, .lead { color: var(--muted) }
+:focus-visible { outline: 3px solid var(--blue) !important; outline-offset: 3px }
+::selection { background: var(--yellow) }
+
+/* меню: більші пігулки, чіткий активний розділ */
+header.site { border-bottom: 2px solid var(--ink); background: rgba(255,253,247,.94); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 40 }
+header.site .logo { font-size: 16px }
+header.site .logo span { color: var(--blue) }
+header.site .pills { gap: 8px }
+header.site .pills a { font-size: 14px; border-width: 2px; padding: 7px 14px; min-height: 40px; display: inline-flex; align-items: center; transition: background .15s }
+header.site .pills a:hover { background: var(--blue-soft) }
+header.site .pills a[aria-current] { background: var(--yellow); color: var(--ink) }
+header.site .join, header.site .authbar .btn-s, header.site .authbar button { font-size: 14px; padding: 8px 16px; min-height: 40px; border: 2px solid var(--ink); background: var(--blue); color: #fff }
+@media (max-width: 1420px) {
+  header.site .in { flex-wrap: wrap }
+  header.site .pills { order: 3; width: 100%; padding-bottom: 2px }
+}
+@media (max-width: 760px) {
+  header.site .pills { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); padding-right: 24px }
+}
+
+/* картки, кнопки, поля: рамки 2px, великі зони натискання */
+.tile, .task, .prog, .notice, .ark, .summary, .card, .box, dialog, .uczen, .slabe .sl { border-width: 2px; border-radius: 20px }
+.tile, .ark, .card, .uczen { transition: transform .15s, box-shadow .15s }
+a.tile:hover, a.ark:hover, a.card:hover, .uczen:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink) }
+.btn, .btn-s, button.primary, .authbar button { min-height: 44px; border-width: 2px; border-radius: 999px; font-weight: 700; font-size: 15px; padding: 10px 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: transform .15s, box-shadow .15s }
+.btn.primary, .btn-s.primary, button.primary { box-shadow: 3px 3px 0 var(--ink); border-color: var(--ink) }
+.btn.primary:hover, .btn-s.primary:hover, button.primary:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink) }
+.btn:active, .btn-s:active, button.primary:active { transform: translate(2px, 2px); box-shadow: none }
+.chip { border-width: 2px; min-height: 40px; font-size: 14.5px; font-weight: 600; padding: 7px 14px }
+.chip[aria-pressed="true"] { background: var(--ink); color: #fff }
+.opt { border-width: 2px; min-height: 48px; font-size: 16px }
+.opt[aria-pressed="true"] { background: var(--blue); border-color: var(--ink); color: #fff }
+.pill { background: var(--yellow); border-width: 2px }
+input, select, textarea, .form-row input, .form-row select { font-size: 16px; min-height: 44px; border: 2px solid var(--ink); border-radius: 12px }
+input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); outline: none }
+.task-h .t { background: var(--blue); color: #fff }
+.uczen .klasa { background: var(--yellow); border-width: 2px }
+.uczen .avatar { border-width: 2px }
+.sheetbar, header.top { border-bottom-width: 2px }
+.lekcja { font-size: 15px; padding-block: 11px }
+table.proby { font-size: 15px }
+table.proby th, table.proby td { padding: 10px 8px }
 
 /* Плавні переходи (Ірина, 2026-11-04): сторінка м'яко зникає і з'являється, а не перемикається різко.
    Між сторінками — @view-transition (Chrome/Edge/Safari 18+); всередині сторінки (наступне завдання, аркуш, учень) — plynnie() у wspolne.js.
