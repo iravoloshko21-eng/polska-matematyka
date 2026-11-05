@@ -1027,7 +1027,7 @@ function karta(u) {
       <form class="form-row" id="dane">${pola(u)}<button class="btn-s primary">Zapisz</button></form><span class="muted-s" id="d-stan"></span></section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Notatki</b>
       <textarea class="notatki" id="notatki" placeholder="Co omówiliśmy, co zadać, na co uważać…">${esc(u.notatki || "")}</textarea><span class="muted-s" id="n-stan"></span></section>
-    <p style="margin-top:22px"><button type="button" class="link-del" id="usun">Usuń ucznia</button></p>`;
+    <p style="margin-top:22px;display:flex;gap:18px;flex-wrap:wrap"><button type="button" class="link-del" id="zeruj">Wyzeruj wyniki</button><button type="button" class="link-del" id="usun">Usuń ucznia</button></p>`;
   pracaZdarzenia(u);
   $("#dane").onsubmit = async e => {
     e.preventDefault();
@@ -1055,6 +1055,13 @@ function karta(u) {
     u.proby = proby.filter((_, i) => i !== +b.dataset.del); await zapisz(u.id, { proby: u.proby }); render();
   });
   let t; $("#notatki").oninput = e => { clearTimeout(t); $("#n-stan").textContent = "…"; t = setTimeout(async () => { u.notatki = e.target.value; await zapisz(u.id, { notatki: u.notatki }); $("#n-stan").textContent = "Zapisano"; }, 800); };
+  // обнулити результати з уроків (Ірина, 2026-11-05): завдання, аркуші й статус домашнього рахуються з wyniki;
+  // пробні іспити, нотатки, домашні завдання й власні результати учня з його акаунта лишаються
+  $("#zeruj").onclick = async () => {
+    if (!confirm(`Wyzerować wyniki ucznia ${nazwa(u)}?\n\nZostaną usunięte wszystkie odpowiedzi z lekcji: zadania, arkusze i wyniki prac domowych. Egzaminy próbne, notatki i zadane prace zostają.\n\nTego nie da się cofnąć.`)) return;
+    try { await auth.fs.updateDoc(auth.fs.doc(auth.db, "uczniowie", u.id), { wyniki: {}, updated: auth.fs.serverTimestamp() }); u.wyniki = {}; render(); }
+    catch (e) { alert("Nie udało się wyzerować wyników. " + (e.code || "")); }
+  };
   $("#usun").onclick = async () => {
     if (!confirm(`Usunąć ucznia ${nazwa(u)} razem z wynikami? Tego nie da się cofnąć.`)) return;
     await auth.fs.deleteDoc(auth.fs.doc(auth.db, "uczniowie", u.id));
