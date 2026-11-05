@@ -60,6 +60,17 @@ footer .in2 { max-width: 1180px; margin: 0 auto; display: flex; justify-content:
 }
 @media (prefers-reduced-motion: reduce) { .karta { transition: none } a.karta:hover { transform: none } }
 
+/* Плитки з прев'ю (2026-11-05): окремі класи tr-*, незалежні від .karta на головній */
+main.wybor.tr { max-width: 1040px }
+.tr-siatka { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px }
+.tr-kafel { display: flex; flex-direction: column; text-decoration: none; color: var(--ink); background: var(--card, #fff); border: 1.5px solid var(--ink); border-radius: 18px; overflow: hidden; box-shadow: 5px 5px 0 var(--ink); transition: transform .15s, box-shadow .15s }
+a.tr-kafel:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink) }
+.tr-podglad { display: block; width: 100%; height: auto; aspect-ratio: 600 / 413; object-fit: cover; object-position: top left; border-bottom: 1.5px solid var(--ink); background: #fff }
+.tr-opis { display: flex; align-items: center; gap: 12px; padding: 12px 14px }
+.tr-opis .ic { width: 44px; height: 44px; font-size: 16px; border-radius: 12px }
+.tr-opis .t b { font-size: 16px }
+@media (prefers-reduced-motion: reduce) { .tr-kafel { transition: none } a.tr-kafel:hover { transform: none } }
+
 /* Motyw «Wołoszko/Math» (обрала Ірина 2026-10-31): широкий гротеск Unbounded, чорні рамки, кольорові блоки, жорсткі тіні.
    build.py дописує цей файл у кінець стилів кожної сторінки, тож він перекриває старі значення. */
 :root {
@@ -183,34 +194,34 @@ header.site { view-transition-name: menu; }
 </head>
 <body>
 <header class="site"><div class="in"><a class="logo" href="../">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../matura/">Matura</a><a href="../arkusze/">Arkusze</a><a href="../materialy/">Materiały</a><a href="../konto/">Mój gabinet</a><a href="../o-mnie/">O mnie</a></nav><a class="join" href="../konto/">Załóż konto</a></div></header>
-<main class="wybor">
+<main class="wybor tr">
   <span class="kicker">Do lekcji i do domu</span>
   <h1>Trena&shy;żery<span>.</span></h1>
-  <p class="lead">Interaktywne gry, sprinty i testy. Działają na telefonie, tablecie i tablicy, bez logowania.</p>
+  <p class="lead">Interaktywne gry, sprinty i testy. Na obrazku widać, jak wygląda pierwsze zadanie. Działają na telefonie, tablecie i tablicy, bez logowania.</p>
   <div class="sep">Klasy 4–6</div>
-  <nav class="lista" aria-label="Klasy 4–6">
-    <a class="karta" href="rajd-miarki/"><span class="ic i-lime" aria-hidden="true">m</span><span class="t"><b>Rajd Miarki</b><small>Jednostki długości: zamiana w prawo i w lewo</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="wyrazenia-dwumianowane/"><span class="ic i-coral" aria-hidden="true">zł</span><span class="t"><b>Wyrażenia dwumianowane</b><small>3,2 m = 3 m 20 cm i z powrotem · klasa 5</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="liczbowe-lowy/"><span class="ic i-blue" aria-hidden="true">÷</span><span class="t"><b>Liczbowe łowy</b><small>Wielokrotności, dzielniki, cechy podzielności · klasa 5</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="ulamki-na-osi/"><span class="ic i-lime" aria-hidden="true">½</span><span class="t"><b>Ułamki na osi</b><small>Oś liczbowa, porównywanie, kolejność, dodawanie</small></span><span class="ar" aria-hidden="true">→</span></a>
+  <nav class="tr-siatka" aria-label="Klasy 4–6">
+    <a class="tr-kafel" href="rajd-miarki/"><img class="tr-podglad" src="rajd-miarki/podglad.jpg" alt="Pierwsze zadanie: Rajd Miarki" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-lime" aria-hidden="true">m</span><span class="t"><b>Rajd Miarki</b><small>Jednostki długości: zamiana w prawo i w lewo</small></span></span></a>
+    <a class="tr-kafel" href="wyrazenia-dwumianowane/"><img class="tr-podglad" src="wyrazenia-dwumianowane/podglad.jpg" alt="Pierwsze zadanie: Wyrażenia dwumianowane" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-coral" aria-hidden="true">zł</span><span class="t"><b>Wyrażenia dwumianowane</b><small>3,2 m = 3 m 20 cm i z powrotem · klasa 5</small></span></span></a>
+    <a class="tr-kafel" href="liczbowe-lowy/"><img class="tr-podglad" src="liczbowe-lowy/podglad.jpg" alt="Pierwsze zadanie: Liczbowe łowy" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-blue" aria-hidden="true">÷</span><span class="t"><b>Liczbowe łowy</b><small>Wielokrotności, dzielniki, cechy podzielności · klasa 5</small></span></span></a>
+    <a class="tr-kafel" href="ulamki-na-osi/"><img class="tr-podglad" src="ulamki-na-osi/podglad.jpg" alt="Pierwsze zadanie: Ułamki na osi" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-lime" aria-hidden="true">½</span><span class="t"><b>Ułamki na osi</b><small>Oś liczbowa, porównywanie, kolejność, dodawanie</small></span></span></a>
   </nav>
   <div class="sep">Klasy 7–8 i egzamin ósmoklasisty</div>
-  <nav class="lista" aria-label="Klasy 7–8 i egzamin ósmoklasisty">
-    <a class="karta" href="rozgrzewka-z-poteg/"><span class="ic i-blue" aria-hidden="true">x²</span><span class="t"><b>Rozgrzewka z potęg</b><small>Potęgi, pierwiastki i ułamki na start lekcji</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="pierwiastki/"><span class="ic i-coral" aria-hidden="true">√</span><span class="t"><b>Pierwiastki</b><small>Trening ósmoklasisty · klasa 8</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="wyrazenia-i-rownania/"><span class="ic i-lime" aria-hidden="true">=</span><span class="t"><b>Wyrażenia i równania</b><small>Redukcja, nawiasy, wartość, równania, proporcje · PL/UA</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="detektyw-figur/"><span class="ic i-ink" aria-hidden="true">△</span><span class="t"><b>Detektyw figur</b><small>Własności trójkątów i czworokątów, kąty, pola · słowniczek PL–UA</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="test-wzorow-figur/"><span class="ic i-blue" aria-hidden="true">P</span><span class="t"><b>Test wzorów figur E8</b><small>Czy znasz wzory z karty wzorów? Bez liczenia</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="szlak-wzorow/"><span class="ic i-coral" aria-hidden="true">★</span><span class="t"><b>Szlak Wzorów E8</b><small>10 odcinków jak na karcie wzorów, po 8 zadań</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="ostroslupy-3d/"><span class="ic i-lime" aria-hidden="true">◭</span><span class="t"><b>Ostrosłupy w 3D</b><small>Model do tablicy: obracaj, rozkładaj siatkę</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="ostroslupowy-sprint/"><span class="ic i-ink" aria-hidden="true">⏱</span><span class="t"><b>Ostrosłupowy sprint</b><small>60 sekund na ostrosłupy · kartkówka</small></span><span class="ar" aria-hidden="true">→</span></a>
+  <nav class="tr-siatka" aria-label="Klasy 7–8 i egzamin ósmoklasisty">
+    <a class="tr-kafel" href="rozgrzewka-z-poteg/"><img class="tr-podglad" src="rozgrzewka-z-poteg/podglad.jpg" alt="Pierwsze zadanie: Rozgrzewka z potęg" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-blue" aria-hidden="true">x²</span><span class="t"><b>Rozgrzewka z potęg</b><small>Potęgi, pierwiastki i ułamki na start lekcji</small></span></span></a>
+    <a class="tr-kafel" href="pierwiastki/"><span class="tr-opis"><span class="ic i-coral" aria-hidden="true">√</span><span class="t"><b>Pierwiastki</b><small>Trening ósmoklasisty · klasa 8</small></span></span></a>
+    <a class="tr-kafel" href="wyrazenia-i-rownania/"><img class="tr-podglad" src="wyrazenia-i-rownania/podglad.jpg" alt="Pierwsze zadanie: Wyrażenia i równania" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-lime" aria-hidden="true">=</span><span class="t"><b>Wyrażenia i równania</b><small>Redukcja, nawiasy, wartość, równania, proporcje · PL/UA</small></span></span></a>
+    <a class="tr-kafel" href="detektyw-figur/"><img class="tr-podglad" src="detektyw-figur/podglad.jpg" alt="Pierwsze zadanie: Detektyw figur" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-ink" aria-hidden="true">△</span><span class="t"><b>Detektyw figur</b><small>Własności trójkątów i czworokątów, kąty, pola · słowniczek PL–UA</small></span></span></a>
+    <a class="tr-kafel" href="test-wzorow-figur/"><img class="tr-podglad" src="test-wzorow-figur/podglad.jpg" alt="Pierwsze zadanie: Test wzorów figur E8" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-blue" aria-hidden="true">P</span><span class="t"><b>Test wzorów figur E8</b><small>Czy znasz wzory z karty wzorów? Bez liczenia</small></span></span></a>
+    <a class="tr-kafel" href="szlak-wzorow/"><img class="tr-podglad" src="szlak-wzorow/podglad.jpg" alt="Pierwsze zadanie: Szlak Wzorów E8" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-coral" aria-hidden="true">★</span><span class="t"><b>Szlak Wzorów E8</b><small>10 odcinków jak na karcie wzorów, po 8 zadań</small></span></span></a>
+    <a class="tr-kafel" href="ostroslupy-3d/"><img class="tr-podglad" src="ostroslupy-3d/podglad.jpg" alt="Pierwsze zadanie: Ostrosłupy w 3D" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-lime" aria-hidden="true">◭</span><span class="t"><b>Ostrosłupy w 3D</b><small>Model do tablicy: obracaj, rozkładaj siatkę</small></span></span></a>
+    <a class="tr-kafel" href="ostroslupowy-sprint/"><img class="tr-podglad" src="ostroslupowy-sprint/podglad.jpg" alt="Pierwsze zadanie: Ostrosłupowy sprint" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-ink" aria-hidden="true">⏱</span><span class="t"><b>Ostrosłupowy sprint</b><small>60 sekund na ostrosłupy · kartkówka</small></span></span></a>
   </nav>
   <div class="sep">Liceum i matura</div>
-  <nav class="lista" aria-label="Liceum i matura">
-    <a class="karta" href="wzory-skroconego-mnozenia/"><span class="ic i-blue" aria-hidden="true">±</span><span class="t"><b>Wzory skróconego mnożenia</b><small>Trening · klasa 1 liceum</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="potegowy-sprint/"><span class="ic i-coral" aria-hidden="true">aⁿ</span><span class="t"><b>Potęgowy sprint</b><small>60 sekund na potęgi · matura podstawowa</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="polowy-sprint/"><span class="ic i-lime" aria-hidden="true">P=</span><span class="t"><b>Polowy sprint</b><small>60 sekund na pola figur · matura</small></span><span class="ar" aria-hidden="true">→</span></a>
-    <a class="karta" href="znajdz-blad-w-dowodzie/"><span class="ic i-ink" aria-hidden="true">?!</span><span class="t"><b>Znajdź błąd w dowodzie</b><small>Bądź w jury: co jest nie tak z rozwiązaniem? · OMJ</small></span><span class="ar" aria-hidden="true">→</span></a>
+  <nav class="tr-siatka" aria-label="Liceum i matura">
+    <a class="tr-kafel" href="wzory-skroconego-mnozenia/"><img class="tr-podglad" src="wzory-skroconego-mnozenia/podglad.jpg" alt="Pierwsze zadanie: Wzory skróconego mnożenia" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-blue" aria-hidden="true">±</span><span class="t"><b>Wzory skróconego mnożenia</b><small>Trening · klasa 1 liceum</small></span></span></a>
+    <a class="tr-kafel" href="potegowy-sprint/"><img class="tr-podglad" src="potegowy-sprint/podglad.jpg" alt="Pierwsze zadanie: Potęgowy sprint" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-coral" aria-hidden="true">aⁿ</span><span class="t"><b>Potęgowy sprint</b><small>60 sekund na potęgi · matura podstawowa</small></span></span></a>
+    <a class="tr-kafel" href="polowy-sprint/"><img class="tr-podglad" src="polowy-sprint/podglad.jpg" alt="Pierwsze zadanie: Polowy sprint" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-lime" aria-hidden="true">P=</span><span class="t"><b>Polowy sprint</b><small>60 sekund na pola figur · matura</small></span></span></a>
+    <a class="tr-kafel" href="znajdz-blad-w-dowodzie/"><img class="tr-podglad" src="znajdz-blad-w-dowodzie/podglad.jpg" alt="Pierwsze zadanie: Znajdź błąd w dowodzie" width="600" height="413" loading="lazy"><span class="tr-opis"><span class="ic i-ink" aria-hidden="true">?!</span><span class="t"><b>Znajdź błąd w dowodzie</b><small>Bądź w jury: co jest nie tak z rozwiązaniem? · OMJ</small></span></span></a>
   </nav>
 
 </main>
