@@ -349,6 +349,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shado
 table.proby { font-size: 15px }
 table.proby th, table.proby td { padding: 10px 8px }
 footer { border-top: 1px solid var(--line) !important }
+.od-iryny { background: #fff1b8; color: #7a5a00; font-weight: 700; border-radius: 999px; padding: 1px 10px }
+.chip:disabled { opacity: .45; cursor: default }
 
 /* Плавні переходи (Ірина, 2026-11-04): сторінка м'яко зникає і з'являється, а не перемикається різко.
    Між сторінками — @view-transition (Chrome/Edge/Safari 18+); всередині сторінки (наступне завдання, аркуш, учень) — plynnie() у wspolne.js.
@@ -383,6 +385,7 @@ header.site { view-transition-name: menu; }
   <div class="filters">
     <div class="row" id="f-temat"><span class="lbl">Dział</span></div>
     <div class="row" id="f-typ"><span class="lbl">Typ</span></div>
+    <div class="row" id="f-zr"><span class="lbl">Źródło</span></div>
   </div>
   <div class="tools">
     <span id="count"></span>
@@ -774,7 +777,7 @@ async function drukuj(lista, { sekcja, temat, podpis }) {
 const plynnie = fn => document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches ? document.startViewTransition(fn) : fn();
 
 
-const state = { temat: "", typ: "", order: null, hideDone: false, shown: 15 };
+const state = { temat: "", typ: "", zr: "", order: null, hideDone: false, shown: 15 };
 // посилання з кабінету: #temat=<назва> одразу відкриває розділ і ховає вже розв'язані
 { const h = new URLSearchParams(location.hash.slice(1)); if (D.tematy.some(t => t.temat === h.get("temat"))) Object.assign(state, { temat: h.get("temat"), hideDone: true });
   // praca domowa з кабінету учня: #zadania=id,id,… — показуємо лише ці завдання
@@ -782,10 +785,12 @@ const state = { temat: "", typ: "", order: null, hideDone: false, shown: 15 };
 
 function chips(el, items, key) {
   el.insertAdjacentHTML("beforeend", items.map(([v, label, n]) =>
-    `<button type="button" class="chip" data-k="${key}" data-v="${esc(v)}" aria-pressed="${state[key] === v}">${esc(label)}<span class="n">${n}</span></button>`).join(""));
+    `<button type="button" class="chip" data-k="${key}" data-v="${esc(v)}" aria-pressed="${state[key] === v}"${v && !n ? " disabled" : ""}>${esc(label)}<span class="n">${n}</span></button>`).join(""));
 }
 chips($("#f-temat"), [["", "Wszystkie", all.length], ...D.tematy.map(t => [t.temat, zNr(t), t.liczba])], "temat");
 chips($("#f-typ"), [["", "Wszystkie", all.length], ...Object.entries(TYPY).map(([k, l]) => [k, l, all.filter(t => t.format === k).length])], "typ");
+// джерело (Ірина, 2026-11-05): офіційні завдання CKE і власні завдання Ірини (поле wlasne з build.py)
+if ($("#f-zr")) chips($("#f-zr"), [["", "Wszystkie", all.length], ["cke", "Oficjalne CKE", all.filter(t => !t.wlasne).length], ["iryna", "Od Iryny", all.filter(t => t.wlasne).length]], "zr");
 
 document.addEventListener("click", e => {
   const c = e.target.closest(".chip");
@@ -832,7 +837,7 @@ $("#prog-list").addEventListener("click", e => {
 
 function list() {
   if (state.ids) return all.filter(t => state.ids.has(t.id)).sort((a, b) => unlocked(b) - unlocked(a));
-  let l = all.filter(t => (!state.temat || t.temat === state.temat) && (!state.typ || t.format === state.typ) && !(state.hideDone && res[t.id]));
+  let l = all.filter(t => (!state.temat || t.temat === state.temat) && (!state.typ || t.format === state.typ) && (!state.zr || (state.zr === "iryna") === !!t.wlasne) && !(state.hideDone && res[t.id]));
   if (state.order) { const pos = Object.fromEntries(state.order.map((id, i) => [id, i])); l = l.slice().sort((a, b) => pos[a.id] - pos[b.id]); }
   else l = l.slice().sort((a, b) => (unlocked(b) - unlocked(a)));   // спершу доступні
   return l;
@@ -868,7 +873,7 @@ function render() {
 
 function card(t) {
   const r = res[t.id];
-  const head = `<div class="task-h"><span class="t">${esc(t.temat)}</span><span>${esc(t.zrodlo)}</span><span>· ${t.pkt} pkt</span><span>· ${TYPY[t.format]}</span>
+  const head = `<div class="task-h"><span class="t">${esc(t.temat)}</span>${t.wlasne ? `<span class="od-iryny">★ Od Iryny</span>` : `<span>${esc(t.zrodlo)}</span>`}<span>· ${t.pkt} pkt</span><span>· ${TYPY[t.format]}</span>
       ${!unlocked(t) ? `<span class="done">🔒</span>` : r ? `<span class="done ${r}">${r === "ok" ? "✓ poprawnie" : "✗ do powtórki"}</span>` : ""}</div>`;
   if (!unlocked(t)) return `<article class="task">${head}${lockedBody()}</article>`;
   return `<article class="task" data-id="${esc(t.id)}">${head}
