@@ -912,7 +912,9 @@ async function wyslijTg(u, p, b) {
     PDF_PRAC[p.id] = f;
   }
   navigator.clipboard?.writeText(t).catch(() => {});
-  if (navigator.canShare?.({ files: [f] })) {
+  // телефон — меню «Поділитися»; комп'ютер — як раніше з посиланням: чат з учнем з готовим текстом, а PDF завантажено, його лише перетягнути в чат
+  const telefon = matchMedia("(pointer: coarse)").matches;
+  if (telefon && navigator.canShare?.({ files: [f] })) {
     try { await navigator.share({ files: [f], text: t }); return; }
     catch (e) {
       if (e.name === "AbortError") return;
@@ -921,8 +923,11 @@ async function wyslijTg(u, p, b) {
     }
   }
   const a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = f.name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 60000);
-  if (u.telegram) window.open(`https://t.me/${u.telegram}`, "_blank", "noopener");
-  alert(`PDF «${f.name}» pobrany.${u.telegram ? " Otworzył się czat z uczniem:" : ""} przeciągnij plik do czatu w Telegramie. Tekst wiadomości jest skopiowany, wklej go jako podpis.`);
+  if (!u.telegram) { alert(`PDF «${f.name}» pobrany. Wpisz Telegram ucznia w «Dane ucznia», a przycisk od razu otworzy czat z nim.`); return; }
+  // tg:// відкриває застосунок Telegram одразу в чаті учня (без нової вкладки, яку браузер заблокував би після створення PDF)
+  const tg = /^\+/.test(u.telegram) ? `tg://resolve?phone=${u.telegram.slice(1)}` : `tg://resolve?domain=${u.telegram}`;
+  setTimeout(() => { location.href = `${tg}&text=${encodeURIComponent(t)}`; }, 400);
+  b.textContent = "✓ PDF w Pobranych — przeciągnij do czatu"; setTimeout(() => { b.textContent = "✈ PDF w Telegram"; }, 15000);
 }
 
 // запрошення: zaproszenia/{email} (хто запросив і яка картка) + лист із посиланням для входу (надсилає Firebase)
