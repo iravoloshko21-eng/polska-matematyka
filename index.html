@@ -49,6 +49,11 @@ a.k:active { transform: translateY(0) }
 .i-lav { background: #efe8ff; color: #7b4ce0 } .i-yel { background: #fff4cc; color: #a77b00 } .i-grey { background: var(--line); color: var(--muted) }
 .k.wk { box-shadow: none; background: rgba(255,255,255,.6); outline: 2px dashed #dcdce8; outline-offset: -2px }
 
+.poznaj { margin-top: 30px; display: grid; grid-template-columns: 150px 1fr auto; gap: 24px; align-items: center; background: #fff; border-radius: 24px; box-shadow: var(--shadow); padding: 18px 26px 18px 18px; text-decoration: none; color: var(--ink) }
+.poznaj img { width: 150px; height: 150px; object-fit: cover; border-radius: 18px; display: block }
+.poznaj small { font-weight: 700; color: var(--blue); font-size: 14px } .poznaj b { display: block; font-size: 22px; font-weight: 800; margin: 2px 0 6px; letter-spacing: -.01em } .poznaj p { margin: 0; color: var(--muted) }
+.poznaj .go { font-weight: 700; background: var(--blue-soft); color: var(--blue); border-radius: 999px; padding: 12px 20px; white-space: nowrap }
+@media (max-width: 760px) { .poznaj { grid-template-columns: 84px 1fr; gap: 14px; padding: 14px } .poznaj img { width: 84px; height: 84px; border-radius: 14px } .poznaj b { font-size: 18px } .poznaj p { font-size: 14.5px } .poznaj .go { grid-column: span 2; text-align: center } }
 .cta { margin-top: 30px; background: var(--ink); color: #fff; border-radius: 24px; padding: 26px 28px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap }
 .cta b { font-size: 22px; line-height: 1.25; font-weight: 800 }
 .cta-b { display: flex; gap: 10px; flex-wrap: wrap }
@@ -307,6 +312,8 @@ header.site { view-transition-name: menu; }
     <div class="k w2 half wk"><span class="badge">wkrótce</span><span class="ic i-grey" aria-hidden="true">∫</span><b>Matura rozszerzona</b><small>Zadania według tematów</small></div>
     <div class="k w4 half wk"><span class="badge">wkrótce</span><span class="ic i-grey" aria-hidden="true">◉</span><b>Webinary</b><small>Dla uczniów i nauczycieli</small></div>
   </nav>
+
+  <a class="poznaj" href="o-mnie/"><img src="o-mnie/iryna.jpg" alt="Iryna Voloshko" width="150" height="150" loading="lazy"><span><small>Kto uczy</small><b>Iryna Voloshko</b><p>5 lat z polskim programem · E8, matura i studia · lekcje online po 55 minut</p></span><span class="go">Poznaj mnie →</span></a>
 
   <div class="cta"><b>Chcesz przerobić wszystko ze mną?</b><span class="cta-b"><a class="jasny" href="o-mnie/">O mnie</a><a href="https://t.me/voloshko_tutor_math" target="_blank" rel="noopener">Napisz na Telegramie →</a></span></div>
 </main>
