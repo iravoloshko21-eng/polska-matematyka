@@ -552,10 +552,10 @@ function authbar() {
   if (!FB) { b.innerHTML = ""; return; }
   if (!auth.user) b.innerHTML = `<button type="button" id="ab-in">Zaloguj się</button><button type="button" class="primary" id="ab-up">Zarejestruj się</button>`;
   // вчитель / адмін: без кнопки з ім'ям (вона вела на «учнівський» кабінет), лише «Moi uczniowie»
-  else b.innerHTML = `${nauczyciel() ? `<a class="btn-s" href="../nauczyciel/">Moi uczniowie</a>` : `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>`}${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
+  else b.innerHTML = `${nauczyciel() ? `<a class="btn-s" href="../nauczyciel/">Moi uczniowie</a>` : `<a class="btn-s" href="../konto/">${esc(auth.user.isAnonymous ? auth.imie || "Mój gabinet" : auth.user.displayName || auth.user.email)}</a>`}${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
   $("#ab-in")?.addEventListener("click", () => openAuth("in"));
   $("#ab-up")?.addEventListener("click", () => openAuth("up"));
-  $("#ab-out")?.addEventListener("click", () => auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));
+  $("#ab-out")?.addEventListener("click", () => (!auth.user.isAnonymous || confirm("Wylogować się? Żeby wrócić do gabinetu, otwórz ponownie swój link od nauczyciela.")) && auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));
 }
 
 let mode = "in";
@@ -609,6 +609,20 @@ async function initFirebase() {
     history.replaceState(null, "", location.pathname + location.hash);
   }
 
+  // вхід за особистим посиланням від вчителя (/konto/#k=<токен>), без e-mailу: анонімний акаунт Firebase на цьому пристрої,
+  // прив'язаний до картки через linki/{токен}; вчитель може перегенерувати або вимкнути посилання (тоді доступ зникає)
+  const kLink = new URLSearchParams(location.hash.slice(1)).get("k");
+  if (kLink && /^[a-f0-9]{32,64}$/.test(kLink)) {
+    history.replaceState(null, "", location.pathname + location.search);
+    await fauth.authStateReady();
+    if (fauth.currentUser && !fauth.currentUser.isAnonymous) alert("Jesteś zalogowany na swoje konto. Link ucznia otwórz w innej przeglądarce albo najpierw się wyloguj.");
+    else {
+      try { localStorage.setItem("link-ucznia", kLink); } catch (e) {}
+      auth.nowyLink = kLink;
+      if (!fauth.currentUser) await a.signInAnonymously(fauth).catch(e => alert("Nie udało się otworzyć linku: " + (e.code || e.message)));
+    }
+  }
+
   $("#g-login").onclick = () => a.signInWithPopup(fauth, new a.GoogleAuthProvider()).then(() => $("#dlg").close(), showErr);
   $("#auth-form").addEventListener("submit", async e => {
     e.preventDefault();
@@ -626,6 +640,7 @@ async function initFirebase() {
   a.onAuthStateChanged(fauth, async user => {
     auth.user = user;
     if (!user) { auth.status = "out"; authbar(); render(); return; }
+    if (user.isAnonymous) return uczenZLinku(user, fs, db);
     const ref = fs.doc(db, "users", user.uid);
     let snap = await fs.getDoc(ref).catch(() => null);
     if (!snap || !snap.exists()) {
@@ -673,16 +688,47 @@ async function initFirebase() {
     }
     auth.status = isAdmin ? "admin" : isTeacher ? "teacher" : snap?.data()?.approved ? "approved" : "pending";
     authbar(); render();
-    if (dostep() && !globalThis.BEZ_PAKIETOW) {   // dostep() уже враховує розділ: пакети чужого розділу не вантажимо
-      try {
-        // лише пакети цього розділу (D.pakiety), щоб сторінка не тягнула закриті завдання інших розділів
-        const packs = D.pakiety ? await Promise.all(D.pakiety.map(id => fs.getDoc(fs.doc(db, "pakiety", id)).catch(() => null)))
-                                : (await fs.getDocs(fs.collection(db, "pakiety"))).docs;
-        packs.forEach(p => p?.exists?.() !== false && JSON.parse(p?.data()?.dane || "[]").forEach(z => { if (byId[z.id]) dodajLiczbe(Object.assign(byId[z.id], z)); }));
-      } catch (e) { console.warn(e); }
-      render();
-    }
+    await wczytajPakiety(fs, db);
   });
+}
+
+// закриті завдання з бази; dostep() уже враховує розділ: пакети чужого розділу не вантажимо
+async function wczytajPakiety(fs, db) {
+  if (!dostep() || globalThis.BEZ_PAKIETOW) return;
+  try {
+    // лише пакети цього розділу (D.pakiety), щоб сторінка не тягнула закриті завдання інших розділів
+    const packs = D.pakiety ? await Promise.all(D.pakiety.map(id => fs.getDoc(fs.doc(db, "pakiety", id)).catch(() => null)))
+                            : (await fs.getDocs(fs.collection(db, "pakiety"))).docs;
+    packs.forEach(p => p?.exists?.() !== false && JSON.parse(p?.data()?.dane || "[]").forEach(z => { if (byId[z.id]) dodajLiczbe(Object.assign(byId[z.id], z)); }));
+  } catch (e) { console.warn(e); }
+  render();
+}
+
+// учень, що увійшов за посиланням: powiazania/{uid}{owner,karta,token} → linki/{token}{owner,karta,zakres,imie}
+async function uczenZLinku(user, fs, db) {
+  const pref = fs.doc(db, "powiazania", user.uid);
+  let p = await fs.getDoc(pref).then(d => d.exists() ? d.data() : null, () => null);
+  const nowy = auth.nowyLink; auth.nowyLink = null;
+  if (nowy && p?.token !== nowy) {
+    const l = await fs.getDoc(fs.doc(db, "linki", nowy)).then(d => d.exists() ? d.data() : null, () => null);
+    if (l) { p = { owner: l.owner, karta: l.karta, token: nowy }; await fs.setDoc(pref, p).catch(e => console.warn(e)); }
+  }
+  const l = p?.token ? await fs.getDoc(fs.doc(db, "linki", p.token)).then(d => d.exists() ? d.data() : null, () => null) : null;
+  if (!l || l.karta !== p.karta || l.owner !== p.owner) {
+    alert("Ten link do gabinetu już nie działa. Poproś nauczyciela o nowy.");
+    await auth.fb.signOut(auth.fb.auth); return;
+  }
+  Object.assign(auth, { db, fs, zakres: l.zakres || "e8", imie: l.imie || "", status: "approved" });
+  const remote = await fs.getDoc(fs.doc(db, "postepy", user.uid)).then(d => d.exists() ? d.data().wyniki || {} : {}, () => null);
+  if (remote) {
+    res = { ...res, ...remote };
+    try { localStorage.setItem(STORE, JSON.stringify(res)); } catch (e) {}
+    let timer;
+    cloud = () => { clearTimeout(timer); timer = setTimeout(() => fs.setDoc(fs.doc(db, "postepy", user.uid), { wyniki: res, updated: fs.serverTimestamp() }).catch(e => console.warn(e)), 1200); };
+    if (Object.keys(res).length !== Object.keys(remote).length) cloud();
+  }
+  authbar(); render();
+  await wczytajPakiety(fs, db);
 }
 
 // смужка «Lekcja z …» над сторінкою в режимі уроку
@@ -792,7 +838,8 @@ async function wczytaj() {
   await Promise.all(pow.map(async d => {
     const u = UCZNIOWIE.find(x => x.id === d.data().karta); if (!u) return;
     u.konto = d.id;
-    u.wlasne = await fs.getDoc(fs.doc(db, "postepy", d.id)).then(p => p.exists() ? p.data().wyniki || {} : {}, () => ({}));
+    // учень за посиланням може зайти з кількох пристроїв (кожен — окремий акаунт): зливаємо всі результати
+    u.wlasne = { ...(u.wlasne || {}), ...await fs.getDoc(fs.doc(db, "postepy", d.id)).then(p => p.exists() ? p.data().wyniki || {} : {}, () => ({})) };
   }));
   // praca domowa (prace/{id картки}): усі мої, щоб у плитках було видно, хто не зробив
   const prace = await fs.getDocs(auth.status === "admin" ? fs.collection(db, "prace") : fs.query(fs.collection(db, "prace"), fs.where("owner", "==", uid))).then(s => s.docs, () => []);
@@ -836,7 +883,7 @@ function lista() {
         <span class="u-wynik"><b>${x.done ? p + "%" : "—"}</b><span>${x.done} zadań · ${ark} ${ark === 1 ? "arkusz" : ark > 1 && ark < 5 ? "arkusze" : "arkuszy"}</span></span>
         <span class="bar">${x.done ? `<i class="ok" style="width:${p}%"></i><i class="bad" style="width:${100 - p}%"></i>` : ""}</span>
         ${pdInfo(u)}
-        ${u.email ? `<span class="muted-s">${u.konto ? "✓ konto ucznia połączone" : "✉ zaproszenie wysłane"}</span>` : ""}</a>`; }).join("") || `<p class="muted-s">Nie masz jeszcze uczniów. Dodaj pierwszego poniżej.</p>`}</div>
+        ${u.email || u.link || u.konto ? `<span class="muted-s">${u.konto ? "✓ konto ucznia połączone" : u.email ? "✉ zaproszenie wysłane" : "🔗 link utworzony"}</span>` : ""}</a>`; }).join("") || `<p class="muted-s">Nie masz jeszcze uczniów. Dodaj pierwszego poniżej.</p>`}</div>
     <section class="summary"><b style="font-family:var(--display);font-size:20px">Dodaj ucznia</b>
       <form class="form-row" id="nowy">${pola({})}
       <label>E-mail ucznia (nieobowiązkowo)<input name="email" type="email" maxlength="100" placeholder="uczeń dostanie zaproszenie"></label>
@@ -943,6 +990,36 @@ async function zapros(u, email) {
   catch (e) { alert("Uczeń jest zapisany, ale e-maila nie udało się wysłać: " + (e.code || e.message) + ". Spróbuj ponownie za chwilę."); }
   return true;
 }
+// особисте посилання учня без e-mailу (Ірина, 2026-11-05): linki/{секретний токен}{owner,karta,zakres,imie}, у картці — u.link.
+// Новий link = старий видаляється й перестає діяти; «Wyłącz» = видалити.
+const linkUrl = t => `${location.origin}/konto/#k=${t}`;
+const nowyToken = () => [...crypto.getRandomValues(new Uint8Array(20))].map(b => b.toString(16).padStart(2, "0")).join("");
+async function ustawLink(u, nowy) {
+  const { fs, db } = auth, stary = u.link, token = nowy ? nowyToken() : null;
+  try {
+    if (token) await fs.setDoc(fs.doc(db, "linki", token), { owner: auth.user.uid, karta: u.id, zakres: zakresUcznia(u), imie: (u.imie || "").slice(0, 60), created: fs.serverTimestamp() });
+    if (stary) await fs.deleteDoc(fs.doc(db, "linki", stary)).catch(e => console.warn(e));
+    await zapisz(u.id, { link: token || fs.deleteField() }); u.link = token || undefined;
+  } catch (e) { alert("Nie udało się zmienić linku: " + (e.code || e.message)); }
+  render();
+}
+function linkHtml(u) {
+  if (!u.link) return `<span class="muted-s">Albo bez e-maila: utwórz osobisty link — uczeń otworzy go i od razu trafi do swojego gabinetu i zadań swojego działu.</span>
+      <p><button type="button" class="btn-s primary" id="link-nowy">Utwórz link do gabinetu</button></p>`;
+  return `<span>Osobisty link ucznia (tylko dla niego — kto ma link, wchodzi do jego gabinetu):</span>
+      <div class="form-row"><input id="link-url" readonly value="${esc(linkUrl(u.link))}" style="flex:1;min-width:220px" onclick="this.select()">
+        <button type="button" class="btn-s primary" id="link-kopiuj">Kopiuj</button></div>
+      <span class="muted-s">Uczeń wchodzi bez hasła; postęp zapisuje się na jego koncie i widzisz go tutaj. Na nowym telefonie wystarczy otworzyć ten sam link.</span>
+      <p style="display:flex;gap:18px;flex-wrap:wrap"><button type="button" class="link-del" id="link-nowy">Nowy link (stary przestanie działać)</button><button type="button" class="link-del" id="link-off">Wyłącz link</button></p>`;
+}
+function linkZdarzenia(u) {
+  $("#link-nowy")?.addEventListener("click", () => (!u.link || confirm("Utworzyć nowy link? Stary przestanie działać — uczeń będzie potrzebował nowego.")) && ustawLink(u, true));
+  $("#link-off")?.addEventListener("click", () => confirm("Wyłączyć link? Uczeń straci dostęp do gabinetu (wyniki zostają).") && ustawLink(u, false));
+  $("#link-kopiuj")?.addEventListener("click", e => { const i = $("#link-url"); i.select();
+    (navigator.clipboard ? navigator.clipboard.writeText(i.value) : Promise.reject()).catch(() => document.execCommand("copy"));
+    e.target.textContent = "✓ Skopiowano"; setTimeout(() => { e.target.textContent = "Kopiuj"; }, 2500); });
+}
+
 function wlasneInfo(u) {
   const w = u.wlasne || {}, z = [...all, ...DZIALY.mp.zadania].map(t => w[t.id]).filter(Boolean), ark = Object.entries(w).filter(([k]) => k.startsWith("arkusz:")).length, t = w["test:e8"];
   return `<span class="muted-s">Samodzielnie na swoim koncie: ${z.length} zadań${z.length ? ` (${pc(z.filter(v => v === "ok").length, z.length)}% poprawnie)` : ""} · arkuszy: ${ark}${t ? ` · bezpłatny test E8: ${t.pkt}/${t.max} pkt` : ""}</span>`;
@@ -1020,22 +1097,25 @@ function karta(u) {
         <label>Maks.<input type="number" name="max" min="1" step="1" value="${u.cel === "mp" ? 50 : 25}" required style="width:90px"></label>
         <button class="btn-s primary">Dodaj wynik</button></form></section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Konto ucznia</b>
-      ${u.email ? `<span>E-mail: <b>${esc(u.email)}</b> · ${u.konto ? "✓ uczeń zalogował się, jego samodzielne wyniki są wliczone w gabinet" : "zaproszenie wysłane, uczeń jeszcze się nie zalogował"}</span>` : `<span class="muted-s">Wpisz e-mail ucznia: dostanie link do logowania i od razu pełny dostęp do zadań. Jego samodzielne wyniki zobaczysz tutaj.</span>`}
+      ${u.email ? `<span>E-mail: <b>${esc(u.email)}</b> · ${u.konto ? "✓ uczeń zalogował się, jego samodzielne wyniki są wliczone w gabinet" : "zaproszenie wysłane, uczeń jeszcze się nie zalogował"}</span>` : u.konto ? `<span>✓ Uczeń wszedł przez osobisty link, jego samodzielne wyniki są wliczone w gabinet</span>` : `<span class="muted-s">Wpisz e-mail ucznia: dostanie link do logowania i od razu pełny dostęp do zadań. Jego samodzielne wyniki zobaczysz tutaj.</span>`}
       ${u.konto ? wlasneInfo(u) : `<form class="form-row" id="zapros"><label>E-mail ucznia<input name="email" type="email" required maxlength="100" value="${esc(u.email || "")}"></label>
-        <button class="btn-s primary">${u.email ? "Wyślij zaproszenie ponownie" : "Wyślij zaproszenie"}</button></form>`}</section>
+        <button class="btn-s primary">${u.email ? "Wyślij zaproszenie ponownie" : "Wyślij zaproszenie"}</button></form>`}
+      ${linkHtml(u)}</section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Dane ucznia</b>
       <form class="form-row" id="dane">${pola(u)}<button class="btn-s primary">Zapisz</button></form><span class="muted-s" id="d-stan"></span></section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Notatki</b>
       <textarea class="notatki" id="notatki" placeholder="Co omówiliśmy, co zadać, na co uważać…">${esc(u.notatki || "")}</textarea><span class="muted-s" id="n-stan"></span></section>
     <p style="margin-top:22px;display:flex;gap:18px;flex-wrap:wrap"><button type="button" class="link-del" id="zeruj">Wyzeruj wyniki</button><button type="button" class="link-del" id="usun">Usuń ucznia</button></p>`;
-  pracaZdarzenia(u);
+  pracaZdarzenia(u); linkZdarzenia(u);
   $("#dane").onsubmit = async e => {
     e.preventDefault();
     const dane = daneZ(new FormData(e.target)); if (!dane.imie || !dane.nazwisko) return;
-    const zmianaCelu = u.email && zakresUcznia(u) !== zakresUcznia(dane);
+    const zmianaCelu = (u.email || u.link) && zakresUcznia(u) !== zakresUcznia(dane);
     await zapisz(u.id, dane); Object.assign(u, dane); UCZNIOWIE.sort(porzadek);
     // змінили «Przygotowanie do» запрошеному учневі: новий розділ підхопиться при його наступному вході
-    if (zmianaCelu) await auth.fs.setDoc(auth.fs.doc(auth.db, "zaproszenia", u.email), { owner: auth.user.uid, karta: u.id, zakres: zakresUcznia(u) }, { merge: true })
+    if (zmianaCelu) await Promise.all([
+      u.email && auth.fs.setDoc(auth.fs.doc(auth.db, "zaproszenia", u.email), { owner: auth.user.uid, karta: u.id, zakres: zakresUcznia(u) }, { merge: true }),
+      u.link && auth.fs.updateDoc(auth.fs.doc(auth.db, "linki", u.link), { zakres: zakresUcznia(u) })])
       .catch(err => alert("Dane zapisane, ale dostępu ucznia nie udało się zmienić: " + (err.code || err.message)));
     render();
   };
@@ -1066,6 +1146,7 @@ function karta(u) {
     if (!confirm(`Usunąć ucznia ${nazwa(u)} razem z wynikami? Tego nie da się cofnąć.`)) return;
     await auth.fs.deleteDoc(auth.fs.doc(auth.db, "uczniowie", u.id));
     if (u.prace) await auth.fs.deleteDoc(auth.fs.doc(auth.db, "prace", u.id)).catch(e => console.warn(e));
+    if (u.link) await auth.fs.deleteDoc(auth.fs.doc(auth.db, "linki", u.link)).catch(e => console.warn(e));
     UCZNIOWIE = UCZNIOWIE.filter(x => x !== u); location.hash = "";
   };
 }
@@ -1091,7 +1172,7 @@ function wynikPracy(p, w) {
 function pracaHtml(u) {
   const w = wszystkie(u), l = sortPrac(u.prace || [], w), za7 = dzienLok(new Date(Date.now() + 7 * 864e5));
   return `<section class="summary" style="margin-top:22px" id="pd"><b style="font-family:var(--display);font-size:20px">Praca domowa</b>
-    ${u.konto ? "" : `<span class="muted-s">Uczeń zobaczy pracę domową w swoim gabinecie po zalogowaniu z zaproszenia (sekcja «Konto ucznia» niżej). Zadania zrobione na lekcji też się liczą.</span>`}
+    ${u.konto ? "" : `<span class="muted-s">Uczeń zobaczy pracę domową w swoim gabinecie po wejściu z zaproszenia lub osobistego linku (sekcja «Konto ucznia» niżej). Zadania zrobione na lekcji też się liczą.</span>`}
     ${l.length ? `<div class="prace">${l.map(p => { const st = stanPracy(p, w);
       return `<div class="pd"><span class="pd-t"><b>${esc(tytulPracy(p))}</b><span class="muted-s">zadano ${esc(new Date(p.od).toLocaleDateString("pl-PL"))} · termin: ${esc(terminTxt(p.termin))}</span></span>
         <span class="pd-r">${etykietaPracy(st)}${st.zrobione ? "" : `<button type="button" class="btn-s" data-pd-tg="${esc(p.id)}" title="PDF z zadaniami: na telefonie «Udostępnij» → Telegram → uczeń">✈ PDF w Telegram</button>`}<button type="button" class="link-del" data-pd-del="${esc(p.id)}">usuń</button></span>${wynikPracy(p, w)}</div>`; }).join("")}</div>`

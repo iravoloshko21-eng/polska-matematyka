@@ -578,10 +578,10 @@ function authbar() {
   if (!FB) { b.innerHTML = ""; return; }
   if (!auth.user) b.innerHTML = `<button type="button" id="ab-in">Zaloguj się</button><button type="button" class="primary" id="ab-up">Zarejestruj się</button>`;
   // вчитель / адмін: без кнопки з ім'ям (вона вела на «учнівський» кабінет), лише «Moi uczniowie»
-  else b.innerHTML = `${nauczyciel() ? `<a class="btn-s" href="../nauczyciel/">Moi uczniowie</a>` : `<a class="btn-s" href="../konto/">${esc(auth.user.displayName || auth.user.email)}</a>`}${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
+  else b.innerHTML = `${nauczyciel() ? `<a class="btn-s" href="../nauczyciel/">Moi uczniowie</a>` : `<a class="btn-s" href="../konto/">${esc(auth.user.isAnonymous ? auth.imie || "Mój gabinet" : auth.user.displayName || auth.user.email)}</a>`}${auth.status === "admin" ? `<a class="btn-s" href="../admin/">Panel</a>` : ""}<button type="button" id="ab-out">Wyloguj</button>`;
   $("#ab-in")?.addEventListener("click", () => openAuth("in"));
   $("#ab-up")?.addEventListener("click", () => openAuth("up"));
-  $("#ab-out")?.addEventListener("click", () => auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));
+  $("#ab-out")?.addEventListener("click", () => (!auth.user.isAnonymous || confirm("Wylogować się? Żeby wrócić do gabinetu, otwórz ponownie swój link od nauczyciela.")) && auth.fb.signOut(auth.fb.auth).then(() => { try { localStorage.removeItem(STORE); } catch (e) {} location.reload(); }));
 }
 
 let mode = "in";
@@ -635,6 +635,20 @@ async function initFirebase() {
     history.replaceState(null, "", location.pathname + location.hash);
   }
 
+  // вхід за особистим посиланням від вчителя (/konto/#k=<токен>), без e-mailу: анонімний акаунт Firebase на цьому пристрої,
+  // прив'язаний до картки через linki/{токен}; вчитель може перегенерувати або вимкнути посилання (тоді доступ зникає)
+  const kLink = new URLSearchParams(location.hash.slice(1)).get("k");
+  if (kLink && /^[a-f0-9]{32,64}$/.test(kLink)) {
+    history.replaceState(null, "", location.pathname + location.search);
+    await fauth.authStateReady();
+    if (fauth.currentUser && !fauth.currentUser.isAnonymous) alert("Jesteś zalogowany na swoje konto. Link ucznia otwórz w innej przeglądarce albo najpierw się wyloguj.");
+    else {
+      try { localStorage.setItem("link-ucznia", kLink); } catch (e) {}
+      auth.nowyLink = kLink;
+      if (!fauth.currentUser) await a.signInAnonymously(fauth).catch(e => alert("Nie udało się otworzyć linku: " + (e.code || e.message)));
+    }
+  }
+
   $("#g-login").onclick = () => a.signInWithPopup(fauth, new a.GoogleAuthProvider()).then(() => $("#dlg").close(), showErr);
   $("#auth-form").addEventListener("submit", async e => {
     e.preventDefault();
@@ -652,6 +666,7 @@ async function initFirebase() {
   a.onAuthStateChanged(fauth, async user => {
     auth.user = user;
     if (!user) { auth.status = "out"; authbar(); render(); return; }
+    if (user.isAnonymous) return uczenZLinku(user, fs, db);
     const ref = fs.doc(db, "users", user.uid);
     let snap = await fs.getDoc(ref).catch(() => null);
     if (!snap || !snap.exists()) {
@@ -699,16 +714,47 @@ async function initFirebase() {
     }
     auth.status = isAdmin ? "admin" : isTeacher ? "teacher" : snap?.data()?.approved ? "approved" : "pending";
     authbar(); render();
-    if (dostep() && !globalThis.BEZ_PAKIETOW) {   // dostep() уже враховує розділ: пакети чужого розділу не вантажимо
-      try {
-        // лише пакети цього розділу (D.pakiety), щоб сторінка не тягнула закриті завдання інших розділів
-        const packs = D.pakiety ? await Promise.all(D.pakiety.map(id => fs.getDoc(fs.doc(db, "pakiety", id)).catch(() => null)))
-                                : (await fs.getDocs(fs.collection(db, "pakiety"))).docs;
-        packs.forEach(p => p?.exists?.() !== false && JSON.parse(p?.data()?.dane || "[]").forEach(z => { if (byId[z.id]) dodajLiczbe(Object.assign(byId[z.id], z)); }));
-      } catch (e) { console.warn(e); }
-      render();
-    }
+    await wczytajPakiety(fs, db);
   });
+}
+
+// закриті завдання з бази; dostep() уже враховує розділ: пакети чужого розділу не вантажимо
+async function wczytajPakiety(fs, db) {
+  if (!dostep() || globalThis.BEZ_PAKIETOW) return;
+  try {
+    // лише пакети цього розділу (D.pakiety), щоб сторінка не тягнула закриті завдання інших розділів
+    const packs = D.pakiety ? await Promise.all(D.pakiety.map(id => fs.getDoc(fs.doc(db, "pakiety", id)).catch(() => null)))
+                            : (await fs.getDocs(fs.collection(db, "pakiety"))).docs;
+    packs.forEach(p => p?.exists?.() !== false && JSON.parse(p?.data()?.dane || "[]").forEach(z => { if (byId[z.id]) dodajLiczbe(Object.assign(byId[z.id], z)); }));
+  } catch (e) { console.warn(e); }
+  render();
+}
+
+// учень, що увійшов за посиланням: powiazania/{uid}{owner,karta,token} → linki/{token}{owner,karta,zakres,imie}
+async function uczenZLinku(user, fs, db) {
+  const pref = fs.doc(db, "powiazania", user.uid);
+  let p = await fs.getDoc(pref).then(d => d.exists() ? d.data() : null, () => null);
+  const nowy = auth.nowyLink; auth.nowyLink = null;
+  if (nowy && p?.token !== nowy) {
+    const l = await fs.getDoc(fs.doc(db, "linki", nowy)).then(d => d.exists() ? d.data() : null, () => null);
+    if (l) { p = { owner: l.owner, karta: l.karta, token: nowy }; await fs.setDoc(pref, p).catch(e => console.warn(e)); }
+  }
+  const l = p?.token ? await fs.getDoc(fs.doc(db, "linki", p.token)).then(d => d.exists() ? d.data() : null, () => null) : null;
+  if (!l || l.karta !== p.karta || l.owner !== p.owner) {
+    alert("Ten link do gabinetu już nie działa. Poproś nauczyciela o nowy.");
+    await auth.fb.signOut(auth.fb.auth); return;
+  }
+  Object.assign(auth, { db, fs, zakres: l.zakres || "e8", imie: l.imie || "", status: "approved" });
+  const remote = await fs.getDoc(fs.doc(db, "postepy", user.uid)).then(d => d.exists() ? d.data().wyniki || {} : {}, () => null);
+  if (remote) {
+    res = { ...res, ...remote };
+    try { localStorage.setItem(STORE, JSON.stringify(res)); } catch (e) {}
+    let timer;
+    cloud = () => { clearTimeout(timer); timer = setTimeout(() => fs.setDoc(fs.doc(db, "postepy", user.uid), { wyniki: res, updated: fs.serverTimestamp() }).catch(e => console.warn(e)), 1200); };
+    if (Object.keys(res).length !== Object.keys(remote).length) cloud();
+  }
+  authbar(); render();
+  await wczytajPakiety(fs, db);
 }
 
 // смужка «Lekcja z …» над сторінкою в режимі уроку
