@@ -712,10 +712,11 @@ function lekcjaBar(u) {
 
 // PDF для домашнього: сторінки A4 у вигляді аркушів matematykaszkolna.pl (заголовок, «Zad. 1 (1 pkt) (джерело)», номер сторінки),
 // складаються на canvas і зберігаються jsPDF як файл. Нумерація завдань — своя, від 1.
-async function drukuj(lista, { sekcja, temat, podpis }) {
+// plik: true — без питання про відповіді, повертає File (для ДЗ у Telegram) замість збереження
+async function drukuj(lista, { sekcja, temat, podpis, plik }) {
   const l = lista.filter(t => unlocked(t) && t.img);
   if (!l.length) { alert("Brak dostępnych zadań do pobrania."); return; }
-  const zOdp = confirm(`PDF: ${l.length} zadań.\n\nDodać na końcu stronę z odpowiedziami (dla nauczyciela)?\nOK — z odpowiedziami, Anuluj — bez odpowiedzi.`);
+  const zOdp = !plik && confirm(`PDF: ${l.length} zadań.\n\nDodać na końcu stronę z odpowiedziami (dla nauczyciela)?\nOK — z odpowiedziami, Anuluj — bez odpowiedzi.`);
   if (!globalThis.jspdf) await new Promise((ok, err) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"; s.onload = ok; s.onerror = err; document.head.append(s); });
   const W = 1323, H = 1871, M = 71, TOP = 90, BOT = 150;          // A4 при 160 dpi — так само, як вирізані картинки завдань
   const load = t => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = new URL(t.img, location.href).href; });
@@ -760,7 +761,9 @@ async function drukuj(lista, { sekcja, temat, podpis }) {
     g.font = "18px Inter, Arial, sans-serif"; const v = "Voloshko Iryna · Matematyka"; g.fillText(v, (W - g.measureText(v).width) / 2, H - 62); });
   const pdf = new jspdf.jsPDF({ unit: "mm", format: "a4" });
   strony.forEach((s, i) => { if (i) pdf.addPage(); pdf.addImage(s.toDataURL("image/png"), "PNG", 0, 0, 210, 297, undefined, "FAST"); });
-  pdf.save(`${temat} - zadania${zOdp ? " z odpowiedziami" : ""}.pdf`.replace(/[\\/:*?"<>|]/g, "-"));
+  const nazwa = `${temat} - zadania${zOdp ? " z odpowiedziami" : ""}.pdf`.replace(/[\\/:*?"<>|]/g, "-");
+  if (plik) return new File([pdf.output("blob")], nazwa, { type: "application/pdf" });
+  pdf.save(nazwa);
 }
 
 // плавна зміна вмісту на сторінці (наступне завдання, аркуш, учень): старе м'яко зникає, нове з'являється; без підтримки браузера чи при вимкнених анімаціях — просто одразу
