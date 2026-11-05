@@ -930,7 +930,7 @@ function karta(u) {
   const arkHtml = arkuszeHtml([u.wyniki, "na lekcji"], [u.konto ? u.wlasne : null, "samodzielnie"]);
   $("#list").innerHTML = `<p><a href="#">← Wszyscy uczniowie</a></p>
     <section class="summary"><b style="font-family:var(--display);font-size:20px">Lekcja z uczniem</b>
-      <span class="muted-s">Otwórz zadania w trybie lekcji: odpowiedzi zapiszą się w gabinecie ucznia.${auth.status === "admin" ? " «Ukryj rozwiązane» + «Pobierz PDF» da Ci zadania, których jeszcze nie zrobiliście, na pracę domową." : " «Ukryj rozwiązane» pokaże zadania, których jeszcze nie zrobiliście."}</span>
+      <span class="muted-s">Otwórz zadania w trybie lekcji: odpowiedzi zapiszą się w gabinecie ucznia. «Ukryj rozwiązane» pokaże zadania, których jeszcze nie zrobiliście.</span>
       <div class="akcje">${lekcja}</div></section>
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Słabe tematy</b>
       ${tem.length ? `<span class="muted-s">Tematy z najniższym wynikiem (liczone, gdy uczeń rozwiązał co najmniej 3 zadania z tematu).</span>
