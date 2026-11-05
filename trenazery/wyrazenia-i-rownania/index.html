@@ -1,0 +1,187 @@
+<!doctype html><html lang="pl"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"></head><body>
+<a href="../" style="position:fixed;z-index:9999;left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));background:#151515;color:#fbf6ea;font:700 13px/1 Inter,system-ui,sans-serif;text-decoration:none;border-radius:999px;padding:10px 14px;box-shadow:3px 3px 0 #5157d6">← Trenażery</a>
+<title>Wyrażenia i równania</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700&family=Unbounded:wght@600&display=swap">
+<style>
+/* Layout: one notebook-width column; topic chips on top, one task on a squared-paper card, answer field and feedback below. Light = squared notebook, dark = chalkboard. */
+:root{
+  --bg:#f3f5f9; --paper:#ffffff; --grid:#d9e2f1; --ink:#1c2a4a; --muted:#5d6b88;
+  --accent:#2447b3; --accent-fg:#ffffff; --margin:#d9534f;
+  --ok:#1f7a4d; --ok-bg:#e3f4ea; --bad:#b3362f; --bad-bg:#fbe7e5; --warn:#8a5a00; --warn-bg:#fdf1d6; --line:#c9d3e6;
+  --display:"Unbounded","Onest",system-ui,sans-serif; --body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#16211d; --paper:#1f2e28; --grid:#2b3d36; --ink:#eef2ea; --muted:#a3b3aa;
+  --accent:#f2d16b; --accent-fg:#1b2420; --margin:#e58a7f;
+  --ok:#8fd9ae; --ok-bg:#1f3a2d; --bad:#f0a59d; --bad-bg:#40272a; --warn:#f2d16b; --warn-bg:#3a3420; --line:#35493f; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#16211d; --paper:#1f2e28; --grid:#2b3d36; --ink:#eef2ea; --muted:#a3b3aa;
+  --accent:#f2d16b; --accent-fg:#1b2420; --margin:#e58a7f;
+  --ok:#8fd9ae; --ok-bg:#1f3a2d; --bad:#f0a59d; --bad-bg:#40272a; --warn:#f2d16b; --warn-bg:#3a3420; --line:#35493f; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:24px 40px;display:flex;flex-direction:column;gap:16px}
+h1{font-family:var(--display);font-size:clamp(20px,5vw,28px);line-height:1.2;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;font-size:14px}
+button,input{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:500;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.card{position:relative;border:1px solid var(--line);border-radius:6px;padding:24px 20px 26px 56px;background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;
+  display:flex;flex-direction:column;gap:10px;min-height:190px;justify-content:center}
+.card::before{content:"";position:absolute;left:40px;top:0;bottom:0;width:2px;background:var(--margin);opacity:.7}
+.kind{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.cmd{font-weight:700}
+.ua{color:var(--muted);font-size:14px}
+.math{font-size:clamp(22px,5.6vw,30px);font-weight:500;display:flex;flex-wrap:wrap;align-items:center;gap:.3em;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.frac{display:inline-flex;flex-direction:column;align-items:center;line-height:1.15}
+.frac span:first-child{border-bottom:2px solid currentColor;padding:0 .3em}
+.frac span:last-child{padding:0 .3em}
+.answer{display:flex;gap:10px;flex-wrap:wrap}
+.answer input{flex:1 1 220px;min-width:0;padding:13px 14px;border:1px solid var(--line);border-radius:8px;background:var(--paper);font-size:20px}
+.btn{padding:13px 18px;border-radius:8px;border:1px solid var(--line);background:var(--paper);cursor:pointer;font-weight:700}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.keys{display:flex;gap:6px;flex-wrap:wrap}
+.key{min-width:44px;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);cursor:pointer;font-size:18px}
+.special{display:flex;gap:8px;flex-wrap:wrap}
+.fb{border-radius:8px;padding:12px 14px;font-weight:500;overflow-wrap:anywhere}
+.fb.ok{background:var(--ok-bg);color:var(--ok)} .fb.no{background:var(--bad-bg);color:var(--bad)} .fb.warn{background:var(--warn-bg);color:var(--warn)}
+.steps{border-left:3px solid var(--accent);padding:4px 0 4px 14px;display:flex;flex-direction:column;gap:4px;font-size:17px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.steps b{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.hint{font-size:14px;color:var(--muted);margin:0}
+</style>
+<div class="wrap">
+  <header>
+    <h1>Wyrażenia algebraiczne i równania</h1>
+    <p class="sub">Trening z rozdziału 2. Тренажер: алгебраїчні вирази та рівняння.</p>
+  </header>
+  <div class="chips" id="chips" role="group" aria-label="Rodzaj zadań"></div>
+  <div class="meta"><span id="score"></span><span id="streak"></span></div>
+  <div class="card">
+    <div class="kind" id="kind"></div>
+    <div class="cmd" id="cmd"></div>
+    <div class="ua" id="ua"></div>
+    <div class="math" id="math"></div>
+  </div>
+  <form class="answer" id="form" autocomplete="off">
+    <input id="ans" type="text" inputmode="text" aria-label="Twoja odpowiedź" placeholder="Twoja odpowiedź" autocapitalize="off" spellcheck="false">
+    <button class="btn primary" id="check" type="submit">Sprawdź</button>
+  </form>
+  <div class="keys" id="keys" aria-label="Znaki"></div>
+  <div class="special" id="special" hidden>
+    <button class="btn" type="button" data-s="sprzeczne">Równanie sprzeczne</button>
+    <button class="btn" type="button" data-s="tozsamosc">Równanie tożsamościowe</button>
+  </div>
+  <div class="fb" id="fb" hidden aria-live="polite"></div>
+  <div class="steps" id="steps" hidden></div>
+  <div class="row">
+    <button class="btn" id="show" type="button">Pokaż rozwiązanie</button>
+    <button class="btn primary" id="next" type="button">Następne zadanie</button>
+  </div>
+  <p class="hint">Jak pisać: potęga <b>x^2</b> lub <b>x²</b>, ułamek <b>3/2</b>, liczba dziesiętna <b>1,5</b>. Як писати: степінь x^2, дріб 3/2, десятковий дріб 1,5.</p>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const NZ=(a,b)=>{let v;do{v=R(a,b)}while(v===0);return v};
+const pick=a=>a[R(0,a.length-1)];
+const M='−';
+// --- formatting ---
+function mono(c,v){const a=Math.abs(c);return (a===1&&v?'':a)+v}
+function sum(terms){ // terms: [coef, varString]
+  let s='';terms.filter(t=>t[0]!==0).forEach((t,i)=>{const neg=t[0]<0;s+=i===0?(neg?M:'')+mono(t[0],t[1]):(neg?' '+M+' ':' + ')+mono(t[0],t[1])});return s||'0'}
+const num=n=>(n<0?M:'')+String(Math.abs(Math.round(n*1000)/1000)).replace('.',',');
+const par=n=>n<0?'('+num(n)+')':num(n);
+// --- parser ---
+function parse(src){
+  let s=src.toLowerCase().replace(/[−–—]/g,'-').replace(/[·×]/g,'*').replace(/:/g,'/').replace(/,/g,'.').replace(/²/g,'^2').replace(/³/g,'^3').replace(/\s+/g,'');
+  s=s.replace(/^[xy]=/,'');
+  const tk=s.match(/\d+(\.\d+)?|[xy+\-*\/^()]/g)||[];
+  if(tk.join('')!==s||!s)throw 0;
+  let i=0,paren=false,vars=false,top=0;
+  const peek=()=>tk[i];
+  function expr(d){let f=term(),n=1;while(peek()==='+'||peek()==='-'){const o=tk[i++],g=term(),a=f;f=o==='+'?e=>a(e)+g(e):e=>a(e)-g(e);n++}if(d===0)top=n;return f}
+  function term(){let f=unary();for(;;){const p=peek();if(p==='*'||p==='/'){i++;const g=unary(),a=f;f=p==='*'?e=>a(e)*g(e):e=>a(e)/g(e)}else if(p!==undefined&&/^[\dxy(]/.test(p)){const g=power(),a=f;f=e=>a(e)*g(e)}else break}return f}
+  function unary(){if(peek()==='-'){i++;const g=unary();return e=>-g(e)}if(peek()==='+'){i++;return unary()}return power()}
+  function power(){let f=atom();if(peek()==='^'){i++;const g=unary(),a=f;f=e=>Math.pow(a(e),g(e))}return f}
+  function atom(){const p=tk[i++];if(p===undefined)throw 0;if(/^\d/.test(p)){const v=parseFloat(p);return()=>v}if(p==='x'||p==='y'){vars=true;return e=>e[p]}if(p==='('){paren=true;const f=expr(1);if(tk[i++]!==')')throw 0;return f}throw 0}
+  const f=expr(0);if(i<tk.length)throw 0;
+  return {f,paren,vars,top}}
+// --- generators ---
+const G={
+ red(){let t,ax,ay,c;do{
+    if(Math.random()<.5){const a1=NZ(-9,9),a2=NZ(-9,9),b1=NZ(-12,12),b2=NZ(-12,12);t=[[a1,'x'],[b1,''],[a2,'x'],[b2,'']];ax=a1+a2;ay=0;c=b1+b2}
+    else{const a1=NZ(-9,9),a2=NZ(-9,9),b1=NZ(-9,9),b2=NZ(-9,9);t=[[a1,'x'],[b1,'y'],[a2,'x'],[b2,'y']];ax=a1+a2;ay=b1+b2;c=0}
+  }while(ax===0||(ay===0&&c===0));
+  const res=sum([[ax,'x'],[ay,'y'],[c,'']]);
+  return{k:'red',show:[sum(t)],f:e=>ax*e.x+ay*e.y+c,max:2,noParen:true,res,steps:['Grupujemy wyrazy podobne i dodajemy ich współczynniki.',sum(t)+' = '+res]}},
+ naw(){let a,b,c,d,e2,f2,X,C;do{a=R(2,6);b=NZ(-5,5);c=NZ(-9,9);d=R(2,5);e2=NZ(-5,5);f2=NZ(-9,9);X=a*b-d*e2;C=a*c-d*f2}while(X===0);
+  const show=a+'('+sum([[b,'x'],[c,'']])+') '+M+' '+d+'('+sum([[e2,'x'],[f2,'']])+')';
+  const mid=sum([[a*b,'x'],[a*c,''],[-d*e2,'x'],[-d*f2,'']]);const res=sum([[X,'x'],[C,'']]);
+  return{k:'naw',show:[show],f:e=>X*e.x+C,max:2,noParen:true,res,steps:['Mnożymy każdy wyraz w nawiasie; minus przed nawiasem zmienia znaki.',show+' = '+mid,'= '+res]}},
+ mno(){let p=Math.random()<.35?R(2,4):1,a=NZ(-9,9),b=NZ(-9,9);
+  const show='('+sum([[p,'x'],[a,'']])+')('+sum([[1,'x'],[b,'']])+')';
+  const mid=sum([[p,'x²'],[p*b,'x'],[a,'x'],[a*b,'']]);const res=sum([[p,'x²'],[p*b+a,'x'],[a*b,'']]);
+  return{k:'mno',show:[show],f:e=>(p*e.x+a)*(e.x+b),max:3,noParen:true,res,steps:['Mnożymy każdy wyraz pierwszej sumy przez każdy wyraz drugiej.',show+' = '+mid,'= '+res]}},
+ war(){const p=NZ(-3,3),q=NZ(-6,6),r=NZ(-9,9),k=NZ(-4,4);const ex=sum([[p,'x²'],[q,'x'],[r,'']]);const v=p*k*k+q*k+r;
+  return{k:'war',show:[ex],arg:'x = '+num(k),val:v,res:num(v),steps:['Podstawiamy '+num(k)+' w miejsce x. Liczbę ujemną bierzemy w nawias.',
+   (p===1?'':p===-1?M:num(p)+' · ')+par(k)+'² '+(q<0?M:'+')+' '+Math.abs(q)+' · '+par(k)+' '+(r<0?M:'+')+' '+Math.abs(r),'= '+num(p*k*k)+' '+(q*k<0?M:'+')+' '+Math.abs(q*k)+' '+(r<0?M:'+')+' '+Math.abs(r)+' = '+num(v)]}},
+ row(){const sp=Math.random();
+  if(sp<.12||sp>.88){const a=R(2,6),m=NZ(-6,6),ok=sp>.88,d=ok?a*m:a*m+NZ(-5,5);
+    const L=a+'('+sum([[1,'x'],[m,'']])+')',P=sum([[a,'x'],[d,'']]);
+    return{k:'row',show:[L+' = '+P],special:ok?'tozsamosc':'sprzeczne',res:ok?'równanie tożsamościowe':'równanie sprzeczne',
+      steps:[L+' = '+P,sum([[a,'x'],[a*m,'']])+' = '+P,num(a*m)+' = '+num(d),ok?'Równość prawdziwa dla każdej liczby: równanie tożsamościowe.':'Równość fałszywa: równanie sprzeczne, brak rozwiązań.']}}
+  const s=R(-9,9);let a,c;do{a=NZ(-7,9);c=NZ(-7,9)}while(a===c);
+  if(Math.random()<.5){const b=NZ(-12,12),d=(a-c)*s+b;const L=sum([[a,'x'],[b,'']]),P=sum([[c,'x'],[d,'']]);
+    return{k:'row',show:[L+' = '+P],val:s,res:'x = '+num(s),steps:['Wyrazy z x przenosimy na lewą stronę, liczby na prawą (ze zmianą znaku).',sum([[a,'x'],[-c,'x']])+' = '+sum([[d,''],[-b,'']]),sum([[a-c,'x']])+' = '+num(d-b),'x = '+num(s)]}}
+  const m=NZ(-6,6),d=(a-c)*s+a*m;const L=(a===-1?M:a===1?'':num(a))+'('+sum([[1,'x'],[m,'']])+')',P=sum([[c,'x'],[d,'']]);
+  return{k:'row',show:[L+' = '+P],val:s,res:'x = '+num(s),steps:['Najpierw opuszczamy nawias.',sum([[a,'x'],[a*m,'']])+' = '+P,sum([[a-c,'x']])+' = '+num(d-a*m),'x = '+num(s)]}},
+ pro(){const s=R(2,12),b=R(2,9),k=R(2,4);let q=[[s,b],[s*k,b*k]];if(Math.random()<.5)q.reverse();
+  const pos=q[0][0]===s?[0,0]:[1,0];const flip=Math.random()<.5;if(flip){q=q.map(p=>[p[1],p[0]])}
+  const cell=(i,j)=>(i===pos[0]&&j===(flip?1:0))?'x':String(q[i][j]);
+  const fr=i=>({n:cell(i,0),d:cell(i,1)});
+  const o=1-pos[0];const A=q[o][0],B=q[o][1],own=flip?q[pos[0]][0]:q[pos[0]][1];
+  const cross=flip?(own+' · '+B+' = '+A+' · x'):('x · '+B+' = '+own+' · '+A);
+  return{k:'pro',show:[fr(0),'=',fr(1)],val:s,res:'x = '+num(s),steps:['Korzystamy z własności proporcji: mnożymy „na krzyż”.',cross,flip?('x = '+(own*B)+' : '+A):('x = '+(own*A)+' : '+B),'x = '+num(s)]}}
+};
+const KINDS=[
+ ['red','Redukcja','Redukcja wyrazów podobnych','Uprość wyrażenie.','Спрости вираз (зведи подібні доданки).'],
+ ['naw','Nawiasy','Opuszczanie nawiasów','Opuść nawiasy i uprość wyrażenie.','Розкрий дужки і спрости вираз.'],
+ ['mno','Mnożenie sum','Mnożenie sum algebraicznych','Wykonaj mnożenie i uprość.','Перемнож многочлени і спрости.'],
+ ['war','Wartość','Wartość liczbowa wyrażenia','Oblicz wartość wyrażenia dla ','Обчисли значення виразу для заданого x.'],
+ ['row','Równania','Równania','Rozwiąż równanie.','Розв’яжи рівняння. Якщо розв’язків немає або їх безліч, натисни відповідну кнопку.'],
+ ['pro','Proporcje','Proporcje','Wyznacz x.','Знайди x з пропорції.']];
+let kind='mix',task=null,good=0,all=0,streak=0,counted=false;
+function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+const chips=$('chips');
+[['mix','Wszystko']].concat(KINDS.map(k=>[k[0],k[1]])).forEach(([id,label])=>{const b=el('button','chip',label);b.type='button';b.setAttribute('aria-pressed',id===kind);b.onclick=()=>{kind=id;[...chips.children].forEach(c=>c.setAttribute('aria-pressed',c===b));newTask()};chips.append(b)});
+['x','y','²','(',')',M,'+','/'].forEach(k=>{const b=el('button','key',k);b.type='button';b.setAttribute('aria-label','Wstaw '+k);b.onclick=()=>{const i=$('ans');const a=i.selectionStart??i.value.length,z=i.selectionEnd??a;i.value=i.value.slice(0,a)+k+i.value.slice(z);i.focus();i.setSelectionRange(a+k.length,a+k.length)};$('keys').append(b)});
+function meta(){$('score').textContent='Poprawnie: '+good+' z '+all;$('streak').textContent='Seria: '+streak}
+function newTask(){const id=kind==='mix'?pick(KINDS)[0]:kind;task=G[id]();const K=KINDS.find(k=>k[0]===id);
+  $('kind').textContent=K[2];$('cmd').textContent=K[3]+(task.arg?task.arg+'.':'');$('ua').textContent=K[4];
+  $('math').replaceChildren(...task.show.map(p=>{if(typeof p==='string')return el('span',null,p);const f=el('span','frac');f.append(el('span',null,p.n),el('span',null,p.d));return f}));
+  $('ans').value='';$('fb').hidden=true;$('steps').hidden=true;$('special').hidden=id!=='row';counted=false;meta();}
+function fb(cls,txt){const f=$('fb');f.className='fb '+cls;f.textContent=txt;f.hidden=false}
+function count(ok){if(counted)return;counted=true;all++;if(ok){good++;streak++}else streak=0;meta()}
+function verdict(ok){if(ok){fb('ok','Dobrze! Правильно.');count(true)}else{fb('no','Jeszcze nie. Спробуй ще раз або відкрий розв’язання.');count(false)}}
+function check(){const v=$('ans').value.trim();if(!v){fb('warn','Wpisz odpowiedź. Спочатку введи відповідь.');return}
+  let p;try{p=parse(v)}catch(e){fb('warn','Nie rozumiem tego zapisu. Не розумію запис: перевір знаки й дужки.');return}
+  if(task.special){verdict(false);return}
+  if(task.val!==undefined){if(p.vars){fb('warn','Odpowiedzią ma być liczba. Відповідь має бути числом.');return}
+    verdict(Math.abs(p.f({})-task.val)<1e-9);return}
+  let same=true;for(let i=0;i<5;i++){const e={x:1.37+i*0.91,y:-0.73+i*1.19};if(Math.abs(p.f(e)-task.f(e))>1e-6)same=false}
+  if(!same){verdict(false);return}
+  if((task.noParen&&p.paren)||p.top>task.max){fb('warn','Wyrażenie jest równe, ale można je jeszcze uprościć. Вираз правильний, але його ще можна спростити.');return}
+  verdict(true)}
+$('form').addEventListener('submit',e=>{e.preventDefault();check()});
+$('special').addEventListener('click',e=>{const s=e.target.dataset.s;if(!s)return;verdict(task.special===s)});
+$('show').onclick=()=>{count(false);const s=$('steps');s.replaceChildren(el('b',null,'Rozwiązanie'),...task.steps.map(t=>el('div',null,t)),el('div',null,'Odpowiedź: '+task.res));s.hidden=false};
+$('next').onclick=()=>{newTask();$('ans').focus()};
+newTask();
+</script>
+
+</body></html>

@@ -1,0 +1,334 @@
+<!doctype html><html lang="pl"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"></head><body>
+<a href="../" style="position:fixed;z-index:9999;left:max(10px,env(safe-area-inset-left,0px));bottom:max(10px,env(safe-area-inset-bottom,0px));background:#151515;color:#fbf6ea;font:700 13px/1 Inter,system-ui,sans-serif;text-decoration:none;border-radius:999px;padding:10px 14px;box-shadow:3px 3px 0 #5157d6">← Trenażery</a>
+<title>Ułamki na osi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Nunito:wght@400;700;800&display=swap">
+<style>
+/* Layout: jedna kolumna, duża oś liczbowa w centrum, przyciski pod nią. Paleta Iryny. */
+:root {
+  --cream: #F9F6F1; --brown: #2A1F1B; --olive: #575D45; --blue: #627CF2;
+  --bg: #F9F6F1; --card: #ffffff; --ink: #2A1F1B; --muted: #6d6656; --line: #d9d2c4;
+  --good: #3f7d4e; --bad: #b8452f;
+  --display: "Fraunces", Georgia, serif; --body: "Nunito", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1d1714; --card: #2a221e; --ink: #f2ede4; --muted: #b9b09f; --line: #4a3f38; --olive: #a7b08d; --blue: #8c9ef7;
+  --good: #7cc08b; --bad: #f08a72; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #1d1714; --card: #2a221e; --ink: #f2ede4; --muted: #b9b09f; --line: #4a3f38; --olive: #a7b08d; --blue: #8c9ef7;
+  --good: #7cc08b; --bad: #f08a72; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 22px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 14px; }
+h1 { font-family: var(--display); font-size: 2.2rem; margin: 0; color: var(--olive); text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pill { font: 700 .95rem var(--body); border: 2px solid var(--olive); background: var(--card); color: var(--olive);
+  border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+.pill[aria-pressed="true"] { background: var(--olive); color: var(--bg); }
+.sep { width: 1px; height: 26px; background: var(--line); margin: 0 4px; }
+.card { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 14px; }
+.q { font-size: 1.35rem; font-weight: 800; text-align: center; min-height: 1.6em; }
+.q .num { color: var(--blue); font-family: var(--display); font-size: 1.6rem; }
+svg { width: 100%; height: auto; display: block; touch-action: manipulation; }
+svg.clickable { cursor: crosshair; }
+.opts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.opt, .big { font: 800 1.15rem var(--body); border: 2px solid var(--blue); background: var(--card); color: var(--blue);
+  border-radius: 10px; padding: 12px 6px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.opt.ok, .big.ok { background: var(--good); border-color: var(--good); color: var(--card); }
+.opt.bad, .big.bad { background: var(--bad); border-color: var(--bad); color: var(--card); }
+.cmp { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; text-align: center; }
+.cmp .n { font-family: var(--display); font-size: 2.2rem; }
+.cmp .slot { font-family: var(--display); font-size: 2.2rem; color: var(--blue); min-width: 1.4em; border-bottom: 2px dashed var(--line); }
+.signs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fb { min-height: 2.8em; font-weight: 700; text-align: center; }
+.fb.good { color: var(--good); } .fb.wrong { color: var(--bad); }
+.foot { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; }
+.score { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--olive); }
+.next { font: 800 1rem var(--body); background: var(--blue); color: #fff; border: none; border-radius: 10px; padding: 11px 20px; cursor: pointer; }
+.tip { color: var(--muted); font-size: .95rem; }
+button:focus-visible { outline: 3px solid var(--bad); outline-offset: 2px; }
+.ans { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.ans input { font: 800 1.4rem var(--body); width: 9ch; text-align: center; padding: 8px; border: 2px solid var(--blue); border-radius: 10px; background: var(--bg); color: var(--ink); }
+.ans input.ok { border-color: var(--good); } .ans input.bad { border-color: var(--bad); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.chip { font: 800 1.25rem var(--body); border: 2px solid var(--olive); background: var(--card); color: var(--ink); border-radius: 10px; padding: 10px 14px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.chip.done { background: var(--good); border-color: var(--good); color: var(--card); cursor: default; }
+.chip.bad { background: var(--bad); border-color: var(--bad); color: var(--card); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; min-height: 2.6em; align-items: center; font: 800 1.2rem var(--body); color: var(--good); }
+.fr { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; line-height: 1.05; }
+.fr span:first-child { border-bottom: 2px solid currentColor; padding: 0 3px; }
+.streak { color: var(--blue); }
+.colw { display: flex; justify-content: center; }
+.colt { font: 800 1.5rem var(--body); font-variant-numeric: tabular-nums; border-collapse: collapse; }
+.colt td { padding: 0 3px; text-align: center; min-width: .8em; }
+.colt tr.res td { border-top: 2px solid var(--ink); color: var(--good); }
+@media (max-width: 480px) { .opts { grid-template-columns: repeat(2, 1fr); } h1 { font-size: 1.8rem; } }
+</style>
+
+<div class="wrap">
+  <h1>Ułamki na osi</h1>
+  <p class="sub">Oś liczbowa, porównywanie, kolejność, jednostki i dodawanie. Poziom „mistrz” jest dla odważnych.</p>
+  <div class="bar" role="group" aria-label="Tryb">
+    <button class="pill" data-mode="read" aria-pressed="true">Odczytaj punkt</button>
+    <button class="pill" data-mode="place" aria-pressed="false">Zaznacz liczbę</button>
+    <button class="pill" data-mode="cmp" aria-pressed="false">Porównaj</button>
+    <button class="pill" data-mode="order" aria-pressed="false">Kolejność</button>
+    <button class="pill" data-mode="units" aria-pressed="false">Jednostki</button>
+    <button class="pill" data-mode="add" aria-pressed="false">Dodawanie</button>
+  </div>
+  <div class="bar" role="group" aria-label="Poziom">
+    <button class="pill" data-lvl="1" aria-pressed="true">dziesiąte</button>
+    <button class="pill" data-lvl="2" aria-pressed="false">setne</button>
+    <button class="pill" data-lvl="3" aria-pressed="false">mistrz</button>
+  </div>
+  <section class="card">
+    <div class="q" id="q"></div>
+    <div id="stage"></div>
+    <div class="fb" id="fb"></div>
+    <div class="foot"><span class="score" id="score"></span><button class="next" id="next" hidden>Dalej</button></div>
+  </section>
+  <p class="tip" id="tip"></p>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[rnd(0, a.length - 1)];
+const r4 = v => Math.round(v * 10000) / 10000;
+const fmt = v => String(r4(v)).replace('.', ',');
+const fmtD = (v, d) => r4(v).toFixed(d).replace('.', ',');
+const parse = t => { const x = parseFloat(String(t).trim().replace(/\s/g, '').replace(',', '.')); return isNaN(x) ? null : x; };
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const frac = (a, b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+let mode = 'read', lvl = 1, round = 0, good = 0, streak = 0, best = 0, locked = false;
+
+// ---- oś ----
+function makeAxis() {
+  if (lvl === 1) { const s = rnd(0, 4); return { start: s, step: 0.1, n: 20, labels: [0, 10, 20] }; }
+  if (lvl === 2) { const s = rnd(0, 29) / 10; return { start: s, step: 0.01, n: 10, labels: [0, 10] }; }
+  // mistrz: odcinek między podpisami dzielony na 2, 4, 5 lub 10 części, różne skale
+  const opt = pick([
+    { span: 1, parts: 4 }, { span: 1, parts: 5 }, { span: 1, parts: 2 },
+    { span: 0.1, parts: 5 }, { span: 0.1, parts: 2 }, { span: 0.1, parts: 4 },
+    { span: 0.01, parts: 10 }, { span: 0.01, parts: 5 }, { span: 0.5, parts: 5 }]);
+  const base = opt.span >= 0.5 ? rnd(0, 6) * opt.span : opt.span === 0.1 ? rnd(0, 40) / 10 : rnd(100, 300) / 100;
+  const per = opt.parts;
+  return { start: r4(base), step: r4(opt.span / per), n: per * 2, labels: [0, per, per * 2] };
+}
+const W = 640, X0 = 30, X1 = 600, Y = 50;
+const xOf = (ax, i) => X0 + (X1 - X0) * i / ax.n;
+const valOf = (ax, i) => r4(ax.start + i * ax.step);
+function axisSVG(ax, marks, clickable) {
+  const ink = css('--ink'), blue = css('--blue');
+  let s = `<svg viewBox="0 0 ${W} 90" class="${clickable ? 'clickable' : ''}" role="img" aria-label="oś liczbowa">`;
+  s += `<rect x="0" y="0" width="${W}" height="90" fill="transparent"/>`;
+  s += `<line x1="8" y1="${Y}" x2="${W - 12}" y2="${Y}" stroke="${ink}" stroke-width="2"/><path d="M${W - 10} ${Y} l-12 -6 v12 z" fill="${ink}"/>`;
+  for (let i = 0; i <= ax.n; i++) {
+    const big = ax.labels.includes(i), mid = !big && ax.n === 20 && i % 5 === 0, h = big ? 12 : mid ? 9 : 6, x = xOf(ax, i);
+    s += `<line x1="${x}" y1="${Y - h}" x2="${x}" y2="${Y + h}" stroke="${ink}" stroke-width="${big ? 2.4 : 1.4}"/>`;
+    if (big) s += `<text x="${x}" y="${Y + 34}" font-size="20" font-weight="700" text-anchor="middle" fill="${ink}" font-family="Nunito, sans-serif">${fmt(valOf(ax, i))}</text>`;
+  }
+  for (const m of marks) {
+    s += `<circle cx="${xOf(ax, m.i)}" cy="${Y}" r="8" fill="${m.color || blue}"/>`;
+    if (m.t) s += `<text x="${xOf(ax, m.i)}" y="${Y - 18}" font-size="19" font-weight="800" text-anchor="middle" fill="${m.color || blue}" font-family="Nunito, sans-serif">${m.t}</text>`;
+  }
+  return s + '</svg>';
+}
+const tickIdx = ax => { let i; do { i = rnd(1, ax.n - 1); } while (ax.labels.includes(i)); return i; };
+const stepWhy = ax => `Między ${fmt(valOf(ax, 0))} a ${fmt(valOf(ax, ax.labels[1]))} jest ${ax.labels[1]} równych części, więc jedna kreska to ${fmt(ax.step)}.`;
+
+// ---- licznik ----
+function setScore() { $('score').innerHTML = `Pytanie ${round + 1} z 10 · dobrze: ${good} · <span class="streak">seria: ${streak}</span>`; }
+function finish(ok, msg) {
+  locked = true; if (ok) { good++; streak++; best = Math.max(best, streak); } else streak = 0;
+  $('fb').innerHTML = msg; $('fb').className = 'fb ' + (ok ? 'good' : 'wrong');
+  $('next').hidden = false; setScore();
+}
+function end() {
+  round = 10;
+  $('q').innerHTML = `Koniec! Wynik: <span class="num">${good} / 10</span>`;
+  $('stage').innerHTML = ''; $('fb').textContent = `Najdłuższa seria: ${best}. ` + (good >= 8 ? (lvl < 3 ? 'Świetnie! Spróbuj wyższego poziomu.' : 'Mistrzostwo!') : 'Zagraj jeszcze raz, będzie lepiej!');
+  $('fb').className = 'fb good'; $('next').hidden = false; $('next').textContent = 'Zagraj od nowa'; $('score').textContent = '';
+}
+function restart() { round = 0; good = 0; streak = 0; best = 0; show(); }
+function show() {
+  locked = false; $('fb').textContent = ''; $('fb').className = 'fb'; $('next').hidden = true; $('next').textContent = 'Dalej'; setScore();
+  ({ read: showRead, place: showPlace, cmp: showCmp, order: showOrder, units: showUnits, add: showAdd })[mode]();
+}
+function typed(right, why, onCheck) {
+  $('stage').insertAdjacentHTML('beforeend', `<form class="ans" id="af"><input id="ai" inputmode="decimal" autocomplete="off" aria-label="odpowiedź" placeholder="?"><button class="next" type="submit">Sprawdź</button></form>`);
+  $('ai').focus({ preventScroll: true });
+  $('af').addEventListener('submit', e => {
+    e.preventDefault(); if (locked) return; const v = parse($('ai').value);
+    if (v === null) { $('fb').textContent = 'Wpisz liczbę, np. 2,35'; $('fb').className = 'fb wrong'; return; }
+    const ok = Math.abs(v - right) < 1e-9; $('ai').className = ok ? 'ok' : 'bad';
+    if (onCheck) onCheck(ok);
+    finish(ok, (ok ? 'Dobrze! ' : `Poprawna odpowiedź: ${fmt(right)}. `) + why);
+  });
+}
+
+// ---- tryb: odczytaj ----
+function showRead() {
+  const ax = makeAxis(), i = tickIdx(ax), val = valOf(ax, i);
+  $('q').textContent = lvl === 3 ? 'Jaka liczba jest zaznaczona? Wpisz ją.' : 'Jaka liczba jest zaznaczona na osi?';
+  $('stage').innerHTML = axisSVG(ax, [{ i }], false);
+  const why = stepWhy(ax);
+  if (lvl === 3) { typed(val, why); }
+  else {
+    const d = lvl === 1 ? 1 : 2, opts = new Set([fmtD(val, d)]);
+    for (const c of [val + ax.step, val - ax.step, valOf(ax, 0) + i * ax.step * 10, val + 2 * ax.step]) if (opts.size < 4 && c >= 0) opts.add(fmtD(c, d));
+    while (opts.size < 4) opts.add(fmtD(val + rnd(3, 6) * ax.step, d));
+    $('stage').insertAdjacentHTML('beforeend', `<div class="opts">${[...opts].sort(() => Math.random() - .5).map(o => `<button class="opt">${o}</button>`).join('')}</div>`);
+    $('stage').querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => {
+      if (locked) return; const right = fmtD(val, d), ok = b.textContent === right;
+      b.classList.add(ok ? 'ok' : 'bad'); $('stage').querySelectorAll('.opt').forEach(o => { if (o.textContent === right) o.classList.add('ok'); });
+      finish(ok, (ok ? 'Dobrze! ' : `To ${right}. `) + why);
+    }));
+  }
+  $('tip').textContent = 'Podpowiedź: policz, na ile części podzielono odcinek między podpisanymi liczbami.';
+}
+// ---- tryb: zaznacz ----
+function showPlace() {
+  const ax = makeAxis(), i = tickIdx(ax), val = valOf(ax, i);
+  $('q').innerHTML = `Kliknij na osi w miejscu liczby <span class="num">${fmt(val)}</span>`;
+  $('stage').innerHTML = axisSVG(ax, [], true);
+  const svg = $('stage').querySelector('svg');
+  svg.addEventListener('click', e => {
+    if (locked) return;
+    const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) * W / r.width;
+    const k = Math.max(0, Math.min(ax.n, Math.round((x - X0) / (X1 - X0) * ax.n))), ok = k === i;
+    const marks = ok ? [{ i, t: fmt(val), color: css('--good') }] : [{ i: k, t: fmt(valOf(ax, k)), color: css('--bad') }, { i, t: fmt(val), color: css('--good') }];
+    $('stage').innerHTML = axisSVG(ax, marks, false);
+    finish(ok, (ok ? 'Dokładnie tutaj! ' : `Kliknięto ${fmt(valOf(ax, k))}. `) + stepWhy(ax));
+  });
+  $('tip').textContent = 'Podpowiedź: najpierw ustal, ile wynosi jedna kreska.';
+}
+// ---- tryb: porównaj ----
+const FR = [[1,2],[1,4],[3,4],[1,5],[2,5],[3,5],[4,5],[1,8],[3,8],[7,20],[9,25],[3,10],[7,10]];
+function cmpPair() {
+  if (lvl === 3 && Math.random() < 0.7) {
+    const [a, b] = pick(FR), v = a / b, k = rnd(0, 2);
+    const other = k === 0 ? v : r4(v + pick([-1, 1]) * pick([0.01, 0.05, 0.001, 0.1]));
+    const dec = k === 0 ? fmtD(v, String(r4(v)).split('.')[1].length + rnd(0, 1)) : fmt(other);
+    const L = { html: frac(a, b), v }, R = { html: dec, v: other };
+    return Math.random() < .5 ? [L, R] : [R, L];
+  }
+  const d = lvl === 1 ? 1 : lvl === 2 ? 2 : 3, kind = rnd(0, 3);
+  let a = rnd(10, 99) / 10; if (lvl >= 2) a = rnd(100, 999) / 100; if (lvl === 3) a = rnd(1000, 9999) / 1000;
+  let b;
+  if (kind === 0) b = a;
+  else if (kind === 1) b = r4(a + pick([-1, 1]) * Math.pow(10, -d) * rnd(1, 4));
+  else if (kind === 2) b = r4(a + pick([-1, 1]) * rnd(1, 9) / 1000);
+  else b = r4(Math.floor(a * 10) / 10 + pick([0.09, 0.009, 0.1]));
+  if (b <= 0) b = a;
+  const da = String(r4(a)).split('.')[1]?.length || 0;
+  const A = { html: fmt(a), v: a }, B = { html: kind === 0 ? fmtD(b, da + rnd(1, 2)) : fmt(b), v: b };
+  return Math.random() < .5 ? [A, B] : [B, A];
+}
+function showCmp() {
+  const [A, B] = cmpPair(), right = A.v > B.v + 1e-12 ? '>' : A.v < B.v - 1e-12 ? '<' : '=';
+  $('q').textContent = 'Wstaw znak: >, < albo =';
+  $('stage').innerHTML = `<div class="cmp"><span class="n">${A.html}</span><span class="slot" id="slot">?</span><span class="n">${B.html}</span></div>
+    <div class="signs">${['<', '=', '>'].map(s => `<button class="big">${s}</button>`).join('')}</div>`;
+  $('stage').querySelectorAll('.big').forEach(btn => btn.addEventListener('click', () => {
+    if (locked) return; const ok = btn.textContent === right;
+    btn.classList.add(ok ? 'ok' : 'bad'); $('slot').textContent = right;
+    finish(ok, (ok ? 'Dobrze! ' : `Poprawnie: ${right}. `) + `${fmt(A.v)} ${right} ${fmt(B.v)}. Zamień ułamek zwykły na dziesiętny, dopisz zera i porównuj cyfry od lewej.`);
+  }));
+  $('tip').textContent = 'Podpowiedź: 1/4 = 25/100 = 0,25. Dopisz zera: 0,3 = 0,30.';
+}
+// ---- tryb: kolejność ----
+function orderSet() {
+  const d = lvl === 1 ? 1 : lvl === 2 ? 2 : 3;
+  const base = lvl === 1 ? rnd(1, 8) : rnd(1, 9) / 10 + rnd(0, 5);
+  const deltas = lvl === 1 ? [0, 0.1, 0.5, 1, 1.4, 0.3, 2] : lvl === 2 ? [0, 0.05, 0.1, 0.01, 0.15, 0.09, 1] : [0, 0.005, 0.05, 0.045, 0.1, 0.009, 0.0905, 0.01];
+  const set = new Set(); while (set.size < 5) set.add(r4(base + pick(deltas)));
+  return [...set];
+}
+function showOrder() {
+  const nums = orderSet(), sorted = [...nums].sort((a, b) => a - b); let pos = 0, err = false;
+  $('q').textContent = 'Klikaj liczby od najmniejszej do największej';
+  $('stage').innerHTML = `<div class="chips">${nums.sort(() => Math.random() - .5).map(v => `<button class="chip" data-v="${v}">${fmt(v)}</button>`).join('')}</div><div class="row" id="row"></div>`;
+  $('stage').querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    if (locked || c.classList.contains('done')) return;
+    if (+c.dataset.v === sorted[pos]) {
+      c.classList.remove('bad'); c.classList.add('done'); $('row').insertAdjacentHTML('beforeend', `<span>${pos ? '&lt; ' : ''}${c.textContent}</span>`); pos++;
+      if (pos === 5) finish(!err, err ? 'Ułożone, ale z pomyłką. Dopisz zera, żeby wszystkie liczby miały tyle samo cyfr po przecinku.' : 'Bezbłędnie!');
+    } else { err = true; c.classList.add('bad'); $('fb').textContent = `${c.textContent} nie jest teraz najmniejsza. Szukaj dalej!`; $('fb').className = 'fb wrong'; setTimeout(() => c.classList.remove('bad'), 700); }
+  }));
+  $('tip').textContent = 'Podpowiedź: porównuj najpierw całości, potem dziesiąte, potem setne.';
+}
+// ---- tryb: jednostki ----
+const UNIT = [
+  () => { const m = rnd(1, 9), c = rnd(1, 99); return [`${m} m ${c} cm = ? m`, m + c / 100, `1 cm = 0,01 m, więc ${c} cm = ${fmt(c / 100)} m.`]; },
+  () => { const k = rnd(1, 9), d = rnd(1, 99); return [`${k} kg ${d} dag = ? kg`, k + d / 100, `1 dag = 0,01 kg, więc ${d} dag = ${fmt(d / 100)} kg.`]; },
+  () => { const mm = rnd(11, 99); return [`${mm} mm = ? cm`, mm / 10, '1 mm = 0,1 cm.']; },
+  () => { const c = rnd(1, 9); return [`${c} cm = ? m`, c / 100, '1 cm = 0,01 m.']; },
+  () => { const k = rnd(1, 9), m = rnd(1, 999); return [`${k} km ${m} m = ? km`, k + m / 1000, `1 m = 0,001 km, więc ${m} m = ${fmt(m / 1000)} km.`]; },
+  () => { const g = rnd(1001, 9999); return [`${g} g = ? kg`, g / 1000, '1 kg = 1000 g, więc dzielimy przez 1000.']; },
+  () => { const t = rnd(1, 99) / 10; return [`${fmt(t)} t = ? kg`, Math.round(t * 1000), '1 t = 1000 kg, więc mnożymy przez 1000.']; },
+  () => { const k = rnd(1, 9), g = rnd(1, 99); return [`${k} kg ${g} g = ? kg`, k + g / 1000, `1 g = 0,001 kg, więc ${g} g = ${fmt(g / 1000)} kg (uwaga na zera!).`]; },
+  () => { const t = rnd(1, 9), kg = rnd(1, 999); return [`${t} t ${kg} kg = ? t`, t + kg / 1000, `1 kg = 0,001 t, więc ${kg} kg = ${fmt(kg / 1000)} t.`]; },
+  () => { const km = rnd(11, 99) / 10 + rnd(0, 9) / 100; return [`${fmt(km)} km = ? m`, Math.round(km * 1000), '1 km = 1000 m, więc mnożymy przez 1000.']; },
+];
+// ---- tryb: dodawanie ----
+const decs = v => (String(r4(v)).split('.')[1] || '').length;
+function column(nums, op, res) {
+  const D = Math.max(...[...nums, res].map(decs)), I = Math.max(...[...nums, res].map(v => String(Math.floor(r4(v))).length));
+  const row = (v, sign) => { const [a, b = ''] = r4(v).toFixed(D).split('.'); const ip = a.padStart(I, ' ');
+    return `<td>${sign}</td>` + [...ip].map(c => `<td>${c.trim()}</td>`).join('') + (D ? '<td>,</td>' + [...b].map(c => `<td>${c}</td>`).join('') : ''); };
+  return `<div class="colw"><table class="colt">${nums.map((v, k) => `<tr>${row(v, k ? op : '')}</tr>`).join('')}<tr class="res">${row(res, '')}</tr></table></div>`;
+}
+const SHOP = [['zeszyt', 4.59], ['długopis', 2.85], ['chleb', 3.49], ['mleko', 2.79], ['masło', 6.99], ['jabłka', 3.45], ['gruszki', 4.56], ['ser', 7.38], ['sok', 3.2], ['bułka', 0.65], ['czekolada', 4.9], ['jogurt', 1.75]];
+function showAdd() {
+  let nums, op, q;
+  if (lvl === 1) {
+    const a = rnd(1, 89) / 10, b = rnd(1, 49) / 10; op = pick(['+', '−']);
+    nums = op === '+' ? [a, b] : [Math.max(a, b), Math.min(a, b)];
+  } else if (lvl === 2) {
+    const gen = () => r4(rnd(1, 2000) / Math.pow(10, rnd(1, 3)));
+    let a = gen(), b = gen(); op = pick(['+', '−']); if (op === '−' && a < b) [a, b] = [b, a];
+    if (Math.random() < 0.25 && op === '−') a = rnd(2, 20);
+    nums = [a, b];
+  } else {
+    if (Math.random() < 0.5) {
+      const items = [...SHOP].sort(() => Math.random() - .5).slice(0, rnd(2, 3)), pay = pick([10, 20, 50]);
+      const sum = r4(items.reduce((s, x) => s + x[1], 0));
+      const p = pay > sum ? pay : 50;
+      q = `Kupujesz: ${items.map(x => `${x[0]} ${fmtD(x[1], 2)} zł`).join(', ')}. Płacisz ${p} zł. Ile reszty dostaniesz?`;
+      const ans = r4(p - sum);
+      $('q').innerHTML = q; $('stage').innerHTML = '';
+      typed(ans, `Najpierw suma: ${fmtD(sum, 2)} zł, potem ${p} − ${fmtD(sum, 2)} = ${fmtD(ans, 2)} zł.`, () => $('stage').insertAdjacentHTML('afterbegin', column(items.map(x => x[1]), '+', sum) + column([p, sum], '−', ans)));
+      $('tip').textContent = 'Podpowiedź: dodaj ceny w słupku, potem odejmij od kwoty, którą płacisz.';
+      return;
+    }
+    op = '+'; nums = [rnd(1, 300) / 10, rnd(1, 9999) / 1000, rnd(1, 999) / 100].map(r4);
+  }
+  const ans = r4(op === '+' ? nums.reduce((s, x) => s + x, 0) : nums[0] - nums[1]);
+  $('q').innerHTML = `<span class="num">${nums.map(fmt).join(` ${op} `)} = ?</span>`;
+  $('stage').innerHTML = '';
+  typed(ans, 'Przecinek pod przecinkiem, brakujące miejsca uzupełnij zerami.', () => $('stage').insertAdjacentHTML('afterbegin', column(nums, op, ans)));
+  $('tip').textContent = lvl === 1 ? 'Podpowiedź: licz w dziesiątych, np. 0,6 + 0,5 to 6 + 5 = 11 dziesiątych, czyli 1,1.' : 'Podpowiedź: zapisz w zeszycie w słupku, przecinek pod przecinkiem.';
+}
+
+function showUnits() {
+  const pool = lvl === 1 ? UNIT.slice(0, 4) : lvl === 2 ? UNIT.slice(0, 7) : UNIT.slice(4);
+  const [q, ans, why] = pick(pool)();
+  $('q').innerHTML = `<span class="num">${q}</span>`;
+  $('stage').innerHTML = '';
+  typed(r4(ans), why);
+  $('tip').textContent = 'Ściąga: 1 cm = 10 mm, 1 m = 100 cm, 1 km = 1000 m, 1 dag = 10 g, 1 kg = 100 dag = 1000 g, 1 t = 1000 kg.';
+}
+
+document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
+  mode = b.dataset.mode; document.querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed', x === b)); restart();
+}));
+document.querySelectorAll('[data-lvl]').forEach(b => b.addEventListener('click', () => {
+  lvl = +b.dataset.lvl; document.querySelectorAll('[data-lvl]').forEach(x => x.setAttribute('aria-pressed', x === b)); restart();
+}));
+$('next').addEventListener('click', () => { if (round >= 10) restart(); else { round++; round >= 10 ? end() : show(); } });
+restart();
+</script>
+
+</body></html>
