@@ -861,8 +861,25 @@ const pola = u => `<label>Klasa<input name="klasa" maxlength="10" placeholder="n
   <label>Nazwisko<input name="nazwisko" required maxlength="40" placeholder="np. Kowalska" value="${esc(u.nazwisko || "")}"></label>
   <label>Imię<input name="imie" required maxlength="40" placeholder="np. Anna" value="${esc(u.imie || "")}"></label>
   <label>Imię odojcowskie (по батькові)<input name="ojciec" maxlength="40" placeholder="np. Ołeksandriwna" value="${esc(u.ojciec || "")}"></label>
+  <label>Telegram<input name="telegram" maxlength="40" placeholder="@nick albo +48…" style="width:150px" value="${esc(u.telegram ? (/^\+/.test(u.telegram) ? u.telegram : "@" + u.telegram) : "")}"></label>
   <label>Przygotowanie do<select name="cel">${Object.entries({ ...mojeCele(), ...(u.cel && CELE[u.cel] ? { [u.cel]: CELE[u.cel] } : {}) }).map(([k, v]) => `<option value="${k}"${u.cel === k ? " selected" : ""}>${v}</option>`).join("")}</select></label>`;
-const daneZ = f => Object.fromEntries(["klasa", "nazwisko", "imie", "ojciec", "cel"].map(k => [k, String(f.get(k) || "").trim()]));
+const daneZ = f => ({ ...Object.fromEntries(["klasa", "nazwisko", "imie", "ojciec", "cel"].map(k => [k, String(f.get(k) || "").trim()])), telegram: tgNick(f.get("telegram")) });
+// Telegram учня: @нік, посилання t.me/нік або номер +48…; зберігаємо нік без @ або номер з +
+function tgNick(v) {
+  v = String(v || "").trim().replace(/^(https?:\/\/)?(www\.)?(t\.me|telegram\.me)\//i, "").replace(/^@/, "").replace(/[?#/].*$/, "");
+  if (/^\+?[\d\s()-]{7,20}$/.test(v)) return "+" + v.replace(/\D/g, "");
+  return /^[A-Za-z0-9_]{4,32}$/.test(v) ? v : "";
+}
+// ДЗ у Telegram: відкриваємо чат з учнем з готовим текстом (вчитель тисне «Надіслати»); текст ще й копіюємо, якщо Telegram його не підставить
+function tekstPracy(u, p) {
+  const n = p.typ === "arkusz" ? "" : ` (${(p.ids || []).length} завд.)`, co = p.typ === "arkusz" ? tytulPracy(p) : p.temat + n;
+  return `Привіт, ${u.imie}! 📚 Домашнє завдання: ${co}.\nТермін: ${new Date(p.termin + "T12:00").toLocaleDateString("uk-UA", { day: "numeric", month: "long" })}.\nРозв'язуй тут: ${new URL(linkPracy(p), location.href).href}`;
+}
+function wyslijTg(u, p) {
+  const t = tekstPracy(u, p);
+  navigator.clipboard?.writeText(t).catch(() => {});
+  window.open(`https://t.me/${u.telegram}?text=${encodeURIComponent(t)}`, "_blank", "noopener");
+}
 
 // запрошення: zaproszenia/{email} (хто запросив і яка картка) + лист із посиланням для входу (надсилає Firebase)
 async function zapros(u, email) {
@@ -1021,8 +1038,9 @@ function pracaHtml(u) {
     ${u.konto ? "" : `<span class="muted-s">Uczeń zobaczy pracę domową w swoim gabinecie po zalogowaniu z zaproszenia (sekcja «Konto ucznia» niżej). Zadania zrobione na lekcji też się liczą.</span>`}
     ${l.length ? `<div class="prace">${l.map(p => { const st = stanPracy(p, w);
       return `<div class="pd"><span class="pd-t"><b>${esc(tytulPracy(p))}</b><span class="muted-s">zadano ${esc(new Date(p.od).toLocaleDateString("pl-PL"))} · termin: ${esc(terminTxt(p.termin))}</span></span>
-        <span class="pd-r">${etykietaPracy(st)}<button type="button" class="link-del" data-pd-del="${esc(p.id)}">usuń</button></span>${wynikPracy(p, w)}</div>`; }).join("")}</div>`
+        <span class="pd-r">${etykietaPracy(st)}${u.telegram && !st.zrobione ? `<button type="button" class="btn-s" data-pd-tg="${esc(p.id)}" title="Otwórz czat z uczniem z gotową wiadomością">✈ Telegram</button>` : ""}<button type="button" class="link-del" data-pd-del="${esc(p.id)}">usuń</button></span>${wynikPracy(p, w)}</div>`; }).join("")}</div>`
       : `<span class="muted-s">Brak zadanej pracy. Wybierz temat albo arkusz i termin.</span>`}
+    ${u.telegram ? "" : `<span class="muted-s">Wpisz Telegram ucznia w «Dane ucznia», a przy każdej pracy pojawi się przycisk «✈ Telegram».</span>`}
     <form class="form-row" id="pd-form"><label>Co zadać<select name="co" required>
         ${dzialyDla(u.cel).filter(k => DZIALY[k].tematy.length).map(k => `<optgroup label="${k === "mp" ? "Matura" : "E8"} · temat (zadania, których uczeń jeszcze nie rozwiązał)">${DZIALY[k].tematy.map(t => `<option value="t:${k}:${esc(t.temat)}">${esc(zNr(t))}</option>`).join("")}</optgroup>`).join("")}
         ${dzialyDla(u.cel).includes("e8") ? `<optgroup label="Cały arkusz E8">${ARKUSZE.map(a => `<option value="a:${esc(a.slug)}">Arkusz ${esc(label(a))}</option>`).join("")}</optgroup>` : ""}</select></label>
@@ -1053,6 +1071,7 @@ function pracaZdarzenia(u) {
     try { await zapiszPrace(lista); u.prace = lista; render(); $("#pd")?.scrollIntoView({ block: "start" }); }
     catch (err) { b.disabled = false; alert("Nie udało się zapisać pracy domowej. Sprawdź, czy w Firebase są nowe reguły (blok «prace»). " + (err.code || "")); }
   };
+  $("#list").querySelectorAll("[data-pd-tg]").forEach(b => b.onclick = () => { const p = (u.prace || []).find(x => x.id === b.dataset.pdTg); if (p) wyslijTg(u, p); });
   $("#list").querySelectorAll("[data-pd-del]").forEach(b => b.onclick = async () => {
     if (!confirm("Usunąć tę pracę domową?")) return;
     const lista = (u.prace || []).filter(p => p.id !== b.dataset.pdDel);
