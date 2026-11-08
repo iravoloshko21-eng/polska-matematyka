@@ -432,6 +432,30 @@ const all = D.zadania;                       // закриті завдання 
 const byId = Object.fromEntries(all.map(t => [t.id, t]));
 const auth = { user: null, status: "out", fb: null };   // status: out | pending | approved | admin
 
+// Статистика занять для вчителя (Ірина, 2026-11-08): res["dzien:РРРР-ММ-ДД"] = { s: секунди роботи на сайті, z: відповіді на завдання,
+// ok: з них правильні, a: завершені аркуші й тести }. Лежить разом з результатами (postepy / картка учня на уроці), тож правила не міняються.
+// Рахуємо учня (і урок з ?uczen=), а не вчителя, який сам переглядає завдання.
+const dzienKlucz = () => "dzien:" + new Date().toLocaleDateString("sv-SE");
+const liczycAktywnosc = () => UCZEN ? ["admin", "teacher"].includes(auth.status) : !["admin", "teacher"].includes(auth.status);
+function aktywnosc(pole, n = 1) {
+  if (!liczycAktywnosc()) return;
+  const k = dzienKlucz(), d = res[k] && typeof res[k] === "object" ? res[k] : (res[k] = {});
+  d[pole] = (Number(d[pole]) || 0) + n;
+}
+const zrobione = good => { aktywnosc("z"); if (good) aktywnosc("ok"); };
+// час: поки вкладка відкрита і учень щось робив за останні 10 хв (задачу часто розв'язують у зошиті, тож поріг великий)
+(() => {
+  let ruch = Date.now(), last = Date.now(), bufor = 0;
+  const flush = () => { if (bufor >= 1 && liczycAktywnosc()) { aktywnosc("s", Math.round(bufor)); save(); } bufor = 0; };
+  ["pointerdown", "pointermove", "keydown", "scroll", "input", "touchstart"].forEach(e => addEventListener(e, () => { ruch = Date.now(); }, { passive: true, capture: true }));
+  setInterval(() => {
+    const now = Date.now(), dt = (now - last) / 1000; last = now;
+    if (!document.hidden && now - ruch < 10 * 60e3 && liczycAktywnosc()) bufor += Math.min(dt, 30);
+    if (bufor >= 60) flush();
+  }, 15000);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else last = Date.now(); });
+})();
+
 // Числова відповідь у відкритому завданні: приймаємо кому чи крапку, дріб через «/», мішаний дріб «1 1/2», пробіли в тисячах, одиниці.
 function czytajLiczbe(v) {
   let x = String(v ?? "").toLowerCase().replace(/[−–]/g, "-").replace(/[cdmk]?m\s*[23²³](?!\d)/g, " ").replace(/km\/h|[a-ząćęłńóśźż²³%]+\.?/g, " ").trim();
