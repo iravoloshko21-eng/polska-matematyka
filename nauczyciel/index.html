@@ -159,6 +159,45 @@ dialog::backdrop { background: rgba(38, 32, 28, .35) }
 .muted-s { color: var(--muted); font-size: 13px; font-weight: 400 }
 .pr .st .btn-s { padding: 3px 12px; font-size: 12.5px }
 .pts.ok { color: var(--ok) } .pts.bad { color: var(--bad) } .pts.part { color: #8a5a12 }
+</style>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+<header class="site"><div class="in"><a class="logo" href="../">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../matura/">Matura</a><a href="../arkusze/">Arkusze</a><a href="../trenazery/">Trenażery</a><a href="../materialy/">Materiały</a><a href="../konto/">Mój gabinet</a><a href="../o-mnie/">O mnie</a></nav><div class="authbar" id="authbar"></div></div></header><nav class="tabbar" aria-label="Menu"><a href=".././"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Start</span></a><a href="../e8/"><b>8</b><span>E8</span></a><a href="../matura/"><b>√</b><span>Matura</span></a><a href="../trenazery/"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg><span>Trenażery</span></a><a href="../konto/"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Gabinet</span></a></nav>
+
+<header class="top"><div class="wrap">
+  <span class="pill">Gabinet nauczyciela</span>
+  <h1 id="n-title">Moi uczniowie</h1>
+  <p style="margin:0;max-width:62ch" id="n-lead">Karta każdego ucznia: lekcje z zadaniami, postęp po tematach, wyniki egzaminów próbnych i notatki.</p>
+  <div class="tiles" id="tiles"></div>
+</div></header>
+
+<div class="wrap" id="notice-wrap" style="padding-top:6px"></div>
+<main class="wrap" id="list"></main>
+
+<style>
+/* «Aktywność ucznia» (2026-11-08): підсумки, календар 5 тижнів, список днів */
+.akt-pods { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 10px; margin: 4px 0 }
+.akt-p { display: grid; gap: 2px; background: var(--blue-soft, #e9ebfd); border-radius: 14px; padding: 12px 14px; font-size: 14px }
+.akt-p b { font-family: var(--display); font-size: 22px; color: var(--ink) }
+.akt-kal-w { display: grid; grid-template-columns: max-content; gap: 6px; margin: 6px 0 }
+.akt-dni, .akt-kal { display: grid; grid-template-columns: repeat(7, 30px); gap: 5px }
+.akt-dni span { font-size: 11.5px; color: var(--muted); text-align: center }
+.akt-kal i, .akt-leg i { display: block; width: 30px; height: 30px; border-radius: 7px; background: var(--line, #e4ded3) }
+.akt-kal i.dzis { outline: 2px solid var(--ink); outline-offset: 1px }
+.akt-kal i.l1, .akt-leg i.l1 { background: color-mix(in srgb, var(--blue) 35%, #fff) }
+.akt-kal i.l2, .akt-leg i.l2 { background: color-mix(in srgb, var(--blue) 65%, #fff) }
+.akt-kal i.l3, .akt-leg i.l3 { background: var(--blue) }
+.akt-leg { display: flex; align-items: center; gap: 4px; flex-wrap: wrap }
+.akt-leg i { width: 14px; height: 14px; border-radius: 4px; display: inline-block }
+.akt-scroll { overflow-x: auto; max-width: 100%; min-width: 0 }
+.akt-t .tag { font-size: 12px; font-weight: 700; background: var(--blue-soft, #e9ebfd); color: var(--blue); border-radius: 999px; padding: 2px 9px; white-space: nowrap }
+.akt-t td:first-child { white-space: nowrap }
+/* довгі назви тем/аркушів у «Co zadać» розтягували сторінку на телефоні */
+#list .summary, #list .form-row label { grid-template-columns: minmax(0, 1fr) }
+#list .form-row label { max-width: 100%; min-width: 0 }
+#list .form-row select { max-width: 100% }
 
 /* Motyw «Wołoszko/Math» (обрала Ірина 2026-10-31): широкий гротеск Unbounded, чорні рамки, кольорові блоки, жорсткі тіні.
    build.py дописує цей файл у кінець стилів кожної сторінки, тож він перекриває старі значення. */
@@ -366,21 +405,6 @@ header.site { view-transition-name: menu; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 </style>
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-</head>
-<body>
-<header class="site"><div class="in"><a class="logo" href="../">VOLOSHKO<span>/</span>MATH</a><nav class="pills" aria-label="Strona"><a href=".././">Start</a><a href="../e8/">Egzamin ósmoklasisty</a><a href="../matura/">Matura</a><a href="../arkusze/">Arkusze</a><a href="../trenazery/">Trenażery</a><a href="../materialy/">Materiały</a><a href="../konto/">Mój gabinet</a><a href="../o-mnie/">O mnie</a></nav><div class="authbar" id="authbar"></div></div></header><nav class="tabbar" aria-label="Menu"><a href=".././"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Start</span></a><a href="../e8/"><b>8</b><span>E8</span></a><a href="../matura/"><b>√</b><span>Matura</span></a><a href="../trenazery/"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg><span>Trenażery</span></a><a href="../konto/"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Gabinet</span></a></nav>
-
-<header class="top"><div class="wrap">
-  <span class="pill">Gabinet nauczyciela</span>
-  <h1 id="n-title">Moi uczniowie</h1>
-  <p style="margin:0;max-width:62ch" id="n-lead">Karta każdego ucznia: lekcje z zadaniami, postęp po tematach, wyniki egzaminów próbnych i notatki.</p>
-  <div class="tiles" id="tiles"></div>
-</div></header>
-
-<div class="wrap" id="notice-wrap" style="padding-top:6px"></div>
-<main class="wrap" id="list"></main>
 
 
 <dialog id="dlg"><form class="dlg" id="auth-form" method="dialog">
@@ -422,6 +446,30 @@ const save = () => { if (!UCZEN) try { localStorage.setItem(STORE, JSON.stringif
 const all = D.zadania;                       // закриті завдання тут без змісту, поки не прийдуть з бази
 const byId = Object.fromEntries(all.map(t => [t.id, t]));
 const auth = { user: null, status: "out", fb: null };   // status: out | pending | approved | admin
+
+// Статистика занять для вчителя (Ірина, 2026-11-08): res["dzien:РРРР-ММ-ДД"] = { s: секунди роботи на сайті, z: відповіді на завдання,
+// ok: з них правильні, a: завершені аркуші й тести }. Лежить разом з результатами (postepy / картка учня на уроці), тож правила не міняються.
+// Рахуємо учня (і урок з ?uczen=), а не вчителя, який сам переглядає завдання.
+const dzienKlucz = () => "dzien:" + new Date().toLocaleDateString("sv-SE");
+const liczycAktywnosc = () => UCZEN ? ["admin", "teacher"].includes(auth.status) : !["admin", "teacher"].includes(auth.status);
+function aktywnosc(pole, n = 1) {
+  if (!liczycAktywnosc()) return;
+  const k = dzienKlucz(), d = res[k] && typeof res[k] === "object" ? res[k] : (res[k] = {});
+  d[pole] = (Number(d[pole]) || 0) + n;
+}
+const zrobione = good => { aktywnosc("z"); if (good) aktywnosc("ok"); };
+// час: поки вкладка відкрита і учень щось робив за останні 10 хв (задачу часто розв'язують у зошиті, тож поріг великий)
+(() => {
+  let ruch = Date.now(), last = Date.now(), bufor = 0;
+  const flush = () => { if (bufor >= 1 && liczycAktywnosc()) { aktywnosc("s", Math.round(bufor)); save(); } bufor = 0; };
+  ["pointerdown", "pointermove", "keydown", "scroll", "input", "touchstart"].forEach(e => addEventListener(e, () => { ruch = Date.now(); }, { passive: true, capture: true }));
+  setInterval(() => {
+    const now = Date.now(), dt = (now - last) / 1000; last = now;
+    if (!document.hidden && now - ruch < 10 * 60e3 && liczycAktywnosc()) bufor += Math.min(dt, 30);
+    if (bufor >= 60) flush();
+  }, 15000);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else last = Date.now(); });
+})();
 
 // Числова відповідь у відкритому завданні: приймаємо кому чи крапку, дріб через «/», мішаний дріб «1 1/2», пробіли в тисячах, одиниці.
 function czytajLiczbe(v) {
@@ -824,6 +872,30 @@ const inicjaly = u => (u.nazwisko ? u.nazwisko[0] + (u.imie || "")[0] : (u.imie 
 const porzadek = (a, b) => (a.klasa || "").localeCompare(b.klasa || "", "pl", { numeric: true }) || nazwa(a).localeCompare(nazwa(b), "pl");
 const arkLiczba = u => new Set(Object.keys(wszystkie(u)).filter(k => k.startsWith("arkusz:"))).size;
 let KLASA = "";                  // фільтр класу у списку
+let WSZYSTKIE_DNI = false;       // «Aktywność ucznia»: показати всі дні, а не лише 10 останніх
+// статистика занять (wspolne.js aktywnosc): wyniki["dzien:РРРР-ММ-ДД"] = { s, z, ok, a }. Дані з акаунта учня — лише числа й дата за шаблоном.
+const POLA_DNIA = ["s", "z", "ok", "a"];
+function dniZ(w, cel = {}) {
+  Object.entries(w || {}).forEach(([k, v]) => {
+    const d = k.slice(6); if (!k.startsWith("dzien:") || !/^\d{4}-\d{2}-\d{2}$/.test(d) || !v || typeof v !== "object") return;
+    const x = cel[d] ||= { s: 0, z: 0, ok: 0, a: 0 };
+    POLA_DNIA.forEach(p => { const n = Number(v[p]); if (Number.isFinite(n) && n > 0) x[p] += Math.min(n, p === "s" ? 86400 : 5000); });
+  });
+  return cel;
+}
+// усі дні учня: з уроків (картка) + самостійно (сума з усіх його пристроїв, u.dniW)
+function dniUcznia(u) {
+  const lek = dniZ(u.wyniki), sam = u.dniW || {};
+  return [...new Set([...Object.keys(lek), ...Object.keys(sam)])].sort().reverse().map(d => {
+    const l = lek[d], m = sam[d], x = { d, lek: l, sam: m };
+    POLA_DNIA.forEach(p => x[p] = (l?.[p] || 0) + (m?.[p] || 0));
+    return x;
+  });
+}
+const czas = s => { const m = Math.round(s / 60); return !s ? "—" : m < 1 ? "< 1 min" : m < 60 ? m + " min" : Math.floor(m / 60) + " h" + (m % 60 ? " " + (m % 60) + " min" : ""); };
+const dataPL = d => new Date(d + "T12:00").toLocaleDateString("pl-PL", { weekday: "short", day: "numeric", month: "short" });
+const dniTemu = d => { const n = Math.round((new Date(new Date().toLocaleDateString("sv-SE") + "T12:00") - new Date(d + "T12:00")) / 864e5);
+  return n <= 0 ? "dziś" : n === 1 ? "wczoraj" : n + " dni temu"; };
 const statsU = u => { const w = Object.entries(wszystkie(u)).filter(([k]) => !k.includes(":")).map(([, v]) => v); return { done: w.length, ok: w.filter(v => v === "ok").length }; };
 
 async function wczytaj() {
@@ -839,7 +911,9 @@ async function wczytaj() {
     const u = UCZNIOWIE.find(x => x.id === d.data().karta); if (!u) return;
     u.konto = d.id;
     // учень за посиланням може зайти з кількох пристроїв (кожен — окремий акаунт): зливаємо всі результати
-    u.wlasne = { ...(u.wlasne || {}), ...await fs.getDoc(fs.doc(db, "postepy", d.id)).then(p => p.exists() ? p.data().wyniki || {} : {}, () => ({})) };
+    const w = await fs.getDoc(fs.doc(db, "postepy", d.id)).then(p => p.exists() ? p.data().wyniki || {} : {}, () => ({}));
+    u.wlasne = { ...(u.wlasne || {}), ...w };
+    u.dniW = dniZ(w, u.dniW);   // дні занять з різних пристроїв додаємо, а не перезаписуємо
   }));
   // praca domowa (prace/{id картки}): усі мої, щоб у плитках було видно, хто не зробив
   const prace = await fs.getDocs(auth.status === "admin" ? fs.collection(db, "prace") : fs.query(fs.collection(db, "prace"), fs.where("owner", "==", uid))).then(s => s.docs, () => []);
@@ -867,6 +941,7 @@ function render() {
 addEventListener("hashchange", () => plynnie(render));
 
 function lista() {
+  WSZYSTKIE_DNI = false;
   $("#n-title").textContent = "Moi uczniowie";
   if (auth.status === "teacher") $("#n-lead").textContent = `Dostęp nauczyciela do ${auth.nauczycielDo.toLocaleDateString("pl-PL")}. Kliknij ucznia, aby otworzyć jego gabinet: wyniki, arkusze i postęp po tematach.`;
   else $("#n-lead").textContent = "Kliknij ucznia, aby otworzyć jego gabinet: wyniki, arkusze i postęp po tematach.";
@@ -883,6 +958,7 @@ function lista() {
         <span class="u-wynik"><b>${x.done ? p + "%" : "—"}</b><span>${x.done} zadań · ${ark} ${ark === 1 ? "arkusz" : ark > 1 && ark < 5 ? "arkusze" : "arkuszy"}</span></span>
         <span class="bar">${x.done ? `<i class="ok" style="width:${p}%"></i><i class="bad" style="width:${100 - p}%"></i>` : ""}</span>
         ${pdInfo(u)}
+        ${(d => d ? `<span class="muted-s">Ostatnio ćwiczył(a): <b>${dniTemu(d.d)}</b> · ${czas(d.s)}</span>` : "")(dniUcznia(u)[0])}
         ${u.email || u.link || u.konto ? `<span class="muted-s">${u.konto ? "✓ konto ucznia połączone" : u.email ? "✉ zaproszenie wysłane" : "🔗 link utworzony"}</span>` : ""}</a>`; }).join("") || `<p class="muted-s">Nie masz jeszcze uczniów. Dodaj pierwszego poniżej.</p>`}</div>
     <section class="summary"><b style="font-family:var(--display);font-size:20px">Dodaj ucznia</b>
       <form class="form-row" id="nowy">${pola({})}
@@ -1081,6 +1157,7 @@ function karta(u) {
         <span><b class="p">${t.p}%</b> <span class="muted-s">poprawnie z ${t.n} zadań</span></span>
         <div class="akcje"><button type="button" class="btn-s primary" data-zadaj="${esc(t.k + ":" + t.temat)}">Zadaj z tego tematu</button><a class="btn-s" href="${DZIALY[t.k].url}${q}#temat=${encodeURIComponent(t.temat)}">Ćwicz na lekcji</a></div></div>`).join("")}</div>`
         : `<span class="muted-s">Słabe tematy pojawią się, gdy uczeń rozwiąże co najmniej 3 zadania z jednego tematu.</span>`}</section>
+    ${aktywnoscHtml(u)}
     ${pracaHtml(u)}
     <section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Postęp po tematach</b>
       ${tematyHtml(u, q)}</section>
@@ -1107,6 +1184,7 @@ function karta(u) {
       <textarea class="notatki" id="notatki" placeholder="Co omówiliśmy, co zadać, na co uważać…">${esc(u.notatki || "")}</textarea><span class="muted-s" id="n-stan"></span></section>
     <p style="margin-top:22px;display:flex;gap:18px;flex-wrap:wrap"><button type="button" class="link-del" id="zeruj">Wyzeruj wyniki</button><button type="button" class="link-del" id="usun">Usuń ucznia</button></p>`;
   pracaZdarzenia(u); linkZdarzenia(u);
+  $("#akt-wiecej")?.addEventListener("click", () => { WSZYSTKIE_DNI = true; render(); });
   $("#dane").onsubmit = async e => {
     e.preventDefault();
     const dane = daneZ(new FormData(e.target)); if (!dane.imie || !dane.nazwisko) return;
@@ -1138,8 +1216,10 @@ function karta(u) {
   // обнулити результати з уроків (Ірина, 2026-11-05): завдання, аркуші й статус домашнього рахуються з wyniki;
   // пробні іспити, нотатки, домашні завдання й власні результати учня з його акаунта лишаються
   $("#zeruj").onclick = async () => {
-    if (!confirm(`Wyzerować wyniki ucznia ${nazwa(u)}?\n\nZostaną usunięte wszystkie odpowiedzi z lekcji: zadania, arkusze i wyniki prac domowych. Egzaminy próbne, notatki i zadane prace zostają.\n\nTego nie da się cofnąć.`)) return;
-    try { await auth.fs.updateDoc(auth.fs.doc(auth.db, "uczniowie", u.id), { wyniki: {}, updated: auth.fs.serverTimestamp() }); u.wyniki = {}; render(); }
+    if (!confirm(`Wyzerować wyniki ucznia ${nazwa(u)}?\n\nZostaną usunięte wszystkie odpowiedzi z lekcji: zadania, arkusze i wyniki prac domowych. Egzaminy próbne, notatki, zadane prace i statystyka dni nauki zostają.\n\nTego nie da się cofnąć.`)) return;
+    // статистику занять (дні, час) лишаємо: це історія уроків, а не результати
+    const zost = Object.fromEntries(Object.entries(u.wyniki || {}).filter(([k]) => k.startsWith("dzien:")));
+    try { await auth.fs.updateDoc(auth.fs.doc(auth.db, "uczniowie", u.id), { wyniki: zost, updated: auth.fs.serverTimestamp() }); u.wyniki = zost; render(); }
     catch (e) { alert("Nie udało się wyzerować wyników. " + (e.code || "")); }
   };
   $("#usun").onclick = async () => {
@@ -1149,6 +1229,29 @@ function karta(u) {
     if (u.link) await auth.fs.deleteDoc(auth.fs.doc(auth.db, "linki", u.link)).catch(e => console.warn(e));
     UCZNIOWIE = UCZNIOWIE.filter(x => x !== u); location.hash = "";
   };
+}
+
+// «Aktywność» (Ірина, 2026-11-08): коли учень займався, скільки часу і скільки завдань — підсумки 7/30 днів, календар 5 тижнів, список днів
+function aktywnoscHtml(u) {
+  const dni = dniUcznia(u), h = `<section class="summary" style="margin-top:22px"><b style="font-family:var(--display);font-size:20px">Aktywność ucznia</b>`;
+  if (!dni.length) return h + `<span class="muted-s">Tu zobaczysz, kiedy uczeń ćwiczył, ile czasu i ile zadań zrobił — na lekcji i samodzielnie na swoim koncie. Statystyka liczy się od 8.11.2026.</span></section>`;
+  const dzis = new Date(new Date().toLocaleDateString("sv-SE") + "T12:00"), dzien = n => new Date(dzis - n * 864e5).toLocaleDateString("sv-SE");
+  const okres = n => { const od = dzien(n - 1), l = dni.filter(x => x.d >= od); return { dni: l.length, s: l.reduce((a, x) => a + x.s, 0), z: l.reduce((a, x) => a + x.z, 0), ok: l.reduce((a, x) => a + x.ok, 0) }; };
+  const podsum = (tyt, o) => `<div class="akt-p"><span class="muted-s">${tyt}</span><b>${o.dni} ${o.dni === 1 ? "dzień" : "dni"}</b><span>${czas(o.s)} · ${o.z} zadań${o.z ? ` (${pc(o.ok, o.z)}% popr.)` : ""}</span></div>`;
+  // календар: 5 тижнів, рядки — тижні від понеділка
+  const mapa = Object.fromEntries(dni.map(x => [x.d, x])), pon = (dzis.getDay() + 6) % 7, start = 28 + pon;
+  const kal = Array.from({ length: start + 1 }, (_, i) => { const d = dzien(start - i), x = mapa[d], m = x ? x.s / 60 : 0;
+    const c = !x ? "" : m >= 45 ? "l3" : m >= 15 ? "l2" : "l1";
+    return `<i class="${c}${d === dzien(0) ? " dzis" : ""}" title="${dataPL(d)}${x ? `: ${czas(x.s)}, ${x.z} zadań` : ": brak"}"></i>`; }).join("");
+  const pokaz = WSZYSTKIE_DNI ? dni : dni.slice(0, 10);
+  return h + `<div class="akt-pods">${podsum("Ostatnie 7 dni", okres(7))}${podsum("Ostatnie 30 dni", okres(30))}${podsum("Razem", { dni: dni.length, s: dni.reduce((a, x) => a + x.s, 0), z: dni.reduce((a, x) => a + x.z, 0), ok: dni.reduce((a, x) => a + x.ok, 0) })}</div>
+    <div class="akt-kal-w"><div class="akt-dni">${["pn", "wt", "śr", "cz", "pt", "sb", "nd"].map(x => `<span>${x}</span>`).join("")}</div><div class="akt-kal">${kal}</div>
+      <span class="muted-s akt-leg">mniej <i></i><i class="l1"></i><i class="l2"></i><i class="l3"></i> więcej (do 15 min, do 45 min, 45+ min)</span></div>
+    <div class="akt-scroll"><table class="proby akt-t"><thead><tr><th>Dzień</th><th>Czas</th><th>Zadania</th><th>Poprawnie</th><th>Arkusze</th><th>Gdzie</th></tr></thead><tbody>${pokaz.map(x => `<tr>
+      <td>${esc(dataPL(x.d))}</td><td class="num"><b>${czas(x.s)}</b></td><td class="num">${x.z}</td><td class="num">${x.z ? pc(x.ok, x.z) + "%" : "—"}</td><td class="num">${x.a || "—"}</td>
+      <td>${[x.lek && "na lekcji", x.sam && "samodzielnie"].filter(Boolean).map(t => `<span class="tag">${t}</span>`).join(" ")}</td></tr>`).join("")}</tbody></table></div>
+    ${dni.length > pokaz.length ? `<p style="margin:0"><button type="button" class="btn-s" id="akt-wiecej">Pokaż wszystkie dni (${dni.length})</button></p>` : ""}
+    <span class="muted-s">Czas liczy się, gdy strona z zadaniami jest otwarta i uczeń z niej korzysta (przerwa ponad 10 minut nie wlicza się). Zadania = udzielone odpowiedzi, także ponowne.</span></section>`;
 }
 
 // результат домашнього для вчителя (Ірина, 2026-11-04): кожне завдання ✓/✗ квадратиком, разом правильно і %
